@@ -1,16 +1,20 @@
-import express from 'express';
+import ingress from './ingress';
 
-const app = express();
+const app = ingress;
 
-app.post('/event', (req, res) => {
-  console.log('hi :)');
-
-  res.status(200);
-  return res.send();
+const func1 = app.createFunction({
+  id: 'first-function',
+  event: 'first-event',
+  fn: () => {
+    console.log('Hello world');
+  },
+});
+const func2 = app.createFunction({
+  id: 'first-function',
+  event: 'first-event',
+  fn: () => {
+    console.log('Hi :)');
+  },
 });
 
-const PORT = 3000;
-
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
-});
+app.listen(3000);

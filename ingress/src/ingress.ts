@@ -13,11 +13,16 @@ interface FunctionData {
   fn: EventFunction;
 }
 
-const app = express();
+export const app = express();
 app.use(express.json());
 let functions: FunctionData[] = [];
 
-app.post('/event', (req: Request<{}, {}, Event>, res) => {
+app.post('/events', (req: Request<{}, {}, Event>, res) => {
+  if (!req.body.event) {
+    res.status(400);
+    return res.send({ error: 'Event ID was not included in request body' });
+  }
+
   const funcsToExecute = functions.filter(
     (func) => func.event === req.body.event
   );

@@ -1,7 +1,7 @@
 import express, { Request } from 'express';
 import { Event, FunctionsByEvent, RpcRequest } from './types/types';
 import dotenv from 'dotenv';
-import { isValidFunctionsByEvent } from 'utils/utils';
+import { isValidFunctionsByEvent } from './utils/utils';
 dotenv.config();
 
 export const app = express();

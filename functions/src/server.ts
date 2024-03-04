@@ -1,6 +1,8 @@
 import express from 'express';
 import callsRoute from './routes/calls';
 import functions from './services/fn';
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const app = express();
 
@@ -10,11 +12,8 @@ app.all('*', (_, res) => {
   return res.status(404).send();
 });
 
-const INGRESS_URL = 'http://localhost:3000';
-const PORT = 3002;
-
 const serve = () => {
-  fetch(`${INGRESS_URL}/functions`, {
+  fetch(`${process.env.INGRESS_URL}/functions`, {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
@@ -22,8 +21,8 @@ const serve = () => {
     body: JSON.stringify(functions.getAllFunctions()),
   });
 
-  app.listen(PORT, () => {
-    console.log(`Listening on port ${PORT}`);
+  app.listen(process.env.PORT, () => {
+    console.log(`Listening on port ${process.env.PORT}`);
   });
 };
 

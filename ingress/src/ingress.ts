@@ -1,10 +1,12 @@
 import express, { Request } from 'express';
 import { Event, FunctionsByEvent, RpcRequest } from './types/types';
-
-const FUNCTIONS_URL = 'http://localhost:3002';
+import dotenv from 'dotenv';
+import { isValidFunctionsByEvent } from 'utils/utils';
+dotenv.config();
 
 export const app = express();
 app.use(express.json());
+
 let functions: FunctionsByEvent = {};
 
 app.post('/events', (req: Request<{}, {}, Event>, res) => {
@@ -14,7 +16,7 @@ app.post('/events', (req: Request<{}, {}, Event>, res) => {
   }
 
   functions[req.body.name]?.forEach((funcId) => {
-    fetch(`${FUNCTIONS_URL}/calls`, {
+    fetch(`${process.env.FUNCTIONS_URL}/calls`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -31,7 +33,13 @@ app.post('/events', (req: Request<{}, {}, Event>, res) => {
   return res.send();
 });
 
-app.post('/functions', (req: Request<{}, {}, FunctionsByEvent>, res) => {
+app.post('/functions', (req, res) => {
+  if (!isValidFunctionsByEvent(req.body)) {
+    return res.status(400).json({
+      error: 'Invalid syntax',
+    });
+  }
+
   functions = req.body;
 
   res.status(200);

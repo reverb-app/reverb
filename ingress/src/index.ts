@@ -1,9 +1,9 @@
 import ingress from './ingress';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = ingress;
 
-const PORT = 3000;
-
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Listening on port ${process.env.PORT}`);
 });

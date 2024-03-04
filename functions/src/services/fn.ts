@@ -10,4 +10,14 @@ const getFunction = (method: string) => {
   return functions.find((fn) => fn.id === method);
 };
 
-export default { createFunction, getFunction };
+const getAllFunctions = () => {
+  const result: { [event: string]: string[] } = {};
+  functions.forEach((func) => {
+    if (!result[func.event]) result[func.event] = [];
+    result[func.event].push(func.id);
+  });
+
+  return result;
+};
+
+export default { createFunction, getFunction, getAllFunctions };

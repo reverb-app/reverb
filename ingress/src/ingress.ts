@@ -1,21 +1,11 @@
 import express, { Request } from 'express';
+import { Event, FunctionsByEvent, RpcRequest } from './types/types';
 
-interface Event {
-  name: String;
-  payload?: Object;
-}
-
-type EventFunction = (event: Event) => Promise<void>;
-
-interface FunctionData {
-  id: string;
-  event: string;
-  fn: EventFunction;
-}
+const FUNCTIONS_URL = 'http://localhost:3002';
 
 export const app = express();
 app.use(express.json());
-let functions: FunctionData[] = [];
+let functions: FunctionsByEvent = {};
 
 app.post('/events', (req: Request<{}, {}, Event>, res) => {
   if (!req.body.name) {
@@ -23,25 +13,29 @@ app.post('/events', (req: Request<{}, {}, Event>, res) => {
     return res.send({ error: 'Event ID was not included in request body' });
   }
 
-  const funcsToExecute = functions.filter(
-    (func) => func.event === req.body.name
-  );
-  funcsToExecute.forEach((data) => {
-    data.fn(req.body);
+  functions[req.body.name]?.forEach((funcId) => {
+    fetch(`${FUNCTIONS_URL}/calls`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: funcId,
+        params: { event: req.body },
+      }),
+    });
   });
 
   res.status(200);
   return res.send();
 });
 
-export default {
-  listen(port: number) {
-    app.listen(port, () => {
-      console.log(`Listening on port ${port}`);
-    });
-  },
+app.post('/functions', (req: Request<{}, {}, FunctionsByEvent>, res) => {
+  functions = req.body;
 
-  createFunction(data: FunctionData) {
-    functions.push(data);
-  },
-};
+  res.status(200);
+  return res.send();
+});
+
+export default app;

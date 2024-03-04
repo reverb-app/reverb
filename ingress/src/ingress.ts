@@ -1,8 +1,8 @@
 import express, { Request } from 'express';
 
 interface Event {
-  event: String;
-  payload: Object | undefined;
+  name: String;
+  payload?: Object;
 }
 
 type EventFunction = (event: Event) => Promise<void>;
@@ -18,13 +18,13 @@ app.use(express.json());
 let functions: FunctionData[] = [];
 
 app.post('/events', (req: Request<{}, {}, Event>, res) => {
-  if (!req.body.event) {
+  if (!req.body.name) {
     res.status(400);
     return res.send({ error: 'Event ID was not included in request body' });
   }
 
   const funcsToExecute = functions.filter(
-    (func) => func.event === req.body.event
+    (func) => func.event === req.body.name
   );
   funcsToExecute.forEach((data) => {
     data.fn(req.body);

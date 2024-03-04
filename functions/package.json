@@ -1,5 +1,5 @@
 {
-  "name": "ingress-functions",
+  "name": "function-server",
   "version": "0.0.0",
   "description": "",
   "main": "./src/index.ts",

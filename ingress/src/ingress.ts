@@ -1,47 +1,49 @@
 import express, { Request } from 'express';
-
-interface Event {
-  event: String;
-  payload: Object | undefined;
-}
-
-type EventFunction = (event: Event) => Promise<void>;
-
-interface FunctionData {
-  id: string;
-  event: string;
-  fn: EventFunction;
-}
+import { Event, FunctionsByEvent, RpcRequest } from './types/types';
+import dotenv from 'dotenv';
+import { isValidFunctionsByEvent } from './utils/utils';
+dotenv.config();
 
 export const app = express();
 app.use(express.json());
-let functions: FunctionData[] = [];
+
+let functions: FunctionsByEvent = {};
 
 app.post('/events', (req: Request<{}, {}, Event>, res) => {
-  if (!req.body.event) {
+  if (!req.body.name) {
     res.status(400);
     return res.send({ error: 'Event ID was not included in request body' });
   }
 
-  const funcsToExecute = functions.filter(
-    (func) => func.event === req.body.event
-  );
-  funcsToExecute.forEach((data) => {
-    data.fn(req.body);
+  functions[req.body.name]?.forEach((funcId) => {
+    fetch(`${process.env.FUNCTIONS_URL}/calls`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        method: funcId,
+        params: { event: req.body },
+      }),
+    });
   });
 
   res.status(200);
   return res.send();
 });
 
-export default {
-  listen(port: number) {
-    app.listen(port, () => {
-      console.log(`Listening on port ${port}`);
+app.post('/functions', (req, res) => {
+  if (!isValidFunctionsByEvent(req.body)) {
+    return res.status(400).json({
+      error: 'Invalid syntax',
     });
-  },
+  }
 
-  createFunction(data: FunctionData) {
-    functions.push(data);
-  },
-};
+  functions = req.body;
+
+  res.status(200);
+  return res.send();
+});
+
+export default app;

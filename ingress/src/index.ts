@@ -1,27 +1,9 @@
 import ingress from './ingress';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = ingress;
 
-const func1 = app.createFunction({
-  id: 'first-function',
-  event: 'event1',
-  fn: async () => {
-    console.log('Hello world');
-  },
+app.listen(process.env.PORT, () => {
+  console.log(`Listening on port ${process.env.PORT}`);
 });
-const func2 = app.createFunction({
-  id: 'second-function',
-  event: 'event1',
-  fn: async () => {
-    console.log('Hi :)');
-  },
-});
-const func3 = app.createFunction({
-  id: 'third-function',
-  event: 'event2',
-  fn: async () => {
-    console.log('Hey, Vinnie!');
-  },
-});
-
-app.listen(3000);

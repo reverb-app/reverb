@@ -10,9 +10,10 @@ const pool = new Pool({
 export const addEvent = async (event: Event): Promise<void> => {
   const client = await pool.connect();
   try {
-    await client.query(`SELECT graphile_worker.add_job('process_event', $1);`, [
-      event,
-    ]);
+    await client.query(
+      `SELECT graphile_worker.add_job('process_event', $1,'event_processing_queue');`,
+      [event]
+    );
   } finally {
     client.release();
   }

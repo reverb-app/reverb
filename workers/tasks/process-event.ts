@@ -24,19 +24,9 @@ const process_event: Task = async function (event, helpers) {
         [event.name]
       )
     ).rows.map(obj => obj.name);
-    console.log(names);
+
     names.forEach(funcId => {
-      fetch(functionServerUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          method: funcId,
-          params: { event },
-        }),
-      });
+      helpers.addJob("process_job", { name: funcId, event });
     });
   } finally {
     client.release();

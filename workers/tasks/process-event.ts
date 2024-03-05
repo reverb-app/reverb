@@ -1,24 +1,14 @@
 import { Task } from "graphile-worker";
 import { Pool } from "pg";
+import { isValidEvent } from "../utils/utils";
 
 const pool = new Pool({
-  host: "localhost",
-  port: 5432,
-  database: "event_functions",
+  host: process.env.FUNCTION_DATABASE_HOST,
+  port: Number(process.env.FUNCTION_DATABASE_PORT),
+  database: process.env.FUNCTION_DATABASE_NAME,
 });
-interface Event {
-  name: string;
-  payload?: unknown;
-}
 
-const isValidEvent = (event: unknown): event is Event => {
-  return (
-    !!event &&
-    typeof event === "object" &&
-    "name" in event &&
-    typeof event.name === "string"
-  );
-};
+const functionServerUrl: string = process.env.FUNCTION_SERVER_URL ?? "";
 
 const process_event: Task = async function (event, helpers) {
   const client = await pool.connect();
@@ -36,7 +26,7 @@ const process_event: Task = async function (event, helpers) {
     ).rows.map(obj => obj.name);
     console.log(names);
     names.forEach(funcId => {
-      fetch(`${"http://localhost:3002"}/calls`, {
+      fetch(functionServerUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

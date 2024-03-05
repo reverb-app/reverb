@@ -1,0 +1,36 @@
+import { Task } from "graphile-worker";
+import { Pool } from "pg";
+import { isValidEvent } from "../utils/utils";
+
+const pool = new Pool({
+  host: process.env.FUNCTION_DATABASE_HOST,
+  port: Number(process.env.FUNCTION_DATABASE_PORT),
+  database: process.env.FUNCTION_DATABASE_NAME,
+});
+
+const functionServerUrl: string = process.env.FUNCTION_SERVER_URL ?? "";
+
+const process_event: Task = async function (event, helpers) {
+  const client = await pool.connect();
+
+  if (!isValidEvent(event)) {
+    return;
+  }
+
+  try {
+    const names = (
+      await client.query(
+        `SELECT functions.name FROM functions JOIN events ON functions.event_id = events.id WHERE events.name = $1;`,
+        [event.name]
+      )
+    ).rows.map(obj => obj.name);
+
+    names.forEach(funcId => {
+      helpers.addJob("process_job", { name: funcId, event });
+    });
+  } finally {
+    client.release();
+  }
+};
+
+export default process_event;

@@ -12,6 +12,10 @@ export const addEvent = async (event: Event): Promise<void> => {
       `SELECT graphile_worker.add_job('process_event', $1,'event_processing_queue');`,
       [event]
     );
+  } catch (e) {
+    if (e instanceof Error) {
+      throw e;
+    }
   } finally {
     client.release();
   }

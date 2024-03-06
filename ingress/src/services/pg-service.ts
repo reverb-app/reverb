@@ -1,10 +1,8 @@
-import { Pool } from "pg";
-import { Event } from "../types/types";
+import { Pool } from 'pg';
+import { Event } from '../types/types';
 
 const pool = new Pool({
-  host: "localhost",
-  port: 5432,
-  database: "graphile1",
+  connectionString: process.env.GRAPHILE_CONNECTION_STRING,
 });
 
 export const addEvent = async (event: Event): Promise<void> => {

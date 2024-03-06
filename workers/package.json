@@ -11,14 +11,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/uuid": "^9.0.8",
     "graphile-worker": "^0.16.4",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
-    "@types/uuid": "^9.0.8",
-    "dotenv": "^16.4.5",
     "nodemon": "^3.1.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "ts-node": "^10.9.2"
   }
 }

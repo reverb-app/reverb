@@ -1,0 +1,44 @@
+services:
+  database:
+    image: team6/database
+    restart: always
+    ports:
+      - '5454:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U docker']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  functions:
+    image: team6/functions
+    restart: always
+    ports:
+      - '3002:3000'
+    environment:
+      - DATABASE_CONNECTION_STRING=postgresql://docker:team6@host.docker.internal:5454/function_schema
+    depends_on:
+      database:
+        condition: service_healthy
+
+  workers:
+    image: team6/workers
+    restart: always
+    environment:
+      - DATABASE_CONNECTION_STRING=postgresql://docker:team6@host.docker.internal:5454/function_schema
+      - GRAPHILE_CONNECTION_STRING=postgresql://docker:team6@host.docker.internal:5454/graphile
+      - FUNCTION_SERVER_URL=http://host.docker.internal:3002/calls
+    depends_on:
+      database:
+        condition: service_healthy
+
+  ingress:
+    image: team6/ingress
+    restart: always
+    ports:
+      - '3001:3000'
+    environment:
+      - GRAPHILE_CONNECTION_STRING=postgresql://docker:team6@host.docker.internal:5454/graphile
+    depends_on:
+      database:
+        condition: service_healthy

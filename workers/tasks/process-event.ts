@@ -6,8 +6,6 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_CONNECTION_STRING,
 });
 
-const functionServerUrl: string = process.env.FUNCTION_SERVER_URL ?? '';
-
 const process_event: Task = async function (event, helpers) {
   const client = await pool.connect();
 

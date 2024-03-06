@@ -3,6 +3,9 @@ import { isValidFunctionPayload, isValidRpcResponse } from "../utils/utils";
 import { v4 as uuidv4 } from "uuid";
 
 const functionServerUrl: string = process.env.FUNCTION_SERVER_URL ?? "";
+if (!functionServerUrl) {
+  console.error("No function server URL found");
+}
 
 const process_job: Task = async function (job) {
   if (!isValidFunctionPayload(job)) {

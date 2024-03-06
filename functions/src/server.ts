@@ -13,16 +13,6 @@ app.all("*", (_, res) => {
 });
 
 const serve = async () => {
-  // fetch(`${process.env.INGRESS_URL}/functions`, {
-  //   method: "post",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify(functions.getAllFunctions()),
-  // });
-
-  // const data = functions.getAllFunctions();
-
   functions.setUpDb();
 
   app.listen(process.env.PORT, () => {
@@ -31,20 +21,3 @@ const serve = async () => {
 };
 
 export default serve;
-
-/*
-DROP TABLE events;
-DROP TABLES functions;
-
-CREATE TABLE events {
-  id serial PRIMARY KEY,
-  name varchar(30) UNQIUE NOT NULL
-}
-
-CREATE TABLE functions {
-  id serial PRIMARY KEY,
-  name varchar(30) UNIQUE NOT NULL,
-  event_id integer REFERENCES events(id) ON DELETE CASCADE
-}
-
-*/

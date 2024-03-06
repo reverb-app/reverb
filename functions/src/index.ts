@@ -15,11 +15,14 @@ const func2 = functions.createFunction({
     console.log('Hi :)');
   },
 });
+
 const func3 = functions.createFunction({
   id: 'third-function',
   event: 'event2',
-  fn: async () => {
-    console.log('Hey, Vinnie!');
+  fn: async (event) => {
+    if (!!event.payload && "url" in event.payload && typeof event.payload.url === "string") {
+      fetch(event.payload.url);
+    }
   },
 });
 

@@ -1,6 +1,8 @@
 import { Task } from "graphile-worker";
 import { isValidFunctionPayload, isValidRpcResponse } from "../utils/utils";
 import { v4 as uuidv4 } from "uuid";
+import dotenv from 'dotenv';
+dotenv.config();
 
 const functionServerUrl: string = process.env.FUNCTION_SERVER_URL ?? "";
 if (!functionServerUrl) {
@@ -9,10 +11,10 @@ if (!functionServerUrl) {
 
 const process_job: Task = async function (job) {
   if (!isValidFunctionPayload(job)) {
-    return;
+    throw new Error(`${job} not valid Function Payload`);
   }
-
-  let result = await fetch(functionServerUrl, {
+  let result;
+  result = await fetch(functionServerUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

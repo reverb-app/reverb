@@ -10,7 +10,7 @@ const process_event: Task = async function (event, helpers) {
   const client = await pool.connect();
 
   if (!isValidEvent(event)) {
-    return;
+    throw new Error(`${event} is not a valid event`);
   }
 
   try {

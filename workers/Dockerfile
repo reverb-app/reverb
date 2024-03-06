@@ -1,7 +1,7 @@
 FROM node:alpine3.18
 
 ENV NODE_ENV production
-WORKDIR /usr/ingress
+WORKDIR /usr/workers
 COPY package.json .
 RUN npm install
 COPY . .

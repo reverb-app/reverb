@@ -3,23 +3,27 @@ services:
     image: team6/database
     restart: always
     ports:
-      - '5454:5432'
+      - "5454:5432"
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U docker']
+      test: ["CMD-SHELL", "pg_isready -U docker"]
       interval: 10s
       timeout: 5s
       retries: 5
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   functions:
     image: team6/functions
     restart: always
     ports:
-      - '3002:3000'
+      - "3002:3000"
     environment:
       - DATABASE_CONNECTION_STRING=postgresql://docker:team6@host.docker.internal:5454/function_schema
     depends_on:
       database:
         condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   workers:
     image: team6/workers
@@ -31,14 +35,18 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   ingress:
     image: team6/ingress
     restart: always
     ports:
-      - '3001:3000'
+      - "3001:3000"
     environment:
       - GRAPHILE_CONNECTION_STRING=postgresql://docker:team6@host.docker.internal:5454/graphile
     depends_on:
       database:
         condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

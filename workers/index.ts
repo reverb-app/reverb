@@ -1,6 +1,7 @@
-import { run } from "graphile-worker";
 import dotenv from "dotenv";
 dotenv.config();
+
+import { run } from "graphile-worker";
 import process_event from "./tasks/process-event";
 import process_job from "./tasks/process-job";
 
@@ -19,7 +20,7 @@ async function main() {
   await runner1.promise;
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   process.exit(1);
 });

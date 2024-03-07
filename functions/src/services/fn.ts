@@ -1,6 +1,6 @@
-import { EventFunction, FunctionData } from '../types/types';
-import { Client } from 'pg';
-import format from 'pg-format';
+import { FunctionData } from "../types/types";
+import { Client } from "pg";
+import format from "pg-format";
 
 let functions: FunctionData[] = [];
 const client = new Client({
@@ -29,8 +29,8 @@ const setUpDb = async () => {
   await client.connect();
 
   try {
-    client.query('DELETE FROM functions');
-    client.query('DELETE FROM events');
+    client.query("DELETE FROM functions");
+    client.query("DELETE FROM events");
 
     const functions = getAllFunctions();
     const eventNames = Object.keys(functions).map((string) => [string]);

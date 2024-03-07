@@ -1,22 +1,22 @@
-import express, { Response } from 'express';
-import { RpcRequest, RpcResponse } from '../types/types';
-import functions from '../services/fn';
-import { isValidRpcRequest } from '../utils/utils';
+import express, { Response } from "express";
+import { RpcResponse } from "../types/types";
+import functions from "../services/fn";
+import { isValidRpcRequest } from "../utils/utils";
 
 const router = express.Router();
 
 router.use(express.json());
 
-router.post('/', (req, res: Response<RpcResponse>) => {
+router.post("/", (req, res: Response<RpcResponse>) => {
   if (!isValidRpcRequest(req.body)) {
     if (
       !!req.body &&
-      typeof req.body === 'object' &&
-      'id' in req.body &&
-      (typeof req.body.id === 'string' || typeof req.body.id === 'number')
+      typeof req.body === "object" &&
+      "id" in req.body &&
+      (typeof req.body.id === "string" || typeof req.body.id === "number")
     ) {
       return res.status(400).json({
-        error: 'Not a valid JSON RPC request format',
+        error: "Not a valid JSON RPC request format",
         id: req.body.id,
       });
     }
@@ -43,7 +43,7 @@ router.post('/', (req, res: Response<RpcResponse>) => {
       body = { result, id };
     }
   } catch (e) {
-    if (id && (e instanceof Error || typeof e === 'string')) {
+    if (id && (e instanceof Error || typeof e === "string")) {
       body = { error: e, id };
     }
   }

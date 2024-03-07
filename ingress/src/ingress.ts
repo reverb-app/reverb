@@ -1,8 +1,9 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express, { Request } from "express";
 import { Event } from "./types/types";
-import dotenv from "dotenv";
 import { addEvent } from "./services/pg-service";
-dotenv.config();
 
 export const app = express();
 app.use(express.json());

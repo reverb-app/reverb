@@ -1,6 +1,6 @@
-import { Task } from 'graphile-worker';
-import { Pool } from 'pg';
-import { isValidEvent } from '../utils/utils';
+import { Task } from "graphile-worker";
+import { Pool } from "pg";
+import { isValidEvent } from "../utils/utils";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_CONNECTION_STRING,
@@ -22,7 +22,7 @@ const process_event: Task = async function (event, helpers) {
     ).rows.map((obj) => obj.name);
 
     names.forEach((funcId) => {
-      helpers.addJob('process_job', { name: funcId, event });
+      helpers.addJob("process_job", { name: funcId, event });
     });
   } finally {
     client.release();

@@ -11,7 +11,7 @@ if (secret) {
 }
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_CONNECTION_STRING,
+  connectionString,
 });
 
 const process_event: Task = async function (event, helpers) {

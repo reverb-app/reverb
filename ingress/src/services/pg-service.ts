@@ -1,8 +1,15 @@
 import { Pool } from 'pg';
-import { Event } from '../types/types';
+import { Event, Secret } from '../types/types';
+
+let connectionString = process.env.GRAPHILE_CONNECTION_STRING;
+const secret = process.env.DB_SECRET;
+if (secret) {
+  const value = JSON.parse(secret) as Secret;
+  connectionString = `postgresql://${value.username}:${value.password}@${value.host}:${value.port}${process.env.GRAPHILE_ENDPOINT}?ssl=no-verify`;
+}
 
 const pool = new Pool({
-  connectionString: process.env.GRAPHILE_CONNECTION_STRING,
+  connectionString,
 });
 
 export const addEvent = async (event: Event): Promise<void> => {

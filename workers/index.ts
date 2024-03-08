@@ -1,13 +1,22 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 
-import { run } from "graphile-worker";
-import process_event from "./tasks/process-event";
-import process_job from "./tasks/process-job";
+import { Runner, run } from 'graphile-worker';
+import process_event from './tasks/process-event';
+import process_job from './tasks/process-job';
+import { Secret } from './types/types';
 
 async function main() {
-  const runner1 = await run({
-    connectionString: process.env.GRAPHILE_CONNECTION_STRING,
+  const secret = process.env.DB_SECRET;
+  let connectionString = process.env.GRAPHILE_CONNECTION_STRING;
+
+  if (secret) {
+    const value = JSON.parse(secret) as Secret;
+    connectionString = `postgresql://${value.username}:${value.password}@${value.host}:${value.port}${process.env.GRAPHILE_ENDPOINT}?ssl=no-verify`;
+  }
+
+  const runner = await run({
+    connectionString,
     concurrency: 5,
     noHandleSignals: false,
     pollInterval: 1000,
@@ -16,8 +25,7 @@ async function main() {
       process_job,
     },
   });
-
-  await runner1.promise;
+  await runner.promise;
 }
 
 main().catch((err) => {

@@ -23,3 +23,10 @@ export interface Event {
   name: String;
   payload?: Object;
 }
+
+export interface Secret {
+  username: string;
+  password: string;
+  host: string;
+  port: number;
+}

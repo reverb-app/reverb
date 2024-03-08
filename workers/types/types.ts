@@ -13,3 +13,10 @@ export interface RpcResponse {
   error?: Error | string;
   id: number | string;
 }
+
+export interface Secret {
+  username: string;
+  password: string;
+  host: string;
+  port: number;
+}

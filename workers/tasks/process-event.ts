@@ -30,7 +30,7 @@ const process_event: Task = async function (event, helpers) {
     ).rows.map((obj) => obj.name);
 
     names.forEach((funcId) => {
-      helpers.addJob('process_job', { name: funcId, event });
+      helpers.addJob('process_job', { name: funcId, event, cache: {} });
     });
   } finally {
     client.release();

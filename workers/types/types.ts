@@ -6,10 +6,11 @@ export interface Event {
 export interface FunctionPayload {
   name: string;
   event: Event;
+  cache: { [key: string]: any };
 }
 
 export interface RpcResponse {
-  result?: object;
+  result?: CompleteResult | StepResult;
   error?: Error | string;
   id: number | string;
 }
@@ -19,4 +20,16 @@ export interface Secret {
   password: string;
   host: string;
   port: number;
+}
+
+export interface CompleteResult {
+  type: 'complete';
+  stepId: string;
+  stepValue: any;
+}
+
+export interface StepResult {
+  type: 'step';
+  stepId: string;
+  stepValue: any;
 }

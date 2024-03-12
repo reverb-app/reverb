@@ -25,6 +25,9 @@ export const isValidRpcRequest = (body: unknown): body is RpcRequest => {
     isValidEvent(body.params.event) &&
     (!('id' in body) ||
       typeof body.id === 'number' ||
-      typeof body.id === 'string')
+      typeof body.id === 'string') &&
+    'cache' in body.params &&
+    typeof body.params.cache === 'object' &&
+    !!body.params.cache
   );
 };

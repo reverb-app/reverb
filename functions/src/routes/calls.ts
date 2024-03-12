@@ -1,22 +1,23 @@
-import express, { Response } from "express";
-import { RpcResponse } from "../types/types";
-import functions from "../services/fn";
-import { isValidRpcRequest } from "../utils/utils";
+import express, { Response } from 'express';
+import { RpcResponse } from '../types/types';
+import functions from '../services/fn';
+import { isValidRpcRequest } from '../utils/utils';
+import { Step, StepComplete } from '../utils/step';
 
 const router = express.Router();
 
 router.use(express.json());
 
-router.post("/", (req, res: Response<RpcResponse>) => {
+router.post('/', async (req, res: Response<RpcResponse>) => {
   if (!isValidRpcRequest(req.body)) {
     if (
       !!req.body &&
-      typeof req.body === "object" &&
-      "id" in req.body &&
-      (typeof req.body.id === "string" || typeof req.body.id === "number")
+      typeof req.body === 'object' &&
+      'id' in req.body &&
+      (typeof req.body.id === 'string' || typeof req.body.id === 'number')
     ) {
       return res.status(400).json({
-        error: "Not a valid JSON RPC request format",
+        error: 'Not a valid JSON RPC request format',
         id: req.body.id,
       });
     }
@@ -37,13 +38,25 @@ router.post("/", (req, res: Response<RpcResponse>) => {
   }
 
   try {
-    fn.fn(params.event);
-    const result = undefined;
+    const result = await fn.fn(params.event, new Step(params.cache));
     if (id) {
-      body = { result, id };
+      body = {
+        id,
+        result: {
+          type: 'complete',
+        },
+      };
     }
   } catch (e) {
-    if (id && (e instanceof Error || typeof e === "string")) {
+    if (!id) {
+      body = undefined;
+    } else if (e instanceof StepComplete) {
+      if (e.stepValue === undefined) e.stepValue = null;
+      body = {
+        id,
+        result: { type: 'step', stepId: e.stepId, stepValue: e.stepValue },
+      };
+    } else if (e instanceof Error || typeof e === 'string') {
       body = { error: e, id };
     }
   }

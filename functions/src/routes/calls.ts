@@ -38,14 +38,20 @@ router.post('/', async (req, res: Response<RpcResponse>) => {
   }
 
   try {
-    const result = await fn.fn(params.event, new Step({}));
+    const result = await fn.fn(params.event, new Step(params.cache));
     if (id) {
-      body = { result, id };
+      body = {
+        id,
+        result: {
+          type: 'complete',
+        },
+      };
     }
   } catch (e) {
     if (!id) {
       body = undefined;
     } else if (e instanceof StepComplete) {
+      if (e.stepValue === undefined) e.stepValue = null;
       body = {
         id,
         result: { type: 'step', stepId: e.stepId, stepValue: e.stepValue },

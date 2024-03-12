@@ -2,7 +2,7 @@ import { Step } from '../utils/step';
 export interface RpcRequest {
   jsonrpc: '2.0';
   method: string;
-  params: { event: Event };
+  params: { event: Event; cache: { [key: string]: any } };
   id?: number | string;
 }
 

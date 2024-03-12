@@ -1,10 +1,17 @@
-import { FunctionData } from "../types/types";
-import { Client } from "pg";
-import format from "pg-format";
+import { FunctionData, Secret } from '../types/types';
+import { Client } from 'pg';
+import format from 'pg-format';
+
+let connectionString = process.env.DATABASE_CONNECTION_STRING;
+const secret = process.env.DB_SECRET;
+if (secret) {
+  const value = JSON.parse(secret) as Secret;
+  connectionString = `postgresql://${value.username}:${value.password}@${value.host}:${value.port}${process.env.DATABASE_ENDPOINT}?ssl=no-verify`;
+}
 
 let functions: FunctionData[] = [];
 const client = new Client({
-  connectionString: process.env.DATABASE_CONNECTION_STRING,
+  connectionString,
 });
 
 const createFunction = (data: FunctionData) => {
@@ -29,8 +36,8 @@ const setUpDb = async () => {
   await client.connect();
 
   try {
-    client.query("DELETE FROM functions");
-    client.query("DELETE FROM events");
+    client.query('DELETE FROM functions');
+    client.query('DELETE FROM events');
 
     const functions = getAllFunctions();
     const eventNames = Object.keys(functions).map((string) => [string]);

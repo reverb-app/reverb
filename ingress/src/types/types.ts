@@ -13,3 +13,10 @@ export interface RpcRequest {
   params: { event: Event };
   id?: number | string;
 }
+
+export interface Secret {
+  username: string;
+  password: string;
+  host: string;
+  port: number;
+}

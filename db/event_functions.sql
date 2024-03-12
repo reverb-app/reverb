@@ -15,3 +15,7 @@ CREATE TABLE functions (
   name varchar(30) UNIQUE NOT NULL,
   event_id integer REFERENCES events(id) ON DELETE CASCADE
 );
+
+CREATE TABLE hash (
+  hash char(28) UNIQUE NOT NULL DEFAULT ''
+);

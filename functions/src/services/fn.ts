@@ -1,17 +1,11 @@
-import { FunctionData, Secret } from '../types/types';
+import { EventFunction, FunctionData } from '../types/types';
 import { Client } from 'pg';
 import format from 'pg-format';
-
-let connectionString = process.env.DATABASE_CONNECTION_STRING;
-const secret = process.env.DB_SECRET;
-if (secret) {
-  const value = JSON.parse(secret) as Secret;
-  connectionString = `postgresql://${value.username}:${value.password}@${value.host}:${value.port}${process.env.DATABASE_ENDPOINT}?ssl=no-verify`;
-}
+import { createHash } from 'crypto';
 
 let functions: FunctionData[] = [];
 const client = new Client({
-  connectionString,
+  connectionString: process.env.DATABASE_CONNECTION_STRING,
 });
 
 const createFunction = (data: FunctionData) => {
@@ -36,11 +30,23 @@ const setUpDb = async () => {
   await client.connect();
 
   try {
-    client.query('DELETE FROM functions');
-    client.query('DELETE FROM events');
+    const sha1 = createHash('sha1');
+    sha1.update(JSON.stringify(getAllFunctions()));
+    const hash = sha1.digest('base64');
+
+    const dbHash = await client.query('SELECT hash FROM hash');
+    if (dbHash.rows[0]?.hash === hash) return;
+
+    await client.query('BEGIN');
+
+    await client.query('DELETE FROM functions');
+    await client.query('DELETE FROM events');
+    await client.query('DELETE FROM hash');
 
     const functions = getAllFunctions();
     const eventNames = Object.keys(functions).map((string) => [string]);
+
+    await client.query('INSERT INTO hash VALUES ($1)', [hash]);
 
     const ids = (
       await client.query(
@@ -55,7 +61,10 @@ const setUpDb = async () => {
     await client.query(
       format(`INSERT INTO functions (event_id, name) VALUES %L`, insertQuery)
     );
+
+    await client.query('COMMIT');
   } catch (e) {
+    await client.query('ROLLBACK');
     console.error(e);
   } finally {
     await client.end();

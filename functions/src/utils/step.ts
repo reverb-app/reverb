@@ -19,8 +19,8 @@ export class Step {
     }
     timePeriod = timePeriod.toLowerCase();
 
-    const regex = /^(?<quantity>\d+)(?<unit>s|m|h|d|w)$/g;
-    const match = regex.exec(timePeriod);
+    const regex = /(?<quantity>\d+)(?<unit>s|m|h|d|w)/g;
+    let match = regex.exec(timePeriod);
 
     if (!match) {
       throw new Error(
@@ -28,31 +28,37 @@ export class Step {
       );
     }
 
-    const time = match.groups as {
-      quantity: string;
-      unit: 's' | 'm' | 'h' | 'd' | 'w';
-    };
+    let totalMs = 0;
+    while (match) {
+      const time = match.groups as {
+        quantity: string;
+        unit: 's' | 'm' | 'h' | 'd' | 'w';
+      };
 
-    let ms = Number(time.quantity);
+      let ms = Number(time.quantity);
 
-    switch (time.unit) {
-      case 'w':
-        ms *= 7;
-      case 'd':
-        ms *= 24;
-      case 'h':
-        ms *= 60;
-      case 'm':
-        ms *= 60;
-      case 's':
-        ms *= 1000;
-        break;
-      default:
-        const _unknown: never = time.unit;
-        return _unknown;
+      switch (time.unit) {
+        case 'w':
+          ms *= 7;
+        case 'd':
+          ms *= 24;
+        case 'h':
+          ms *= 60;
+        case 'm':
+          ms *= 60;
+        case 's':
+          ms *= 1000;
+          break;
+        default:
+          const _unknown: never = time.unit;
+          return _unknown;
+      }
+
+      totalMs += ms;
+      match = regex.exec(timePeriod);
     }
 
-    throw new DelayInitiated(id, ms);
+    throw new DelayInitiated(id, totalMs);
   }
 }
 

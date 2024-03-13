@@ -40,4 +40,14 @@ const func4 = functions.createFunction({
   },
 });
 
+const func5 = functions.createFunction({
+  id: 'function-calls-function',
+  event: 'event4',
+  fn: async (event, step) => {
+    await step.invoke('call 1st function', 'third-function', {
+      url: 'https://enaeajsfdm4b.x.pipedream.net/',
+    });
+  },
+});
+
 startServer();

@@ -30,12 +30,9 @@ const process_job: Task = async function (job, helpers) {
 
   let data = await response.json();
 
-  console.log(data);
-
   if (!isValidRpcResponse(data)) {
     throw new Error('Not a valid response');
   }
-
   if ('error' in data) {
     if (typeof data.error === 'string') {
       throw new Error(data.error);
@@ -60,6 +57,15 @@ const process_job: Task = async function (job, helpers) {
       const time = new Date(Date.now() + result.delayInMs);
       job.cache[result.stepId] = time;
       helpers.addJob('process_job', job, { runAt: time });
+      break;
+    case 'invoke':
+      helpers.addJob('process_job', {
+        name: result.invokedFnName,
+        event: { name: `invoked from ${job.name}`, payload: result.payload },
+        cache: {},
+      });
+      job.cache[result.stepId] = `${result.invokedFnName} was invoked`;
+      helpers.addJob('process_job', job);
       break;
     default:
       const _exhaustiveCheck: never = result;

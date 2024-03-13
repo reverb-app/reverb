@@ -5,6 +5,7 @@ import {
   CompleteResult,
   StepResult,
   DelayResult,
+  InvokeResult,
 } from '../types/types';
 
 export const isValidEvent = (event: unknown): event is Event => {
@@ -42,7 +43,8 @@ export const isValidRpcResponse = (body: unknown): body is RpcResponse => {
       (!!body.result &&
         (isValidCompleteResult(body.result) ||
           isValidStepResult(body.result) ||
-          isValidDelayResult(body.result)))) &&
+          isValidDelayResult(body.result) ||
+          isValidInvokedResult(body.result)))) &&
     (!('error' in body) || typeof body.error === 'string')
   );
 };
@@ -78,5 +80,18 @@ const isValidDelayResult = (result: unknown): result is DelayResult => {
     typeof result.stepId === 'string' &&
     'delayInMs' in result &&
     typeof result.delayInMs === 'number'
+  );
+};
+
+const isValidInvokedResult = (result: unknown): result is InvokeResult => {
+  return (
+    !!result &&
+    typeof result === 'object' &&
+    'type' in result &&
+    result.type === 'invoke' &&
+    'stepId' in result &&
+    typeof result.stepId === 'string' &&
+    'invokedFnName' in result &&
+    typeof result.invokedFnName === 'string'
   );
 };

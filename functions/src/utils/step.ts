@@ -1,3 +1,5 @@
+import functions from '../services/fn';
+
 export class Step {
   #cache: { [key: string]: any };
 
@@ -60,6 +62,20 @@ export class Step {
 
     throw new DelayInitiated(id, totalMs);
   }
+
+  async invoke(id: string, invokedFnName: string, payload?: object) {
+    if (id in this.#cache) {
+      return this.#cache[id];
+    }
+
+    const fn = functions.getFunction(invokedFnName);
+
+    if (!fn) {
+      throw new Error(`Invoked function ${invokedFnName} does not exist`);
+    }
+
+    throw new InvokeInitiated(id, invokedFnName, payload);
+  }
 }
 
 export class StepComplete extends Error {
@@ -85,5 +101,21 @@ export class DelayInitiated extends Error {
     );
     this.stepId = stepId;
     this.delayInMs = delayInMs;
+  }
+}
+
+export class InvokeInitiated extends Error {
+  stepId: string;
+  invokedFnName: string;
+  payload?: object;
+
+  constructor(stepId: string, invokedFnName: string, payload?: object) {
+    super(
+      `InvokeInitiated ${stepId}: Do not catch errors from step.invoke inside a created function, this will automatically be handled`
+    );
+
+    this.stepId = stepId;
+    this.invokedFnName = invokedFnName;
+    this.payload = payload;
   }
 }

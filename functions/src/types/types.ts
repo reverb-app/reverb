@@ -21,8 +21,8 @@ export interface FunctionData {
 }
 
 export interface Event {
-  name: String;
-  payload?: Object;
+  name: string;
+  payload?: object;
 }
 
 export interface Secret {

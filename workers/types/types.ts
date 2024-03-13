@@ -11,7 +11,7 @@ export interface FunctionPayload {
 
 export interface RpcResponse {
   result?: CompleteResult | StepResult | DelayResult;
-  error?: Error | string;
+  error?: string;
   id: number | string;
 }
 

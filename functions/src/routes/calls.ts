@@ -61,7 +61,9 @@ router.post('/', async (req, res: Response<RpcResponse>) => {
         id,
         result: { type: 'delay', stepId: e.stepId, delayInMs: e.delayInMs },
       };
-    } else if (e instanceof Error || typeof e === 'string') {
+    } else if (e instanceof Error) {
+      body = { error: e.message, id };
+    } else if (typeof e === 'string') {
       body = { error: e, id };
     }
   }

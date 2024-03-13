@@ -43,9 +43,7 @@ export const isValidRpcResponse = (body: unknown): body is RpcResponse => {
         (isValidCompleteResult(body.result) ||
           isValidStepResult(body.result) ||
           isValidDelayResult(body.result)))) &&
-    (!('error' in body) ||
-      typeof body.error === 'string' ||
-      body.error instanceof Error)
+    (!('error' in body) || typeof body.error === 'string')
   );
 };
 

@@ -30,6 +30,8 @@ const process_job: Task = async function (job, helpers) {
 
   let data = await response.json();
 
+  console.log(data);
+
   if (!isValidRpcResponse(data)) {
     throw new Error('Not a valid response');
   }

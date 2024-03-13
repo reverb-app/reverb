@@ -1,6 +1,7 @@
 DROP DATABASE IF EXISTS function_schema;
 DROP TABLE IF EXISTS functions;
 DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS hash;
 
 CREATE DATABASE function_schema;
 \c function_schema

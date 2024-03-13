@@ -10,7 +10,7 @@ export interface FunctionPayload {
 }
 
 export interface RpcResponse {
-  result?: CompleteResult | StepResult;
+  result?: CompleteResult | StepResult | DelayResult;
   error?: Error | string;
   id: number | string;
 }
@@ -32,4 +32,10 @@ export interface StepResult {
   type: 'step';
   stepId: string;
   stepValue: any;
+}
+
+export interface DelayResult {
+  type: 'delay';
+  stepId: string;
+  delayInMs: number;
 }

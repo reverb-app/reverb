@@ -12,6 +12,48 @@ export class Step {
     const result = await callback();
     throw new StepComplete(id, result);
   }
+
+  async delay(id: string, timePeriod: string) {
+    if (id in this.#cache) {
+      return this.#cache[id];
+    }
+    timePeriod = timePeriod.toLowerCase();
+
+    const regex = /^(?<quantity>\d+)(?<unit>s|m|h|d|w)$/g;
+    const match = regex.exec(timePeriod);
+
+    if (!match) {
+      throw new Error(
+        `${timePeriod} not correctly formatted time period string.`
+      );
+    }
+
+    const time = match.groups as {
+      quantity: string;
+      unit: 's' | 'm' | 'h' | 'd' | 'w';
+    };
+
+    let ms = Number(time.quantity);
+
+    switch (time.unit) {
+      case 'w':
+        ms *= 7;
+      case 'd':
+        ms *= 24;
+      case 'h':
+        ms *= 60;
+      case 'm':
+        ms *= 60;
+      case 's':
+        ms *= 1000;
+        break;
+      default:
+        const _unknown: never = time.unit;
+        return _unknown;
+    }
+
+    throw new DelayInitiated(id, ms);
+  }
 }
 
 export class StepComplete extends Error {
@@ -19,8 +61,23 @@ export class StepComplete extends Error {
   stepValue: any;
 
   constructor(stepId: string, stepValue: any) {
-    super(`Not an error: ${stepId} completed`);
+    super(
+      `StepComplete ${stepId}: Do not catch errors from step.run inside a created function, this will automatically be handled`
+    );
     this.stepId = stepId;
     this.stepValue = stepValue;
+  }
+}
+
+export class DelayInitiated extends Error {
+  stepId: string;
+  delayInMs: number;
+
+  constructor(stepId: string, delayInMs: number) {
+    super(
+      `DelayIntiated ${stepId}: Do not catch errors from step.delay inside a created function, this will automatically be handled`
+    );
+    this.stepId = stepId;
+    this.delayInMs = delayInMs;
   }
 }

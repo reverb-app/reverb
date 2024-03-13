@@ -35,6 +35,7 @@ const func4 = functions.createFunction({
   event: 'event3',
   fn: async (event, step) => {
     await step.run('phone person', async () => console.log('phone person'));
+    await step.delay('some delay', '1m'); // /(\d+)(s|m|h|d|w)/
     await step.run('email person', async () => console.log('email person'));
   },
 });

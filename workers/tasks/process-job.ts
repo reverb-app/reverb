@@ -54,6 +54,11 @@ const process_job: Task = async function (job, helpers) {
       job.cache[result.stepId] = result.stepValue;
       helpers.addJob('process_job', job);
       break;
+    case 'delay':
+      const time = new Date(Date.now() + result.delayInMs);
+      job.cache[result.stepId] = time;
+      helpers.addJob('process_job', job, { runAt: time });
+      break;
     default:
       const _exhaustiveCheck: never = result;
       return _exhaustiveCheck;

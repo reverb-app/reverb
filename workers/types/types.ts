@@ -10,7 +10,12 @@ export interface FunctionPayload {
 }
 
 export interface RpcResponse {
-  result?: CompleteResult | StepResult | DelayResult | InvokeResult;
+  result?:
+    | CompleteResult
+    | StepResult
+    | DelayResult
+    | InvokeResult
+    | EmitEventResult;
   error?: string;
   id: number | string;
 }
@@ -23,26 +28,33 @@ export interface Secret {
 }
 
 export interface CompleteResult {
-  type: 'complete';
+  type: "complete";
   stepId: string;
   stepValue: any;
 }
 
 export interface StepResult {
-  type: 'step';
+  type: "step";
   stepId: string;
   stepValue: any;
 }
 
 export interface DelayResult {
-  type: 'delay';
+  type: "delay";
   stepId: string;
   delayInMs: number;
 }
 
 export interface InvokeResult {
-  type: 'invoke';
+  type: "invoke";
   stepId: string;
   invokedFnName: string;
+  payload?: object;
+}
+
+export interface EmitEventResult {
+  type: "emitEvent";
+  stepId: string;
+  eventId: string;
   payload?: object;
 }

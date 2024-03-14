@@ -1,4 +1,4 @@
-import functions from '../services/fn';
+import functions from "../services/fn";
 
 export class Step {
   #cache: { [key: string]: any };
@@ -34,21 +34,21 @@ export class Step {
     while (match) {
       const time = match.groups as {
         quantity: string;
-        unit: 's' | 'm' | 'h' | 'd' | 'w';
+        unit: "s" | "m" | "h" | "d" | "w";
       };
 
       let ms = Number(time.quantity);
 
       switch (time.unit) {
-        case 'w':
+        case "w":
           ms *= 7;
-        case 'd':
+        case "d":
           ms *= 24;
-        case 'h':
+        case "h":
           ms *= 60;
-        case 'm':
+        case "m":
           ms *= 60;
-        case 's':
+        case "s":
           ms *= 1000;
           break;
         default:
@@ -75,6 +75,18 @@ export class Step {
     }
 
     throw new InvokeInitiated(id, invokedFnName, payload);
+  }
+
+  async emitEvent(id: string, eventId: string, payload?: object) {
+    if (id in this.#cache) {
+      return this.#cache[id];
+    }
+
+    if (!Object.keys(functions.getAllFunctions()).includes(eventId)) {
+      throw new Error(`Event ${eventId} does not exist`);
+    }
+
+    throw new EventEmitted(id, eventId, payload);
   }
 }
 
@@ -116,6 +128,22 @@ export class InvokeInitiated extends Error {
 
     this.stepId = stepId;
     this.invokedFnName = invokedFnName;
+    this.payload = payload;
+  }
+}
+
+export class EventEmitted extends Error {
+  stepId: string;
+  eventId: string;
+  payload?: object;
+
+  constructor(stepId: string, eventId: string, payload?: object) {
+    super(
+      `EventEmitted ${stepId}: Do not catch errors from step.emitEvent inside a created function, this will automatically be handled`
+    );
+
+    this.stepId = stepId;
+    this.eventId = eventId;
     this.payload = payload;
   }
 }

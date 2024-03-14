@@ -1,5 +1,5 @@
-import ingress from './ingress';
-import dotenv from 'dotenv';
+import ingress from "./ingress";
+import dotenv from "dotenv";
 dotenv.config();
 
 const app = ingress;

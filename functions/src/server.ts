@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import express from "express";
 import callsRoute from "./routes/calls";
 import functions from "./services/fn";

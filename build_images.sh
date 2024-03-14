@@ -5,7 +5,7 @@ cd db
 docker build . -t team6/database
 
 echo "Building Functions Docker Image"
-cd ../functions
+cd ../sample
 docker build . -t team6/functions
 
 echo "Building Workers Docker Image"

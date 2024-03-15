@@ -21,6 +21,7 @@ export interface FunctionData {
 }
 
 export interface Event {
+  id: string;
   name: string;
   payload?: object;
 }

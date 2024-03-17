@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import server from "function-server";
+import server from "@reverb-app/functions";
 
 const func1 = server.createFunction({
   id: "first-function",

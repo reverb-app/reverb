@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { Runner, run } from 'graphile-worker';
+import { run } from 'graphile-worker';
 import process_event from './tasks/process-event';
 import process_job from './tasks/process-job';
 import { Secret } from './types/types';

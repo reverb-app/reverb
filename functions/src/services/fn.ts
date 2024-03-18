@@ -1,11 +1,19 @@
-import { EventFunction, FunctionData } from '../types/types';
-import { Client } from 'pg';
-import format from 'pg-format';
-import { createHash } from 'crypto';
+import { FunctionData, Secret } from "../types/types";
+import { Client } from "pg";
+import format from "pg-format";
+import { createHash } from "crypto";
 
 let functions: FunctionData[] = [];
+let connectionString = process.env.GRAPHILE_CONNECTION_STRING;
+
+const secret = process.env.DB_SECRET;
+if (secret) {
+  const value = JSON.parse(secret) as Secret;
+  connectionString = `postgresql://${value.username}:${value.password}@${value.host}:${value.port}${process.env.GRAPHILE_ENDPOINT}?ssl=no-verify`;
+}
+
 const client = new Client({
-  connectionString: process.env.DATABASE_CONNECTION_STRING,
+  connectionString,
 });
 
 const createFunction = (data: FunctionData) => {
@@ -30,23 +38,23 @@ const setUpDb = async () => {
   await client.connect();
 
   try {
-    const sha1 = createHash('sha1');
+    const sha1 = createHash("sha1");
     sha1.update(JSON.stringify(getAllFunctions()));
-    const hash = sha1.digest('base64');
+    const hash = sha1.digest("base64");
 
-    const dbHash = await client.query('SELECT hash FROM hash');
+    const dbHash = await client.query("SELECT hash FROM hash");
     if (dbHash.rows[0]?.hash === hash) return;
 
-    await client.query('BEGIN');
+    await client.query("BEGIN");
 
-    await client.query('DELETE FROM functions');
-    await client.query('DELETE FROM events');
-    await client.query('DELETE FROM hash');
+    await client.query("DELETE FROM functions");
+    await client.query("DELETE FROM events");
+    await client.query("DELETE FROM hash");
 
     const functions = getAllFunctions();
     const eventNames = Object.keys(functions).map((string) => [string]);
 
-    await client.query('INSERT INTO hash VALUES ($1)', [hash]);
+    await client.query("INSERT INTO hash VALUES ($1)", [hash]);
 
     const ids = (
       await client.query(
@@ -62,9 +70,9 @@ const setUpDb = async () => {
       format(`INSERT INTO functions (event_id, name) VALUES %L`, insertQuery)
     );
 
-    await client.query('COMMIT');
+    await client.query("COMMIT");
   } catch (e) {
-    await client.query('ROLLBACK');
+    await client.query("ROLLBACK");
     console.error(e);
   } finally {
     await client.end();
@@ -72,13 +80,3 @@ const setUpDb = async () => {
 };
 
 export default { createFunction, getFunction, getAllFunctions, setUpDb };
-
-// const functionData = Object.value(functions).flatMap(
-// (fns, index) => fns.map(
-// name => [name, ids[index]]
-// )
-// );
-
-/*
-INSERT INTO functions VALUES (funcName1, eventId)
-*/

@@ -1,7 +1,7 @@
-import { FunctionData, Secret } from "../types/types";
-import { Client } from "pg";
-import format from "pg-format";
-import { createHash } from "crypto";
+import { FunctionData, Secret } from '../types/types';
+import { Client } from 'pg';
+import format from 'pg-format';
+import { createHash } from 'crypto';
 
 let functions: FunctionData[] = [];
 let connectionString = process.env.GRAPHILE_CONNECTION_STRING;
@@ -34,49 +34,66 @@ const getAllFunctions = () => {
   return result;
 };
 
+const getFunctionsHash = () => {
+  if (Object.keys(getAllFunctions()).length === 0) return '';
+
+  const sha1 = createHash('sha1');
+  sha1.update(JSON.stringify(getAllFunctions()));
+  return sha1.digest('base64');
+};
+
 const setUpDb = async () => {
   await client.connect();
 
   try {
-    const sha1 = createHash("sha1");
-    sha1.update(JSON.stringify(getAllFunctions()));
-    const hash = sha1.digest("base64");
+    const dbHash = await client.query('SELECT hash FROM hash');
+    if (dbHash.rows[0]?.hash === getFunctionsHash()) return;
 
-    const dbHash = await client.query("SELECT hash FROM hash");
-    if (dbHash.rows[0]?.hash === hash) return;
+    await client.query('BEGIN');
 
-    await client.query("BEGIN");
-
-    await client.query("DELETE FROM functions");
-    await client.query("DELETE FROM events");
-    await client.query("DELETE FROM hash");
+    await client.query('DELETE FROM functions');
+    await client.query('DELETE FROM events');
+    await client.query('DELETE FROM hash');
 
     const functions = getAllFunctions();
     const eventNames = Object.keys(functions).map((string) => [string]);
 
-    await client.query("INSERT INTO hash VALUES ($1)", [hash]);
-
-    const ids = (
-      await client.query(
-        format(`INSERT INTO events (name) VALUES %L RETURNING id;`, eventNames)
-      )
-    ).rows.map((obj) => obj.id);
-
-    const insertQuery = ids.flatMap((id, index) => {
-      return functions[eventNames[index][0]].map((ele) => [id, ele]);
-    });
-
     await client.query(
-      format(`INSERT INTO functions (event_id, name) VALUES %L`, insertQuery)
+      format('INSERT INTO hash VALUES %L', [getFunctionsHash()])
     );
 
-    await client.query("COMMIT");
+    if (Object.keys(functions).length > 0) {
+      const ids = (
+        await client.query(
+          format(
+            `INSERT INTO events (name) VALUES %L RETURNING id;`,
+            eventNames
+          )
+        )
+      ).rows.map((obj) => obj.id);
+
+      const insertQuery = ids.flatMap((id, index) => {
+        return functions[eventNames[index][0]].map((ele) => [id, ele]);
+      });
+
+      await client.query(
+        format(`INSERT INTO functions (event_id, name) VALUES %L`, insertQuery)
+      );
+    }
+
+    await client.query('COMMIT');
   } catch (e) {
-    await client.query("ROLLBACK");
+    await client.query('ROLLBACK');
     console.error(e);
   } finally {
     await client.end();
   }
 };
 
-export default { createFunction, getFunction, getAllFunctions, setUpDb };
+export default {
+  createFunction,
+  getFunction,
+  getAllFunctions,
+  setUpDb,
+  getFunctionsHash,
+};

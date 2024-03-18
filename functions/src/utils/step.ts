@@ -1,4 +1,4 @@
-import functions from "../services/fn";
+import functions from '../services/fn';
 
 export class Step {
   #cache: { [key: string]: any };
@@ -34,21 +34,21 @@ export class Step {
     while (match) {
       const time = match.groups as {
         quantity: string;
-        unit: "s" | "m" | "h" | "d" | "w";
+        unit: 's' | 'm' | 'h' | 'd' | 'w';
       };
 
       let ms = Number(time.quantity);
 
       switch (time.unit) {
-        case "w":
+        case 'w':
           ms *= 7;
-        case "d":
+        case 'd':
           ms *= 24;
-        case "h":
+        case 'h':
           ms *= 60;
-        case "m":
+        case 'm':
           ms *= 60;
-        case "s":
+        case 's':
           ms *= 1000;
           break;
         default:

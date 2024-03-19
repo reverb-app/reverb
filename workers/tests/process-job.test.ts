@@ -3,7 +3,9 @@ import { JobHelpers } from "graphile-worker";
 
 const correctJob = {
   name: 'test',
-  event: { name: 'test', payload: 'test' },
+  id: '',
+  event: { name: 'test', payload: 'test', type: 'complete' },
+  cache: {}
 };
 
 const incorrectJobOne = {
@@ -47,7 +49,11 @@ test('throws an error on valid RPCResponse that has an error property', () => {
 
 test('does not throw an error on valid RPC response that has a result property', async () => {
   let resultRPCResponse = {
-    result: {},
+    result: {
+      type: 'complete',
+      stepId: 'step-id',
+      stepValue: 'any',
+    },
     id: 'id'
   };
   global.fetch = jest.fn(() => Promise.resolve({ json: async () => { return resultRPCResponse } })) as jest.Mock;

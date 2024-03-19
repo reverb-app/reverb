@@ -1,11 +1,11 @@
-import { Task } from "graphile-worker";
-import { isValidEvent } from "../utils/utils";
-import { v4 } from "uuid";
-import log from "../utils/logUtils";
+import { Task } from 'graphile-worker';
+import { isValidEvent } from '../utils/utils';
+import { v4 } from 'uuid';
+import log from '../utils/logUtils';
 
 const process_event: Task = async function (event, helpers) {
   if (!isValidEvent(event)) {
-    log.error("Event format is not valid", { event });
+    log.error('Event format is not valid', { event });
     throw new Error(`${event} is not a valid event`);
   }
 
@@ -16,10 +16,10 @@ const process_event: Task = async function (event, helpers) {
         [event.name]
       )
     ).rows.map((obj) => obj.name);
-    log.info("Event fired", { eventId: event.id, eventName: event.name });
+    log.info('Event fired', { eventId: event.id, eventName: event.name });
 
     if (names.length === 0) {
-      log.warn("Event is not configured to trigger any functions", {
+      log.warn('Event is not configured to trigger any functions', {
         eventId: event.id,
         eventName: event.name,
       });
@@ -27,16 +27,16 @@ const process_event: Task = async function (event, helpers) {
 
     names.forEach((funcName) => {
       const funcId = v4();
-      helpers.addJob("process_job", {
+      helpers.addJob('process_job', {
         name: funcName,
         event,
         id: funcId,
         cache: {},
       });
-      log.info("Invoked function", { eventId: event.id, funcName, funcId });
+      log.info('Invoked function', { eventId: event.id, funcName, funcId });
     });
   } catch (e) {
-    log.error("Querying function database failed.");
+    log.error('Querying function database failed.');
     throw e;
   }
 };

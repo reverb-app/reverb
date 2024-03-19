@@ -1,19 +1,15 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
-import { run } from 'graphile-worker';
-import process_event from './tasks/process-event';
-import process_job from './tasks/process-job';
-import { Secret } from './types/types';
+import { run } from "graphile-worker";
+import process_event from "./tasks/process_event";
+import process_job from "./tasks/process_job";
+import { waitForDB, connectionString, startCronRunner } from "./utils/dbUtils";
 
 async function main() {
-  const secret = process.env.DB_SECRET;
-  let connectionString = process.env.GRAPHILE_CONNECTION_STRING;
+  await waitForDB();
 
-  if (secret) {
-    const value = JSON.parse(secret) as Secret;
-    connectionString = `postgresql://${value.username}:${value.password}@${value.host}:${value.port}${process.env.GRAPHILE_ENDPOINT}?ssl=no-verify`;
-  }
+  await startCronRunner();
 
   const runner = await run({
     connectionString,

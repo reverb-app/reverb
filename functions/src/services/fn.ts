@@ -118,6 +118,10 @@ const setUpDb = async () => {
       format("INSERT INTO hash (hash) VALUES %L", [[funcsHash]])
     );
 
+    await client.query("SELECT graphile_worker.add_job('update_cron', $1);", [
+      { hash: "" },
+    ]);
+
     await client.query("COMMIT");
   } catch (e) {
     await client.query("ROLLBACK");

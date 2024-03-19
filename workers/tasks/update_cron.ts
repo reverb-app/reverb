@@ -14,7 +14,7 @@ const update_cron: Task = async function (job, helpers) {
 
   if (job.hash === dbHash) return;
 
-  await startCronRunner();
+  startCronRunner();
 };
 
 export default update_cron;

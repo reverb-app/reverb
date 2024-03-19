@@ -73,7 +73,7 @@ import(
 
     const func7 = server.createFunction({
       id: "cron-function",
-      cron: "* * * * *",
+      cron: "*/4 * * * *",
       fn: async (event, step) => {
         await step.invoke("call 3rd function", "third-function", {
           url: "https://enaeajsfdm4b.x.pipedream.net/",

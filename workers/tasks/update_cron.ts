@@ -1,5 +1,4 @@
 import { Task } from "graphile-worker";
-import { v4 } from "uuid";
 import log from "../utils/logUtils";
 import { isValidUpdateCronPayload } from "../utils/utils";
 import { startCronRunner } from "../utils/dbUtils";

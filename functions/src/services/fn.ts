@@ -1,7 +1,7 @@
-import { FunctionData, Secret } from '../types/types';
-import { Client } from 'pg';
-import format from 'pg-format';
-import { createHash } from 'crypto';
+import { FunctionData, Secret } from "../types/types";
+import { Client } from "pg";
+import format from "pg-format";
+import { createHash } from "crypto";
 
 let functions: FunctionData[] = [];
 let connectionString = process.env.GRAPHILE_CONNECTION_STRING;
@@ -27,6 +27,15 @@ const createFunction = (data: FunctionData) => {
     );
   }
 
+  if (data.cron) {
+    const regex =
+      /^(\*\/[1-5]?\d|[1-5]?\d-[1-5]?\d|\*|[1-5]?\d)(,(\*\/[1-5]?\d|[1-5]?\d-[1-5]?\d|\*|[1-5]?\d))* (\*\/[1-2]?\d|[1-2]?\d-[1-2]?\d|\*|[1-2]?\d)(,(\*\/[0-2]?\d|[1-2]?\d-[1-2]?\d|\*|[1-2]?\d))* (\*\/[1-3]?\d|[1-3]?\d-[1-3]?\d|\*|[1-3]?\d)(,(\*\/[1-3]?\d|[1-3]?\d-[1-3]?\d|\*|[1-3]?\d))* (\*\/1?\d|1?\d-1?\d|\*|1?\d)(,(\*\/1?\d|1?\d-1?\d|\*|1?\d))* (\*\/[0-6]|[0-6]-[0-6]|\*|[0-6])(,(\*\/[0-6]|[0-6]-[0-6]|\*|[0-6]))*$/;
+
+    if (!regex.test(data.cron)) {
+      throw new Error(`CRON string for function ${data.id} invalid.`);
+    }
+  }
+
   functions.push(data);
 };
 
@@ -40,8 +49,8 @@ const getAllFunctions = () => {
     cron: [string, string][];
   } = { events: {}, cron: [] };
 
-  const eventFunctions = functions.filter((funcData) => 'event' in funcData);
-  const cronFunctions = functions.filter((funcData) => 'cron' in funcData);
+  const eventFunctions = functions.filter((funcData) => "event" in funcData);
+  const cronFunctions = functions.filter((funcData) => "cron" in funcData);
 
   result.cron = cronFunctions.map((funcData) => [
     funcData.id,
@@ -65,26 +74,26 @@ const getFunctionsHash = () => {
     Object.keys(functionsObj.events).length === 0 &&
     Object.keys(functionsObj.cron).length === 0
   )
-    return '';
+    return "";
 
-  const sha1 = createHash('sha1');
+  const sha1 = createHash("sha1");
   sha1.update(JSON.stringify(functionsObj));
-  return sha1.digest('base64');
+  return sha1.digest("base64");
 };
 
 const setUpDb = async () => {
   await client.connect();
 
   try {
-    const dbHash = await client.query('SELECT hash FROM hash');
+    const dbHash = (await client.query("SELECT hash FROM hash")).rows[0]?.hash;
     const funcsHash = getFunctionsHash();
-    if (dbHash.rows[0]?.hash === funcsHash) return;
+    if (dbHash === funcsHash) return;
 
-    await client.query('BEGIN');
+    await client.query("BEGIN");
 
-    await client.query('DELETE FROM functions');
-    await client.query('DELETE FROM events');
-    await client.query('DELETE FROM hash');
+    await client.query("DELETE FROM functions");
+    await client.query("DELETE FROM events");
+    await client.query("DELETE FROM hash");
 
     const functions = getAllFunctions();
     const eventNames = Object.keys(functions.events).map((string) => [string]);
@@ -115,16 +124,19 @@ const setUpDb = async () => {
     }
 
     await client.query(
-      format('INSERT INTO hash (hash) VALUES %L', [[funcsHash]])
+      format("INSERT INTO hash (hash) VALUES %L", [[funcsHash]])
     );
 
-    await client.query("SELECT graphile_worker.add_job('update_cron', $1);", [
-      { hash: '' },
-    ]);
+    if (dbHash) {
+      // only push job if updating, not initializing
+      await client.query("SELECT graphile_worker.add_job('update_cron', $1);", [
+        { hash: "" },
+      ]);
+    }
 
-    await client.query('COMMIT');
+    await client.query("COMMIT");
   } catch (e) {
-    await client.query('ROLLBACK');
+    await client.query("ROLLBACK");
     console.error(e);
   } finally {
     await client.end();

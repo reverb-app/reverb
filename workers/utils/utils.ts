@@ -1,6 +1,8 @@
 import {
   Event,
   FunctionPayload,
+  CronPayload,
+  UpdateCronPayload,
   RpcResponse,
   CompleteResult,
   StepResult,
@@ -108,5 +110,27 @@ const isValidEmitEventResult = (result: unknown): result is EmitEventResult => {
     typeof result.stepId === "string" &&
     "eventId" in result &&
     typeof result.eventId === "string"
+  );
+};
+
+export const isValidCronPayload = (
+  payload: unknown
+): payload is CronPayload => {
+  return (
+    !!payload &&
+    typeof payload === "object" &&
+    "funcName" in payload &&
+    typeof payload.funcName === "string"
+  );
+};
+
+export const isValidUpdateCronPayload = (
+  payload: unknown
+): payload is UpdateCronPayload => {
+  return (
+    !!payload &&
+    typeof payload === "object" &&
+    "hash" in payload &&
+    typeof payload.hash === "string"
   );
 };

@@ -17,6 +17,16 @@ const client = new Client({
 });
 
 const createFunction = (data: FunctionData) => {
+  if (data.event && data.cron) {
+    throw new Error(
+      `Function ${data.id}: Cannot trigger function by both cron and event.`
+    );
+  } else if (!data.event && !data.cron) {
+    throw new Error(
+      `Function ${data.id}: must be triggered by either cron or event.`
+    );
+  }
+
   functions.push(data);
 };
 
@@ -25,20 +35,40 @@ const getFunction = (method: string) => {
 };
 
 const getAllFunctions = () => {
-  const result: { [event: string]: string[] } = {};
-  functions.forEach((func) => {
-    if (!result[func.event]) result[func.event] = [];
-    result[func.event].push(func.id);
+  const result: {
+    events: { [event: string]: string[] };
+    cron: [string, string][];
+  } = { events: {}, cron: [] };
+
+  const eventFunctions = functions.filter((funcData) => 'event' in funcData);
+  const cronFunctions = functions.filter((funcData) => 'cron' in funcData);
+
+  result.cron = cronFunctions.map((funcData) => [
+    funcData.id,
+    funcData.cron as string,
+  ]);
+
+  eventFunctions.forEach((funcData) => {
+    const key = funcData.event as string;
+    if (!(key in result.events)) {
+      result.events[key] = [];
+    }
+    result.events[key].push(funcData.id);
   });
 
   return result;
 };
 
 const getFunctionsHash = () => {
-  if (Object.keys(getAllFunctions()).length === 0) return '';
+  const functionsObj = getAllFunctions();
+  if (
+    Object.keys(functionsObj.events).length === 0 &&
+    Object.keys(functionsObj.cron).length === 0
+  )
+    return '';
 
   const sha1 = createHash('sha1');
-  sha1.update(JSON.stringify(getAllFunctions()));
+  sha1.update(JSON.stringify(functionsObj));
   return sha1.digest('base64');
 };
 
@@ -47,7 +77,8 @@ const setUpDb = async () => {
 
   try {
     const dbHash = await client.query('SELECT hash FROM hash');
-    if (dbHash.rows[0]?.hash === getFunctionsHash()) return;
+    const funcsHash = getFunctionsHash();
+    if (dbHash.rows[0]?.hash === funcsHash) return;
 
     await client.query('BEGIN');
 
@@ -56,13 +87,9 @@ const setUpDb = async () => {
     await client.query('DELETE FROM hash');
 
     const functions = getAllFunctions();
-    const eventNames = Object.keys(functions).map((string) => [string]);
+    const eventNames = Object.keys(functions.events).map((string) => [string]);
 
-    await client.query(
-      format('INSERT INTO hash VALUES %L', [getFunctionsHash()])
-    );
-
-    if (Object.keys(functions).length > 0) {
+    if (Object.keys(functions.events).length > 0) {
       const ids = (
         await client.query(
           format(
@@ -73,13 +100,27 @@ const setUpDb = async () => {
       ).rows.map((obj) => obj.id);
 
       const insertQuery = ids.flatMap((id, index) => {
-        return functions[eventNames[index][0]].map((ele) => [id, ele]);
+        return functions.events[eventNames[index][0]].map((ele) => [id, ele]);
       });
 
       await client.query(
         format(`INSERT INTO functions (event_id, name) VALUES %L`, insertQuery)
       );
     }
+
+    if (Object.keys(functions.cron).length > 0) {
+      await client.query(
+        format(`INSERT INTO functions (name, cron) VALUES %L`, functions.cron)
+      );
+    }
+
+    await client.query(
+      format('INSERT INTO hash (hash) VALUES %L', [[funcsHash]])
+    );
+
+    await client.query("SELECT graphile_worker.add_job('update_cron', $1);", [
+      { hash: '' },
+    ]);
 
     await client.query('COMMIT');
   } catch (e) {

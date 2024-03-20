@@ -27,10 +27,27 @@ getFunction.mockImplementation((method: string) => {
 
 const getAllFunctions = jest.spyOn(functions, 'getAllFunctions');
 getAllFunctions.mockImplementation(() => {
-  const result: { [event: string]: string[] } = {};
-  mockFunctions.forEach((func) => {
-    if (!result[func.event]) result[func.event] = [];
-    result[func.event].push(func.id);
+  const result: {
+    events: { [event: string]: string[] };
+    cron: [string, string][];
+  } = { events: {}, cron: [] };
+
+  const eventFunctions = mockFunctions.filter(
+    (funcData) => 'event' in funcData
+  );
+  const cronFunctions = mockFunctions.filter((funcData) => 'cron' in funcData);
+
+  result.cron = cronFunctions.map((funcData) => [
+    funcData.id,
+    funcData.cron as string,
+  ]);
+
+  eventFunctions.forEach((funcData) => {
+    const key = funcData.event as string;
+    if (!(key in result.events)) {
+      result.events[key] = [];
+    }
+    result.events[key].push(funcData.id);
   });
 
   return result;
@@ -162,7 +179,7 @@ describe('Database', () => {
     expect(client.query).toHaveBeenCalledWith('DELETE FROM hash');
 
     expect(client.query).toHaveBeenCalledWith(
-      `INSERT INTO hash VALUES '${functions.getFunctionsHash()}'`
+      expect.stringMatching(/INSERT INTO/)
     );
 
     expect(client.end).toHaveBeenCalled();

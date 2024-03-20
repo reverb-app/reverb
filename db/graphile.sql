@@ -15,7 +15,8 @@ CREATE TABLE events (
 CREATE TABLE functions (
   id serial PRIMARY KEY,
   name varchar(50) UNIQUE NOT NULL,
-  event_id integer REFERENCES events(id) ON DELETE CASCADE
+  event_id integer REFERENCES events(id) ON DELETE CASCADE,
+  cron varchar(100)
 );
 
 CREATE TABLE hash (

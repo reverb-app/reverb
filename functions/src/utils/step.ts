@@ -82,7 +82,7 @@ export class Step {
       return this.#cache[id];
     }
 
-    if (!Object.keys(functions.getAllFunctions()).includes(eventId)) {
+    if (!Object.keys(functions.getAllFunctions().events).includes(eventId)) {
       throw new Error(`Event ${eventId} does not exist`);
     }
 

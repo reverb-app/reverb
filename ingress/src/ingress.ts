@@ -1,42 +1,15 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import express, { Request } from 'express';
-import { Event } from './types/types';
-import { addEvent } from './services/pg-service';
+import express from 'express';
+import { json } from 'body-parser';
+import eventsRouter from './routes/events';
+import logsRouter from './routes/logs';
 
-import { v4 } from 'uuid';
+const app = express();
+app.use(json());
 
-import { MongoClient } from 'mongodb';
-
-const uri = process.env.MONGO_URI ?? '';
-const dbName = process.env.MONGO_DB_NAME ?? '';
-const client = new MongoClient(uri);
-client.connect();
-
-export const app = express();
-app.use(express.json());
-
-app.post('/events', (req: Request<{}, {}, Event>, res) => {
-  if (!req.body.name) {
-    res.status(400);
-    return res.send({ error: 'Event ID was not included in request body' });
-  }
-
-  addEvent({ ...req.body, id: v4() });
-  res.status(200);
-  return res.send();
-});
-
-app.get('/logs', async (req, res) => {
-  try {
-    const database = client.db(dbName);
-    const collection = database.collection('logs');
-    const logs = await collection.find({}).toArray();
-    res.status(200).json(logs);
-  } catch (error) {
-    res.status(500).json({ error: 'Error retrieving logs from MongoDB' });
-  }
-});
+app.use('/events', eventsRouter);
+app.use('/logs', logsRouter);
 
 export default app;

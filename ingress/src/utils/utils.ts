@@ -14,3 +14,11 @@ export const isValidFunctionsByEvent = (
     })
   );
 };
+
+export const isValidDateString = (value: unknown): value is string => {
+  return typeof value === 'string' && !isNaN(Date.parse(value));
+}
+
+export const isValidNumberString = (value: unknown): value is string => {
+  return typeof value === 'string' && !isNaN(parseInt(value));
+}

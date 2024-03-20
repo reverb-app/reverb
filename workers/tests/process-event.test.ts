@@ -1,4 +1,4 @@
-import process_event from '../tasks/process-event';
+import process_event from '../tasks/process_event';
 import { JobHelpers } from 'graphile-worker';
 import { v4 } from 'uuid';
 import log from '../utils/logUtils';

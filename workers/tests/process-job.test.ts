@@ -1,4 +1,4 @@
-import process_job from '../tasks/process-job';
+import process_job from '../tasks/process_job';
 import { JobHelpers } from 'graphile-worker';
 import log from '../utils/logUtils';
 

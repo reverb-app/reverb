@@ -18,23 +18,16 @@ const incorrectEventTwo = {
 };
 
 jest.mock('../utils/logUtils', () => {
-  const winston = require('winston');
-
-  return winston.createLogger({
-    transports: [
-      new winston.transports.Console({
-        silent: true,
-      }),
-    ],
-  });
+  return {
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+  };
 });
 
-const info = jest.spyOn(log, 'info');
-info.mockImplementation((_) => log);
-const warn = jest.spyOn(log, 'warn');
-warn.mockImplementation((_) => log);
-const error = jest.spyOn(log, 'error');
-error.mockImplementation((_) => log);
+jest.spyOn(log, 'info');
+jest.spyOn(log, 'warn');
+jest.spyOn(log, 'error');
 
 beforeEach(() => {
   jest.clearAllMocks();

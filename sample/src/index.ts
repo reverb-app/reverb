@@ -83,7 +83,7 @@ import(
 
     const func8 = server.createFunction({
       id: 'error-function',
-      event: 'event6',
+      event: 'error',
       fn: async () => {
         throw new Error('This error is for testing purposes');
       },

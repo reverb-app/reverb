@@ -11,6 +11,11 @@ if (secret) {
   mongoConnectionString = `mongodb://${user.username}:${user.password}@${url}`;
 }
 
+const mongoTransport = new winston.transports.MongoDB({
+  db: mongoConnectionString,
+  collection: 'log',
+});
+
 const log = winston.createLogger({
   level: 'info',
   format: combine(timestamp(), json(), metadata()),
@@ -18,11 +23,9 @@ const log = winston.createLogger({
     new winston.transports.Console({
       format: combine(timestamp(), simple(), metadata()),
     }),
-    new winston.transports.MongoDB({
-      db: mongoConnectionString,
-      collection: 'log',
-    }),
+    mongoTransport,
   ],
+  exceptionHandlers: [mongoTransport],
 });
 
 export default log;

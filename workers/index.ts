@@ -4,7 +4,11 @@ dotenv.config();
 import { run } from "graphile-worker";
 import process_event from "./tasks/process_event";
 import process_job from "./tasks/process_job";
-import { waitForDB, connectionString, startCronRunner } from "./utils/dbUtils";
+import {
+  waitForDB,
+  connectionString,
+  startCronRunner,
+} from "./utils/cronUtils";
 
 async function main() {
   await waitForDB();

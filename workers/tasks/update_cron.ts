@@ -1,7 +1,7 @@
 import { Task } from "graphile-worker";
 import log from "../utils/logUtils";
 import { isValidUpdateCronPayload } from "../utils/utils";
-import { startCronRunner } from "../utils/dbUtils";
+import { startCronRunner } from "../utils/cronUtils";
 
 const update_cron: Task = async function (job, helpers) {
   const dbHash = (await helpers.query("SELECT hash FROM hash")).rows[0].hash;

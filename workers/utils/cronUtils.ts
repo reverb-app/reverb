@@ -19,15 +19,15 @@ export const waitForDB = async () => {
   const utils = await makeWorkerUtils({ connectionString });
 
   let hashExists;
-  await utils.withPgClient(async client => {
+  await utils.withPgClient(async (client) => {
     const result = await client.query("SELECT * FROM hash");
     if (result.rows.length > 0) hashExists = true;
   });
   if (hashExists) return;
 
-  return new Promise<void>(res => {
+  return new Promise<void>((res) => {
     const id = setInterval(() => {
-      utils.withPgClient(async client => {
+      utils.withPgClient(async (client) => {
         const result = await client.query("SELECT * FROM hash");
         if (result.rows.length > 0) {
           clearInterval(id);
@@ -47,7 +47,7 @@ export const startCronRunner = async () => {
   const parsedCrons: ParsedCronItem[] = [];
 
   const utils = await makeWorkerUtils({ connectionString });
-  utils.withPgClient(async client => {
+  utils.withPgClient(async (client) => {
     const hash = (await client.query("SELECT hash FROM hash")).rows[0].hash;
     const cronFuncs = (
       await client.query(
@@ -55,7 +55,7 @@ export const startCronRunner = async () => {
       )
     ).rows;
 
-    cronFuncs.forEach(cronFunc => {
+    cronFuncs.forEach((cronFunc) => {
       const cronItem: CronItem = {
         task: "process_cron",
         match: cronFunc.cron,

@@ -9,13 +9,21 @@ import log from '../utils/logUtils';
 
 const functionServerUrl: string = process.env.FUNCTION_SERVER_URL ?? '';
 if (!functionServerUrl) {
-  log.error('No function server URL found');
+  throw new Error('No function server URL found');
 }
 
 const process_job: Task = async function (job, helpers) {
+  const { payload, attempts, max_attempts } = helpers.job;
+
   if (!isValidFunctionPayload(job)) {
-    log.error('Not a valid Function Payload', helpers.job);
-    throw new Error(`${job} not valid Function Payload`);
+    const e = new Error(`${job} not valid Function Payload`);
+    log.error('Not a valid Function Payload', {
+      error: e,
+      payload,
+      attempts,
+      max_attempts,
+    });
+    throw e;
   }
   let data: any;
   try {
@@ -38,27 +46,70 @@ const process_job: Task = async function (job, helpers) {
       funcId: job.id,
       eventId: job.event.id,
       error: e,
+      payload,
+      attempts,
+      max_attempts,
     });
+    if (e instanceof Error)
+      e.message = 'Error communicating with function server';
     throw e;
   }
 
   if (!isValidRpcResponse(data)) {
+    const e = new Error(
+      'Did not receive a valid RPC response from function server'
+    );
+
     log.error('Did not receive a valid RPC response from function server', {
       funcId: job.id,
       eventId: job.event.id,
       response: data,
+      error: e,
+      payload,
+      attempts,
+      max_attempts,
     });
-    throw new Error('Not a valid RPC response');
+
+    throw e;
   }
   if ('error' in data) {
-    log.error('RPC Response contains an error.', {
-      funcId: job.id,
-      eventid: job.event.id,
-      error: data.error,
-    });
     if (typeof data.error === 'string') {
-      throw new Error(data.error);
+      let e;
+      let logMessage = 'RPC Response contains an error.';
+
+      try {
+        const parsed = JSON.parse(data.error);
+        if ('message' in parsed && 'stack' in parsed) {
+          e = new Error(parsed.message);
+          e.stack = parsed.stack;
+        }
+      } catch {}
+
+      if (!e) {
+        e = new Error(data.error);
+        logMessage = 'RPC Response contains an improperly formatted error.';
+      }
+
+      log.error(logMessage, {
+        funcId: job.id,
+        eventid: job.event.id,
+        error: e,
+        payload,
+        attempts,
+        max_attempts,
+      });
+
+      throw e;
     } else {
+      log.error('RPC Response contains an error.', {
+        funcId: job.id,
+        eventid: job.event.id,
+        error: data.error,
+        payload,
+        attempts,
+        max_attempts,
+      });
+
       throw data.error;
     }
   }
@@ -112,7 +163,7 @@ const process_job: Task = async function (job, helpers) {
         },
         cache: {},
       });
-      log.info('Invoked function', {
+      log.info('Invoked function as step', {
         funcId: funcId,
         eventId: job.event.id,
         funcName: result.invokedFnName,

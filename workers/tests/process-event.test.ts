@@ -33,19 +33,23 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
+const mockHelpers = {
+  job: {
+    payload: {},
+    attempts: 0,
+    max_attempts: 0,
+  },
+} as JobHelpers;
+
 test('incorrect event throws an error', () => {
-  expect(() =>
-    process_event(incorrectEventOne, {} as JobHelpers)
-  ).rejects.toThrow();
-  expect(() =>
-    process_event(incorrectEventTwo, {} as JobHelpers)
-  ).rejects.toThrow();
+  expect(() => process_event(incorrectEventOne, mockHelpers)).rejects.toThrow();
+  expect(() => process_event(incorrectEventTwo, mockHelpers)).rejects.toThrow();
 });
 
 describe('Logger', () => {
   test('logs an error on incorrect job', async () => {
     try {
-      await process_event(incorrectEventOne, {} as JobHelpers);
+      await process_event(incorrectEventOne, mockHelpers);
     } catch {
     } finally {
       expect(log.error).toHaveBeenCalled();
@@ -56,7 +60,7 @@ describe('Logger', () => {
     await process_event(correctEvent, {
       addJob: () => {},
       query: () => {
-        return { rows: [{ name: 'test_function' }] };
+        return { job: mockHelpers.job, rows: [{ name: 'test_function' }] };
       },
     } as unknown as JobHelpers);
     expect(log.info).toHaveBeenCalled();
@@ -65,7 +69,10 @@ describe('Logger', () => {
   test('logs a warning when event has no functions', async () => {
     await process_event(correctEvent, {
       query: () => {
-        return { rows: [] };
+        return {
+          job: mockHelpers.job,
+          rows: [],
+        };
       },
     } as unknown as JobHelpers);
 
@@ -77,6 +84,7 @@ describe('Logger', () => {
       addJob: () => {},
       query: () => {
         return {
+          job: mockHelpers.job,
           rows: [{ name: 'test_function1' }, { name: 'test_function2' }],
         };
       },

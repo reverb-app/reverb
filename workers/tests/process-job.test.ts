@@ -33,18 +33,22 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
+const mockHelpers = {
+  job: {
+    payload: {},
+    attempts: 0,
+    max_attempts: 0,
+  },
+} as JobHelpers;
+
 test('incorrect job throws an error', () => {
-  expect(() =>
-    process_job(incorrectJobOne, {} as JobHelpers)
-  ).rejects.toThrow();
-  expect(() =>
-    process_job(incorrectJobTwo, {} as JobHelpers)
-  ).rejects.toThrow();
+  expect(() => process_job(incorrectJobOne, mockHelpers)).rejects.toThrow();
+  expect(() => process_job(incorrectJobTwo, mockHelpers)).rejects.toThrow();
 });
 
 test("throws an error when it can't connect to Function server", () => {
   global.fetch = jest.fn(() => Promise.reject(new Error('failed')));
-  expect(() => process_job(correctJob, {} as JobHelpers)).rejects.toThrow();
+  expect(() => process_job(correctJob, mockHelpers)).rejects.toThrow();
 });
 
 test('throws an error when invalid RPCResponse', () => {
@@ -55,7 +59,7 @@ test('throws an error when invalid RPCResponse', () => {
       },
     })
   ) as jest.Mock;
-  expect(() => process_job(correctJob, {} as JobHelpers)).rejects.toThrow();
+  expect(() => process_job(correctJob, mockHelpers)).rejects.toThrow();
 });
 
 test('throws an error on valid RPCResponse that has an error property', () => {
@@ -70,7 +74,7 @@ test('throws an error on valid RPCResponse that has an error property', () => {
       },
     })
   ) as jest.Mock;
-  expect(() => process_job(correctJob, {} as JobHelpers)).rejects.toThrow();
+  expect(() => process_job(correctJob, mockHelpers)).rejects.toThrow();
 });
 
 test('does not throw an error on valid RPC response that has a result property', async () => {
@@ -90,7 +94,7 @@ test('does not throw an error on valid RPC response that has a result property',
     })
   ) as jest.Mock;
 
-  (process_job(correctJob, {} as JobHelpers) as Promise<void>).then((val) =>
+  (process_job(correctJob, mockHelpers) as Promise<void>).then((val) =>
     expect(val).toBeUndefined()
   );
 });
@@ -98,7 +102,7 @@ test('does not throw an error on valid RPC response that has a result property',
 describe('Logger', () => {
   test('logs an error on incorrect job', async () => {
     try {
-      await process_job(incorrectJobOne, {} as JobHelpers);
+      await process_job(incorrectJobOne, mockHelpers);
     } catch {
     } finally {
       expect(log.error).toHaveBeenCalled();
@@ -108,7 +112,7 @@ describe('Logger', () => {
   test("logs an error when it can't connect to Function server", async () => {
     global.fetch = jest.fn(() => Promise.reject(new Error('failed')));
     try {
-      await process_job(correctJob, {} as JobHelpers);
+      await process_job(correctJob, mockHelpers);
     } catch {
     } finally {
       expect(log.error).toHaveBeenCalled();
@@ -125,7 +129,7 @@ describe('Logger', () => {
     ) as jest.Mock;
 
     try {
-      await process_job(correctJob, {} as JobHelpers);
+      await process_job(correctJob, mockHelpers);
     } catch {
     } finally {
       expect(log.error).toHaveBeenCalled();
@@ -146,7 +150,7 @@ describe('Logger', () => {
     ) as jest.Mock;
 
     try {
-      await process_job(correctJob, {} as JobHelpers);
+      await process_job(correctJob, mockHelpers);
     } catch {
     } finally {
       expect(log.error).toHaveBeenCalled();
@@ -165,7 +169,7 @@ describe('Logger', () => {
       })
     ) as jest.Mock;
 
-    await process_job(correctJob, {} as JobHelpers);
+    await process_job(correctJob, mockHelpers);
     expect(log.warn).toHaveBeenCalled();
   });
 
@@ -184,7 +188,7 @@ describe('Logger', () => {
       })
     ) as jest.Mock;
 
-    await process_job(correctJob, {} as JobHelpers);
+    await process_job(correctJob, mockHelpers);
     expect(log.info).toHaveBeenCalled();
   });
 
@@ -207,6 +211,7 @@ describe('Logger', () => {
 
     await process_job(correctJob, {
       addJob: () => {},
+      job: mockHelpers.job,
     } as unknown as JobHelpers);
     expect(log.info).toHaveBeenCalled();
   });
@@ -230,6 +235,7 @@ describe('Logger', () => {
 
     await process_job(correctJob, {
       addJob: () => {},
+      job: mockHelpers.job,
     } as unknown as JobHelpers);
     expect(log.info).toHaveBeenCalled();
   });
@@ -253,6 +259,7 @@ describe('Logger', () => {
 
     await process_job(correctJob, {
       addJob: () => {},
+      job: mockHelpers.job,
     } as unknown as JobHelpers);
     expect(log.info).toHaveBeenCalled();
   });
@@ -276,6 +283,7 @@ describe('Logger', () => {
 
     await process_job(correctJob, {
       addJob: () => {},
+      job: mockHelpers.job,
     } as unknown as JobHelpers);
     expect(log.info).toHaveBeenCalled();
   });

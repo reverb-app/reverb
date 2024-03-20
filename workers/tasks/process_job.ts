@@ -99,8 +99,6 @@ const process_job: Task = async function (job, helpers) {
         max_attempts,
       });
 
-      console.log(logMessage);
-
       throw e;
     } else {
       log.error('RPC Response contains an error.', {

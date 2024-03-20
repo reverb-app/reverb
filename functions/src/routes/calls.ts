@@ -88,7 +88,7 @@ router.post('/', async (req, res: Response<RpcResponse>) => {
         },
       };
     } else if (e instanceof Error) {
-      body = { error: e.message, id };
+      body = { error: JSON.stringify(e, Object.getOwnPropertyNames(e)), id };
     } else if (typeof e === 'string') {
       body = { error: e, id };
     }

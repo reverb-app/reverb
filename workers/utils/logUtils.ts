@@ -1,7 +1,7 @@
 import winston from 'winston';
 import 'winston-mongodb';
 
-const { combine, timestamp, json, simple } = winston.format;
+const { combine, timestamp, json, simple, metadata } = winston.format;
 
 let mongoConnectionString = process.env.MONGO_CONNECTION_STRING as string;
 const secret = process.env.MONGO_SECRET;
@@ -13,9 +13,11 @@ if (secret) {
 
 const log = winston.createLogger({
   level: 'info',
-  format: combine(timestamp(), json()),
+  format: combine(timestamp(), json(), metadata()),
   transports: [
-    new winston.transports.Console({ format: combine(timestamp(), simple()) }),
+    new winston.transports.Console({
+      format: combine(timestamp(), simple(), metadata()),
+    }),
     new winston.transports.MongoDB({
       db: mongoConnectionString,
       collection: 'log',

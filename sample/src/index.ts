@@ -30,7 +30,7 @@ import(
     const func3 = server.createFunction({
       id: "third-function",
       event: "event2",
-      fn: async (event) => {
+      fn: async event => {
         if (
           !!event.payload &&
           "url" in event.payload &&
@@ -74,7 +74,7 @@ import(
     const func7 = server.createFunction({
       id: "cron-function",
       cron: "*/4 * * * *",
-      fn: async (event, step) => {
+      fn: async (_event, step) => {
         await step.invoke("call 3rd function", "third-function", {
           url: "https://enaeajsfdm4b.x.pipedream.net/",
         });

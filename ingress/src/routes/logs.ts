@@ -1,17 +1,15 @@
-import express from 'express';
+import express, { Request } from 'express';
 import { client, dbName } from '../services/mongo-service';
-import { getPaginatedLogs, } from '../utils/paginationUtils';
+import { getPaginatedLogs, handlePagination } from '../utils/paginationUtils';
 import { isValidDateString, isValidNumberString } from '../utils/utils';
 
 const router = express.Router();
 
-const logsPerPage = 10;
-
-router.get('/', async (req, res) => {
+router.get('/', async (req: Request, res) => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const offset = (page - 1) * logsPerPage;
-    const logs = await getPaginatedLogs(offset, logsPerPage);
+    const { page, limit, offset } = handlePagination(req);
+
+    const logs = await getPaginatedLogs(offset, limit);
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: 'Page not found' });
@@ -23,7 +21,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get('/events', async (req, res) => {
+router.get('/events', async (req: Request, res) => {
   const { startTime, endTime } = req.query;
 
   if (!startTime || !endTime || !isValidDateString(startTime) || !isValidDateString(endTime)) {
@@ -31,12 +29,11 @@ router.get('/events', async (req, res) => {
   }
 
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const offset = (page - 1) * logsPerPage;
+    const { page, limit, offset } = handlePagination(req);
     const filter = {
       timestamp: { $gte: new Date(startTime), $lte: new Date(endTime) }
     }
-    const logs = await getPaginatedLogs(offset, logsPerPage, filter);
+    const logs = await getPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: 'Page not found' });
@@ -48,14 +45,13 @@ router.get('/events', async (req, res) => {
   }
 });
 
-router.get('/events/:eventId', async (req, res) => {
+router.get('/events/:eventId', async (req: Request, res) => {
   const { eventId } = req.params;
 
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const offset = (page - 1) * logsPerPage;
+    const { page, limit, offset } = handlePagination(req);
     const filter = { eventId }
-    const logs = await getPaginatedLogs(offset, logsPerPage, filter);
+    const logs = await getPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: 'Page not found' });
@@ -70,15 +66,13 @@ router.get('/events/:eventId', async (req, res) => {
   }
 });
 
-router.get('/functions/:funcId', async (req, res) => {
+router.get('/functions/:funcId', async (req: Request, res) => {
   const { funcId } = req.params;
 
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const offset = (page - 1) * logsPerPage;
+    const { page, limit, offset } = handlePagination(req);
     const filter = { funcId }
-
-    const logs = await getPaginatedLogs(offset, logsPerPage, filter);
+    const logs = await getPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: 'Page not found' });
@@ -94,7 +88,7 @@ router.get('/functions/:funcId', async (req, res) => {
   }
 })
 
-router.get('/errors/:count', async (req, res) => {
+router.get('/errors/:count', async (req: Request, res) => {
   const { count } = req.params;
 
   if (!isValidNumberString(count) || parseInt(count) <= 0) {

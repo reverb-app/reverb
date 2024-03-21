@@ -1,8 +1,9 @@
 import { client, dbName } from '../services/mongo-service';
+import { Request } from 'express';
 
 export async function getPaginatedLogs(
-  offset: number = 0,
-  limit: number = 10,
+  offset: number,
+  limit: number,
   filter: {} = {},
   sort: {} = {}
 ): Promise<any[]> {
@@ -14,4 +15,15 @@ export async function getPaginatedLogs(
   } catch (error) {
     throw new Error('Error retrieving logs from MongoDB');
   }
+}
+
+const MAX_LIMIT = 50;
+
+export function handlePagination(req: Request): { page: number, limit: number, offset: number } {
+  let limit = parseInt(req.query.limit as string) || 10;
+  limit = Math.min(limit, MAX_LIMIT);
+  const page = parseInt(req.query.page as string) || 1;
+  const offset = (page - 1) * limit;
+
+  return { page, limit, offset };
 }

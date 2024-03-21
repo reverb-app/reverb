@@ -3,7 +3,7 @@ dotenv.config();
 import functionsExportType from '@reverb-app/functions';
 import(
   process.env.NODE_ENV === 'development'
-    ? '../../functions/src'
+    ? '@reverb-app/functions'
     : '@reverb-app/functions'
 ).then(
   (
@@ -86,6 +86,14 @@ import(
       event: 'error',
       fn: async () => {
         throw new Error('This error is for testing purposes');
+      },
+    });
+
+    const func9 = server.createFunction({
+      id: 'webhook_test',
+      event: 'reverb_received_webhook',
+      fn: async (event) => {
+        console.log(event);
       },
     });
 

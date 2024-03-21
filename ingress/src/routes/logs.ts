@@ -1,20 +1,22 @@
-// return events within a certain time period (a get request with query string params)
-// return every log tied to specific event
-// return an event tied to a specific function if
-// return the last x number of errors
-// paginated  
-
 import express from 'express';
 import { client, dbName } from '../services/mongo-service';
+import { getPaginatedLogs, } from '../utils/paginationUtils';
 import { isValidDateString, isValidNumberString } from '../utils/utils';
 
 const router = express.Router();
 
+const logsPerPage = 10;
+
 router.get('/', async (req, res) => {
   try {
-    const database = client.db(dbName);
-    const collection = database.collection('logs');
-    const logs = await collection.find({}).toArray();
+    const page = parseInt(req.query.page as string) || 1;
+    const offset = (page - 1) * logsPerPage;
+    const logs = await getPaginatedLogs(offset, logsPerPage);
+
+    if (logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: 'Page not found' });
+    }
+
     res.status(200).json(logs);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving logs from MongoDB' });
@@ -29,11 +31,17 @@ router.get('/events', async (req, res) => {
   }
 
   try {
-    const database = client.db(dbName);
-    const collection = database.collection('logs');
-    const logs = await collection.find({
+    const page = parseInt(req.query.page as string) || 1;
+    const offset = (page - 1) * logsPerPage;
+    const filter = {
       timestamp: { $gte: new Date(startTime), $lte: new Date(endTime) }
-    }).toArray();
+    }
+    const logs = await getPaginatedLogs(offset, logsPerPage, filter);
+
+    if (logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: 'Page not found' });
+    }
+
     res.status(200).json(logs);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving events from MongoDB' });
@@ -44,9 +52,14 @@ router.get('/events/:eventId', async (req, res) => {
   const { eventId } = req.params;
 
   try {
-    const database = client.db(dbName);
-    const collection = database.collection('logs');
-    const logs = await collection.find({ eventId }).toArray();
+    const page = parseInt(req.query.page as string) || 1;
+    const offset = (page - 1) * logsPerPage;
+    const filter = { eventId }
+    const logs = await getPaginatedLogs(offset, logsPerPage, filter);
+
+    if (logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: 'Page not found' });
+    }
 
     if (logs.length === 0) {
       return res.status(404).json({ error: 'Event not found' });
@@ -61,9 +74,15 @@ router.get('/functions/:funcId', async (req, res) => {
   const { funcId } = req.params;
 
   try {
-    const database = client.db(dbName);
-    const collection = database.collection('logs');
-    const logs = await collection.find({ funcId }).toArray();
+    const page = parseInt(req.query.page as string) || 1;
+    const offset = (page - 1) * logsPerPage;
+    const filter = { funcId }
+
+    const logs = await getPaginatedLogs(offset, logsPerPage, filter);
+
+    if (logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: 'Page not found' });
+    }
 
     if (logs.length === 0) {
       return res.status(404).json({ error: 'Function not found' });

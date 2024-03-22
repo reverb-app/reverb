@@ -22,7 +22,7 @@ const run = async () => {
   console.info(chalk.yellowBright("Welcome to create-reverb.\n"));
 
   if (!process.argv[2]) {
-    console.info(chalk.red("Please specify a directory via the command line."));
+    console.info(chalk.red("Please specify a directory name via the command line."));
     console.info("An example would be:");
     console.info(chalk.yellow("    npm create reverb myFunctionServer"));
     return;

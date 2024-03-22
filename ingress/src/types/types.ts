@@ -31,4 +31,5 @@ export interface QueryFilter {
   message?: string | { $in: string[] };
   timestamp?: { $gte: Date; $lte: Date };
   count?: string;
+  level?: "info" | "warn" | "debug" | "error" | "silly" | "http" | "verbose";
 }

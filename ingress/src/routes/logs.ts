@@ -1,15 +1,9 @@
 import express, { Request } from "express";
-import { client, dbName } from "../services/mongo-service";
 import {
   getPaginatedLogs,
   handlePagination,
   setFilterTimestamp,
 } from "../utils/loggingUtils";
-import {
-  isValidDateString,
-  isValidNumberString,
-  isValidTimeParams,
-} from "../utils/utils";
 import { QueryFilter } from "types/types";
 
 const router = express.Router();
@@ -143,25 +137,31 @@ router.get("/functions/:funcId", async (req: Request, res) => {
   }
 });
 
-// Change count to query parameter
-router.get("/errors/:count", async (req: Request, res) => {
-  const { count } = req.params;
+router.get("/errors", async (req: Request, res) => {
+  const filter: QueryFilter = {};
 
-  if (!isValidNumberString(count) || parseInt(count) <= 0) {
-    return res.status(400).json({ error: "Count is invalid" });
+  try {
+    setFilterTimestamp(req, filter);
+  } catch (e) {
+    if (!(e instanceof Error)) return;
+
+    return res.status(400).json({
+      error: e.message,
+    });
   }
 
   try {
-    const database = client.db(dbName);
-    const collection = database.collection("logs");
-    const errors = await collection
-      .find({ level: "error" })
-      .sort({ timestamp: -1 })
-      .limit(parseInt(count))
-      .toArray();
-    res.status(200).json(errors);
+    const { page, limit, offset } = handlePagination(req);
+    filter.level = "error";
+    const logs = await getPaginatedLogs(offset, limit, filter);
+
+    if (logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: "Page not found" });
+    }
+
+    res.status(200).json(logs);
   } catch (error) {
-    res.status(500).json({ error: "Error retrieving errors from MongoDB" });
+    res.status(500).json({ error: "Error retrieving events from MongoDB" });
   }
 });
 

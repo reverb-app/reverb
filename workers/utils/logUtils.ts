@@ -1,5 +1,5 @@
-import winston from 'winston';
-import 'winston-mongodb';
+import winston from "winston";
+import "winston-mongodb";
 
 const { combine, timestamp, json, simple, metadata } = winston.format;
 
@@ -13,11 +13,11 @@ if (secret) {
 
 const mongoTransport = new winston.transports.MongoDB({
   db: mongoConnectionString,
-  collection: 'log',
+  collection: "logs",
 });
 
 const log = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: combine(timestamp(), json(), metadata()),
   transports: [
     new winston.transports.Console({

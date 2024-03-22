@@ -17,7 +17,7 @@ const process_cron: Task = async function (cronJob, helpers) {
     cache: {},
   });
 
-  log.info("Invoked function", {
+  log.info("Function invoked", {
     funcId,
     funcName: cronJob.funcName,
     cron: true,

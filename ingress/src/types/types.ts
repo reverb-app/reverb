@@ -9,7 +9,7 @@ export interface FunctionsByEvent {
 }
 
 export interface RpcRequest {
-  jsonrpc: '2.0';
+  jsonrpc: "2.0";
   method: string;
   params: { event: Event };
   id?: number | string;
@@ -20,4 +20,15 @@ export interface Secret {
   password: string;
   host: string;
   port: number;
+}
+
+export interface QueryTimestamp {
+  startTime?: Date;
+  endTime?: Date;
+}
+
+export interface QueryFilter {
+  message?: string | { $in: string[] };
+  timestamp?: { $gte: Date; $lte: Date };
+  count?: string;
 }

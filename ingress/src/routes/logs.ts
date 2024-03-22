@@ -1,39 +1,35 @@
 import express, { Request } from "express";
 import { client, dbName } from "../services/mongo-service";
-import { getPaginatedLogs, handlePagination } from "../utils/paginationUtils";
-import { isValidDateString, isValidNumberString } from "../utils/utils";
+import {
+  getPaginatedLogs,
+  handlePagination,
+  setFilterTimestamp,
+} from "../utils/loggingUtils";
+import {
+  isValidDateString,
+  isValidNumberString,
+  isValidTimeParams,
+} from "../utils/utils";
+import { QueryFilter } from "types/types";
 
 const router = express.Router();
 
-// Implement time filter for all non-id routes
-
 // Implement previous and next
 router.get("/", async (req: Request, res) => {
-  const { startTime, endTime } = req.query;
+  const filter: QueryFilter = {};
 
-  if (
-    !(
-      (startTime &&
-        isValidDateString(startTime) &&
-        endTime &&
-        isValidDateString(endTime)) ||
-      (!startTime && !endTime)
-    )
-  ) {
-    return res
-      .status(400)
-      .json({
-        error: "startTime and endTime must be provided together and be valid",
-      });
+  try {
+    setFilterTimestamp(req, filter);
+  } catch (e) {
+    if (!(e instanceof Error)) return;
+
+    return res.status(400).json({
+      error: e.message,
+    });
   }
 
   try {
     const { page, limit, offset } = handlePagination(req);
-    const filter: { timestamp?: { $gte: Date; $lte: Date } } = {};
-    if (startTime && endTime) {
-      filter.timestamp = { $gte: new Date(startTime), $lte: new Date(endTime) };
-    }
-
     const logs = await getPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
@@ -46,27 +42,50 @@ router.get("/", async (req: Request, res) => {
   }
 });
 
-// Incorporate searching by timestamp into base endpoint
-// Refactor /events to only display emitted events
 router.get("/events", async (req: Request, res) => {
-  const { startTime, endTime } = req.query;
+  const filter: QueryFilter = {};
 
-  if (
-    !startTime ||
-    !endTime ||
-    !isValidDateString(startTime) ||
-    !isValidDateString(endTime)
-  ) {
-    return res
-      .status(400)
-      .json({ error: "No or invalid startTime or endTime provided in URL" });
+  try {
+    setFilterTimestamp(req, filter);
+  } catch (e) {
+    if (!(e instanceof Error)) return;
+
+    return res.status(400).json({
+      error: e.message,
+    });
   }
 
   try {
     const { page, limit, offset } = handlePagination(req);
-    const filter = {
-      timestamp: { $gte: new Date(startTime), $lte: new Date(endTime) },
-    };
+    filter.message = "Event emitted";
+    const logs = await getPaginatedLogs(offset, limit, filter);
+
+    if (logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: "Page not found" });
+    }
+
+    res.status(200).json(logs);
+  } catch (error) {
+    res.status(500).json({ error: "Error retrieving events from MongoDB" });
+  }
+});
+
+router.get("/functions", async (req: Request, res) => {
+  const filter: QueryFilter = {};
+
+  try {
+    setFilterTimestamp(req, filter);
+  } catch (e) {
+    if (!(e instanceof Error)) return;
+
+    return res.status(400).json({
+      error: e.message,
+    });
+  }
+
+  try {
+    const { page, limit, offset } = handlePagination(req);
+    filter.message = { $in: ["Function invoked", "Function completed"] };
     const logs = await getPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {

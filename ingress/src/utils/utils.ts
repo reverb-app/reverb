@@ -1,24 +1,41 @@
-import { FunctionsByEvent } from '../types/types';
+import { FunctionsByEvent } from "../types/types";
+import { QueryTimestamp } from "../types/types";
 
 export const isValidFunctionsByEvent = (
   body: unknown
 ): body is FunctionsByEvent => {
   return (
     !!body &&
-    typeof body === 'object' &&
-    Object.values(body).every((value) => {
+    typeof body === "object" &&
+    Object.values(body).every(value => {
       return (
         Array.isArray(value) &&
-        value.every((element) => typeof element === 'string')
+        value.every(element => typeof element === "string")
       );
     })
   );
 };
 
 export const isValidDateString = (value: unknown): value is string => {
-  return typeof value === 'string' && !isNaN(Date.parse(value));
-}
+  return typeof value === "string" && !isNaN(Date.parse(value));
+};
 
 export const isValidNumberString = (value: unknown): value is string => {
-  return typeof value === 'string' && !isNaN(parseInt(value));
+  return typeof value === "string" && !isNaN(parseInt(value));
+};
+
+export function isValidTimeParams(
+  timestamp: unknown
+): timestamp is QueryTimestamp {
+  return (
+    !!timestamp &&
+    typeof timestamp === "object" &&
+    (("startTime" in timestamp &&
+      !!timestamp.startTime &&
+      isValidDateString(timestamp.startTime) &&
+      "endTime" in timestamp &&
+      !!timestamp.endTime &&
+      isValidDateString(timestamp.endTime)) ||
+      (!("startTime" in timestamp) && !("endTime" in timestamp)))
+  );
 }

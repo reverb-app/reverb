@@ -34,11 +34,9 @@ export async function getPaginatedLogs(
 export async function getAggregate(group: AggregateGroup, filter: QueryFilter) {
   const database = client.db(dbName);
   const collection = database.collection("logs");
-  const logs = await collection.aggregate([
-    { $group: group },
-    { $match: filter },
-    { $sort: { date: -1 } },
-  ]);
+  const logs = collection
+    .aggregate([{ $match: filter }, { $group: group }, { $sort: { date: -1 } }])
+    .toArray();
 
   return logs;
 }
@@ -61,6 +59,10 @@ export function setFilterTimestamp(req: Request, filter: QueryFilter) {
     endTime: req.query.endTime,
   };
 
+  if (!queryTimestamp.startTime && !queryTimestamp.endTime) {
+    return;
+  }
+
   if (!isValidTimeParams(queryTimestamp)) {
     throw new Error(
       "startTime and endTime must be provided together and be valid"
@@ -68,7 +70,7 @@ export function setFilterTimestamp(req: Request, filter: QueryFilter) {
   }
 
   if (queryTimestamp.startTime && queryTimestamp.endTime) {
-    filter.timestamp = {
+    filter["meta.timestamp"] = {
       $gte: new Date(queryTimestamp.startTime),
       $lte: new Date(queryTimestamp.endTime),
     };

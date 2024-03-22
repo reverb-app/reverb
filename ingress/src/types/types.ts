@@ -28,17 +28,19 @@ export interface QueryTimestamp {
 }
 
 export interface QueryFilter {
-  eventId?: string;
+  message?: string | { $in: string[] };
   count?: string;
   level?: "info" | "warn" | "debug" | "error" | "silly" | "http" | "verbose";
-  message?: string | { $in: string[] };
-  timestamp?: { $gte: Date; $lte: Date };
-  funcId?: { $in: string[] };
+  "meta.eventId"?: string;
+  "meta.timestamp"?: { $gte: Date; $lte: Date };
+  "meta.funcId"?: { $in: string[] };
 }
 
 export interface AggregateGroup {
   _id: string;
-  message?: { $last: string };
-  timestamp?: { $last: string };
-  level?: { $last: string };
+  message?: { $last: "$message" };
+  timestamp?: { $last: "$meta.timestamp" };
+  level?: { $last: "$level" };
+  name?: { $first: "$meta.funcName" };
+  invoked?: { $first: "$meta.timestamp" };
 }

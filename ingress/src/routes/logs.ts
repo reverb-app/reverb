@@ -5,7 +5,7 @@ import {
   handlePagination,
   setFilterTimestamp,
 } from "../utils/loggingUtils";
-import { QueryFilter } from "types/types";
+import { AggregateGroup, QueryFilter } from "types/types";
 
 const router = express.Router();
 
@@ -52,7 +52,7 @@ router.get("/events", async (req: Request, res) => {
 
   try {
     const { page, limit, offset } = handlePagination(req);
-    filter.message = "Event emitted";
+    filter.message = { $in: ["Event emitted", "Event fired"] };
     const logs = await getPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
@@ -93,40 +93,38 @@ router.get("/functions", async (req: Request, res) => {
   }
 });
 
-// get /events/asdf
-// Get function invoked
-// { funcId, funcName, timeStamp }
-// get last log for each funcId
-// { eventId, functions: [{funcId, funcName, invokedTime, lastLogTime, status}]
-
 router.get("/events/:eventId", async (req: Request, res) => {
   const { eventId } = req.params;
 
   const functions: any[] = [];
   try {
     const { page, limit, offset } = handlePagination(req);
-    const filter: QueryFilter = { eventId, message: "Function invoked" };
+    const filter: QueryFilter = {
+      "meta.eventId": eventId,
+      message: "Function invoked",
+    };
     const logs = await getPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: "Page not found" });
     }
 
-    const idsToFilterOn = logs.map(log => log.funcId);
+    const idsToFilterOn = logs.map((log) => log.meta.funcId);
 
-    const group = {
-      _id: "$funcId",
+    const group: AggregateGroup = {
+      _id: "$meta.funcId",
       message: { $last: "$message" },
       level: { $last: "$level" },
-      timeStamp: { $last: "$timestamp" },
+      timestamp: { $last: "$meta.timestamp" },
+      name: { $first: "$meta.funcName" },
+      invoked: { $first: "$meta.timestamp" },
     };
 
     const statusLogs = await getAggregate(group, {
-      funcId: { $in: idsToFilterOn },
+      "meta.funcId": { $in: idsToFilterOn },
     });
 
-    statusLogs.forEach(log => {
-      const startLog = logs.find(old => old.funcId === log.funcId);
+    statusLogs.forEach((log) => {
       let status = "running";
       if (log.message === "Function completed") {
         status = "completed";
@@ -136,14 +134,63 @@ router.get("/events/:eventId", async (req: Request, res) => {
 
       functions.push({
         status,
-        funcId: log.funcId,
+        funcId: log._id,
         lastUpdate: log.timestamp,
-        invoked: startLog.timeStamp,
-        funcName: startLog.funcName,
+        invoked: log.invoked,
+        funcName: log.name,
       });
     });
 
     res.status(200).json({ eventId, functions });
+  } catch (error) {
+    res.status(500).json({ error: "Error retrieving logs from MongoDB" });
+  }
+});
+
+router.get("/functions/status", async (req: Request, res) => {
+  const { id } = req.query;
+  if (id === undefined) {
+    res
+      .status(404)
+      .json({ error: "Must include function id's as id query parameters" });
+  }
+
+  const filter: QueryFilter = {};
+
+  if (typeof id === "string") {
+    filter["meta.funcId"] = { $in: [id] };
+  } else if (Array.isArray(id)) {
+    filter["meta.funcId"] = { $in: id as string[] };
+  }
+  const group: AggregateGroup = {
+    _id: "$meta.funcId",
+    message: { $last: "$message" },
+    level: { $last: "$level" },
+    timestamp: { $last: "$meta.timestamp" },
+    name: { $first: "$meta.funcName" },
+    invoked: { $first: "$meta.timestamp" },
+  };
+
+  try {
+    const logs = await getAggregate(group, filter);
+    const statusReport = logs.map((log) => {
+      let status = "running";
+      if (log.message === "Function completed") {
+        status = "completed";
+      } else if (log.level === "error") {
+        status = "error";
+      }
+
+      return {
+        funcId: log._id,
+        lastUpdate: log.timestamp,
+        status,
+        funcName: log.name,
+        invoked: log.invoked,
+      };
+    });
+
+    res.status(200).json(statusReport);
   } catch (error) {
     res.status(500).json({ error: "Error retrieving logs from MongoDB" });
   }
@@ -167,47 +214,6 @@ router.get("/functions/:funcId", async (req: Request, res) => {
     }
 
     res.status(200).json(logs);
-  } catch (error) {
-    res.status(500).json({ error: "Error retrieving logs from MongoDB" });
-  }
-});
-
-router.get("/functions/status", async (req: Request, res) => {
-  const { id } = req.query;
-  if (id === undefined) {
-    res
-      .status(404)
-      .json({ error: "Must include function id's as id query parameters" });
-  }
-
-  const filter: QueryFilter = {};
-
-  if (typeof id === "string") {
-    filter.funcId = { $in: [id] };
-  } else if (Array.isArray(id)) {
-    filter.funcId = { $in: id as string[] };
-  }
-  const group = {
-    _id: "$funcId",
-    message: { $last: "$message" },
-    level: { $last: "$level" },
-    timeStamp: { $last: "$timestamp" },
-  };
-
-  try {
-    const logs = await getAggregate(group, filter);
-    const statusReport = logs.map(log => {
-      let status = "running";
-      if (log.message === "Function completed") {
-        status = "completed";
-      } else if (log.level === "error") {
-        status = "error";
-      }
-
-      return { funcId: log.funcId, lastUpdate: log.timestamp, status };
-    });
-
-    res.status(200).json(statusReport);
   } catch (error) {
     res.status(500).json({ error: "Error retrieving logs from MongoDB" });
   }

@@ -1,10 +1,6 @@
 import { client, dbName } from "../services/mongo-service";
 import { Request } from "express";
-import {
-  isValidDateString,
-  isValidNumberString,
-  isValidTimeParams,
-} from "../utils/utils";
+import { isValidTimeParams } from "../utils/utils";
 import { QueryFilter, AggregateGroup } from "types/types";
 
 const DEFAULT_LIMIT = 10;

@@ -5,7 +5,7 @@ import {
   isValidNumberString,
   isValidTimeParams,
 } from "../utils/utils";
-import { QueryFilter } from "types/types";
+import { QueryFilter, AggregateGroup } from "types/types";
 
 const DEFAULT_LIMIT = 10;
 const DEFAULT_PAGE = 1;
@@ -29,6 +29,18 @@ export async function getPaginatedLogs(
   } catch (error) {
     throw new Error("Error retrieving logs from MongoDB");
   }
+}
+
+export async function getAggregate(group: AggregateGroup, filter: QueryFilter) {
+  const database = client.db(dbName);
+  const collection = database.collection("logs");
+  const logs = await collection.aggregate([
+    { $group: group },
+    { $match: filter },
+    { $sort: { date: -1 } },
+  ]);
+
+  return logs;
 }
 
 export function handlePagination(req: Request): {

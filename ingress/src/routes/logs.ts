@@ -1,6 +1,7 @@
 import express, { Request } from "express";
 import {
   getPaginatedLogs,
+  getAggregate,
   handlePagination,
   setFilterTimestamp,
 } from "../utils/loggingUtils";
@@ -92,6 +93,12 @@ router.get("/functions", async (req: Request, res) => {
   }
 });
 
+// get /events/asdf
+// Get function invoked
+// { funcId, funcName, timeStamp }
+// get last log for each funcId
+// { eventId, functions: [{funcId, funcName, invokedTime, lastLogTime, status}]
+
 router.get("/events/:eventId", async (req: Request, res) => {
   const { eventId } = req.params;
 
@@ -128,6 +135,47 @@ router.get("/functions/:funcId", async (req: Request, res) => {
     }
 
     res.status(200).json(logs);
+  } catch (error) {
+    res.status(500).json({ error: "Error retrieving logs from MongoDB" });
+  }
+});
+
+router.get("/functions/status", async (req: Request, res) => {
+  const { id } = req.query;
+  if (id === undefined) {
+    res
+      .status(404)
+      .json({ error: "Must include function id's as id query parameters" });
+  }
+
+  const filter: QueryFilter = {};
+
+  if (typeof id === "string") {
+    filter.funcId = { $in: [id] };
+  } else if (Array.isArray(id)) {
+    filter.funcId = { $in: id as string[] };
+  }
+  const group = {
+    _id: "$funcId",
+    message: { $last: "$message" },
+    level: { $last: "$level" },
+    timeStamp: { $last: "$timestamp" },
+  };
+
+  try {
+    const logs = await getAggregate(group, filter);
+    const statusReport = logs.map(log => {
+      let status = "running";
+      if (log.message === "Function completed") {
+        status = "completed";
+      } else if (log.level === "error") {
+        status = "error";
+      }
+
+      return { funcId: log.funcId, lastUpdate: log.timestamp, status };
+    });
+
+    res.status(200).json(statusReport);
   } catch (error) {
     res.status(500).json({ error: "Error retrieving logs from MongoDB" });
   }

@@ -99,19 +99,6 @@ router.get("/events/:eventId", async (req: Request, res) => {
 
   const functions: any[] = [];
   try {
-    const { page, limit, offset } = handlePagination(req);
-    const filter: QueryFilter = {
-      "meta.eventId": eventId,
-      message: "Function invoked",
-    };
-    const logs = await getPaginatedLogs(offset, limit, filter);
-
-    if (logs.length === 0 && page !== 1) {
-      return res.status(404).json({ error: "Page not found" });
-    }
-
-    const idsToFilterOn = logs.map((log) => log.meta.funcId);
-
     const group: AggregateGroup = {
       _id: "$meta.funcId",
       message: { $last: "$message" },
@@ -122,10 +109,11 @@ router.get("/events/:eventId", async (req: Request, res) => {
     };
 
     const statusLogs = await getAggregate(group, {
-      "meta.funcId": { $in: idsToFilterOn },
+      "meta.eventId": eventId,
     });
 
     statusLogs.forEach((log) => {
+      if (!log._id) return;
       let status = "running";
       if (log.message === "Function completed") {
         status = "completed";

@@ -92,22 +92,18 @@ router.get("/functions", async (req: Request, res) => {
   }
 });
 
-// Maybe drop pagination?
 router.get("/events/:eventId", async (req: Request, res) => {
   const { eventId } = req.params;
 
   try {
     const { page, limit, offset } = handlePagination(req);
-    const filter = { eventId };
+    const filter: QueryFilter = { eventId, message: "Function invoked" };
     const logs = await getPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: "Page not found" });
     }
 
-    if (logs.length === 0) {
-      return res.status(404).json({ error: "Event not found" });
-    }
     res.status(200).json(logs);
   } catch (error) {
     res.status(500).json({ error: "Error retrieving logs from MongoDB" });

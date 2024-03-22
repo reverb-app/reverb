@@ -7,6 +7,9 @@ import {
 } from "../utils/utils";
 import { QueryFilter } from "types/types";
 
+const DEFAULT_LIMIT = 10;
+const DEFAULT_PAGE = 1;
+
 export async function getPaginatedLogs(
   offset: number,
   limit: number,
@@ -33,8 +36,8 @@ export function handlePagination(req: Request): {
   limit: number;
   offset: number;
 } {
-  let limit = parseInt(req.query.limit as string) || 10;
-  const page = parseInt(req.query.page as string) || 1;
+  let limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
   const offset = (page - 1) * limit;
 
   return { page, limit, offset };

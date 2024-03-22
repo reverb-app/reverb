@@ -16,4 +16,3 @@ test('GET request to /logs should return 200', async () => {
 //   };
 //   await request(app).get('/logs').query(req.query).expect(200);
 // });
-

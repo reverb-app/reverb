@@ -6,6 +6,7 @@ import {
   setFilterTimestamp,
 } from "../utils/loggingUtils";
 import { AggregateGroup, QueryFilter } from "types/types";
+import { Query } from "pg";
 
 const router = express.Router();
 
@@ -202,7 +203,7 @@ router.get("/functions/:funcId", async (req: Request, res) => {
 
   try {
     const { page, limit, offset } = handlePagination(req);
-    const filter = { funcId };
+    const filter: QueryFilter = { "meta.funcId": funcId };
     const logs = await getPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {

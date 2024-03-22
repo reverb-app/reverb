@@ -33,7 +33,7 @@ export interface QueryFilter {
   level?: "info" | "warn" | "debug" | "error" | "silly" | "http" | "verbose";
   "meta.eventId"?: string;
   "meta.timestamp"?: { $gte: Date; $lte: Date };
-  "meta.funcId"?: { $in: string[] };
+  "meta.funcId"?: string | { $in: string[] };
 }
 
 export interface AggregateGroup {

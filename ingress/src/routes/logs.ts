@@ -6,7 +6,6 @@ import {
   setFilterTimestamp,
 } from "../utils/loggingUtils";
 import { AggregateGroup, QueryFilter } from "types/types";
-import { Query } from "pg";
 
 const router = express.Router();
 
@@ -112,7 +111,7 @@ router.get("/events/:eventId", async (req: Request, res) => {
       "meta.eventId": eventId,
     });
 
-    statusLogs.forEach((log) => {
+    statusLogs.forEach(log => {
       if (!log._id) return;
       let status = "running";
       if (log.message === "Function completed") {
@@ -162,7 +161,7 @@ router.get("/functions/status", async (req: Request, res) => {
 
   try {
     const logs = await getAggregate(group, filter);
-    const statusReport = logs.map((log) => {
+    const statusReport = logs.map(log => {
       let status = "running";
       if (log.message === "Function completed") {
         status = "completed";

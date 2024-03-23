@@ -1,4 +1,4 @@
-import functions from '../services/fn';
+import functions from "../services/fn";
 
 export class Step {
   #cache: { [key: string]: any };
@@ -34,21 +34,21 @@ export class Step {
     while (match) {
       const time = match.groups as {
         quantity: string;
-        unit: 's' | 'm' | 'h' | 'd' | 'w';
+        unit: "s" | "m" | "h" | "d" | "w";
       };
 
       let ms = Number(time.quantity);
 
       switch (time.unit) {
-        case 'w':
+        case "w":
           ms *= 7;
-        case 'd':
+        case "d":
           ms *= 24;
-        case 'h':
+        case "h":
           ms *= 60;
-        case 'm':
+        case "m":
           ms *= 60;
-        case 's':
+        case "s":
           ms *= 1000;
           break;
         default:
@@ -96,7 +96,7 @@ export class StepComplete extends Error {
 
   constructor(stepId: string, stepValue: any) {
     super(
-      `StepComplete ${stepId}: Do not catch errors from step.run inside a created function, this will automatically be handled`
+      `StepComplete ${stepId}: Do not catch errors from step.run inside a created function. And be sure to await each step.`
     );
     this.stepId = stepId;
     this.stepValue = stepValue;
@@ -109,7 +109,7 @@ export class DelayInitiated extends Error {
 
   constructor(stepId: string, delayInMs: number) {
     super(
-      `DelayIntiated ${stepId}: Do not catch errors from step.delay inside a created function, this will automatically be handled`
+      `DelayIntiated ${stepId}: Do not catch errors from step.delay inside a created function. And be sure to await each step.`
     );
     this.stepId = stepId;
     this.delayInMs = delayInMs;
@@ -123,7 +123,7 @@ export class InvokeInitiated extends Error {
 
   constructor(stepId: string, invokedFnName: string, payload?: object) {
     super(
-      `InvokeInitiated ${stepId}: Do not catch errors from step.invoke inside a created function, this will automatically be handled`
+      `InvokeInitiated ${stepId}: Do not catch errors from step.invoke inside a created function. And be sure to await each step.`
     );
 
     this.stepId = stepId;
@@ -139,7 +139,7 @@ export class EventEmitted extends Error {
 
   constructor(stepId: string, eventId: string, payload?: object) {
     super(
-      `EventEmitted ${stepId}: Do not catch errors from step.emitEvent inside a created function, this will automatically be handled`
+      `EventEmitted ${stepId}: Do not catch errors from step.emitEvent inside a created function. And be sure to await each step.`
     );
 
     this.stepId = stepId;

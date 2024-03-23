@@ -1,9 +1,12 @@
 import express, { Request } from "express";
 import {
-  getPaginatedLogs,
+  getCursorPaginatedLogs,
+  getOffsetPaginatedLogs,
   getAggregate,
-  handlePagination,
+  handleOffsetPagination,
+  handleCursorPagination,
   setFilterTimestamp,
+  setFilterCursor,
 } from "../utils/loggingUtils";
 import { AggregateGroup, QueryFilter } from "types/types";
 
@@ -15,6 +18,7 @@ router.get("/", async (req: Request, res) => {
 
   try {
     setFilterTimestamp(req, filter);
+    setFilterCursor(req, filter);
   } catch (e) {
     if (!(e instanceof Error)) return;
 
@@ -24,12 +28,8 @@ router.get("/", async (req: Request, res) => {
   }
 
   try {
-    const { page, limit, offset } = handlePagination(req);
-    const logs = await getPaginatedLogs(offset, limit, filter);
-
-    if (logs.length === 0 && page !== 1) {
-      return res.status(404).json({ error: "Page not found" });
-    }
+    const { limit } = handleCursorPagination(req);
+    const logs = await getCursorPaginatedLogs(limit, filter);
 
     res.status(200).json(logs);
   } catch (error) {
@@ -51,9 +51,9 @@ router.get("/events", async (req: Request, res) => {
   }
 
   try {
-    const { page, limit, offset } = handlePagination(req);
+    const { page, limit, offset } = handleOffsetPagination(req);
     filter.message = { $in: ["Event emitted", "Event fired"] };
-    const logs = await getPaginatedLogs(offset, limit, filter);
+    const logs = await getOffsetPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: "Page not found" });
@@ -79,9 +79,9 @@ router.get("/functions", async (req: Request, res) => {
   }
 
   try {
-    const { page, limit, offset } = handlePagination(req);
+    const { page, limit, offset } = handleOffsetPagination(req);
     filter.message = { $in: ["Function invoked", "Function completed"] };
-    const logs = await getPaginatedLogs(offset, limit, filter);
+    const logs = await getOffsetPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: "Page not found" });
@@ -189,9 +189,9 @@ router.get("/functions/:funcId", async (req: Request, res) => {
   const { funcId } = req.params;
 
   try {
-    const { page, limit, offset } = handlePagination(req);
+    const { page, limit, offset } = handleOffsetPagination(req);
     const filter: QueryFilter = { "meta.funcId": funcId };
-    const logs = await getPaginatedLogs(offset, limit, filter);
+    const logs = await getOffsetPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: "Page not found" });
@@ -221,9 +221,9 @@ router.get("/errors", async (req: Request, res) => {
   }
 
   try {
-    const { page, limit, offset } = handlePagination(req);
+    const { page, limit, offset } = handleOffsetPagination(req);
     filter.level = "error";
-    const logs = await getPaginatedLogs(offset, limit, filter);
+    const logs = await getOffsetPaginatedLogs(offset, limit, filter);
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: "Page not found" });

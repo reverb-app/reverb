@@ -31,6 +31,7 @@ export interface QueryFilter {
   message?: string | { $in: string[] };
   count?: string;
   level?: "info" | "warn" | "debug" | "error" | "silly" | "http" | "verbose";
+  cursor?: {};
   "meta.eventId"?: string;
   "meta.timestamp"?: { $gte: Date; $lte: Date };
   "meta.funcId"?: string | { $in: string[] };

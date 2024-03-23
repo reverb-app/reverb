@@ -16,7 +16,6 @@ const router = express.Router();
 router.get("/", async (req: Request, res) => {
   const filter: QueryFilter = {};
 
-
   try {
     setFilterTimestamp(req, filter);
     setFilterCursor(req, filter);

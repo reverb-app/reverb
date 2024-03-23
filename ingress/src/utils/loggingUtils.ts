@@ -103,6 +103,10 @@ export function setFilterTimestamp(req: Request, filter: QueryFilter) {
 
 export function setFilterCursor(req: Request, filter: QueryFilter) {
   const { cursor } = req.query;
-  const cursorFilter: object = cursor ? { _id: { $gt: new ObjectId(cursor as string) } } : {};
-  filter["cursor"] = cursorFilter;
+
+  if (!cursor) {
+    return;
+  }
+
+  filter["_id"] = { $gt: new ObjectId(cursor as string) };
 }

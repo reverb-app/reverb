@@ -61,7 +61,7 @@ router.get("/events", async (req: Request, res) => {
 
     res.status(200).json(logs);
   } catch (error) {
-    res.status(500).json({ error: "Error retrieving events from MongoDB" });
+    res.status(500).json({ error: "Error retrieving event logs from MongoDB" });
   }
 });
 
@@ -89,7 +89,9 @@ router.get("/functions", async (req: Request, res) => {
 
     res.status(200).json(status);
   } catch (error) {
-    res.status(500).json({ error: "Error retrieving events from MongoDB" });
+    res
+      .status(500)
+      .json({ error: "Error retrieving function logs from MongoDB" });
   }
 });
 
@@ -103,7 +105,7 @@ router.get("/events/:eventId", async (req: Request, res) => {
 
     res.status(200).json({ eventId, functions: status });
   } catch (error) {
-    res.status(500).json({ error: "Error retrieving logs from MongoDB" });
+    res.status(500).json({ error: "Error retrieving event logs from MongoDB" });
   }
 });
 
@@ -150,7 +152,9 @@ router.get("/functions/:funcId", async (req: Request, res) => {
 
     res.status(200).json(logs);
   } catch (error) {
-    res.status(500).json({ error: "Error retrieving logs from MongoDB" });
+    res
+      .status(500)
+      .json({ error: "Error retrieving function logs from MongoDB" });
   }
 });
 
@@ -178,7 +182,7 @@ router.get("/errors", async (req: Request, res) => {
 
     res.status(200).json(logs);
   } catch (error) {
-    res.status(500).json({ error: "Error retrieving events from MongoDB" });
+    res.status(500).json({ error: "Error retrieving error logs from MongoDB" });
   }
 });
 

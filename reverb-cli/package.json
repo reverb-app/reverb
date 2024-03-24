@@ -1,14 +1,17 @@
 {
-  "name": "reverb-cli",
-  "version": "0.4.25",
+  "name": "@reverb-app/cli",
+  "version": "0.1.0",
   "description": "Log explorer for Reverb",
   "keywords": [
     "oclif"
   ],
-  "homepage": "https://github.com/project/reverb-cli",
-  "bugs": "https://github.com/project/reverb-cli/issues",
   "license": "MIT",
-  "author": "Christopher Perkins",
+  "contributors": [
+    "Christopher Perkins",
+    "Blake Fromkin",
+    "Morgan Davis",
+    "Vincent Sijssens"
+  ],
   "type": "module",
   "exports": "./lib/index.js",
   "types": "dist/index.d.ts",
@@ -45,6 +48,9 @@
       },
       "functions": {
         "description": "Commands related to functions"
+      },
+      "api": {
+        "description": "Commands for the configuration of api settings"
       }
     }
   },

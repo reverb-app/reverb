@@ -1,5 +1,5 @@
 import { client, dbName } from "../services/mongo-service";
-import { ObjectId } from 'mongodb';
+import { ObjectId } from "mongodb";
 import { Request } from "express";
 import { isValidTimeParams } from "../utils/utils";
 import { QueryFilter, AggregateGroup } from "types/types";
@@ -71,7 +71,9 @@ export async function getFunctionsStatus(
     search = await search.limit(limit);
   }
 
-  const logs = await search.toArray();
+  let logs = await search.toArray();
+
+  logs = logs.filter((log) => log._id !== null);
 
   return logs.map((log) => {
     let status = "running";

@@ -84,6 +84,8 @@ export abstract class ApiCommand<T extends typeof Command> extends Command {
     const { flags } = await this.parse({
       flags: this.ctor.flags,
       baseFlags: (super.ctor as typeof ApiCommand).apiFlags,
+      args: this.ctor.args,
+      strict: this.ctor.strict,
     });
     this.flags = flags as Flags<T>;
   }

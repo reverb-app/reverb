@@ -17,7 +17,7 @@ export default class Status extends ApiCommand<typeof Status> {
 
   async run(): Promise<void> {
     const { args } = await this.parse(Status);
-    const url = this.getUrl();
+    const url = await this.getUrl();
 
     let data: {
       functions: FuncStatus[];

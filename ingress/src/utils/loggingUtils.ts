@@ -1,5 +1,5 @@
 import { client, dbName } from "../services/mongo-service";
-import { ObjectId } from "mongodb";
+import { AggregateOptions, ObjectId } from "mongodb";
 import { Request } from "express";
 import { isValidTimeParams } from "../utils/utils";
 import { QueryFilter, AggregateGroup } from "types/types";
@@ -63,23 +63,20 @@ export async function getFunctionsStatus(
 
   const database = client.db(dbName);
   const collection = database.collection("logs");
-  let search = await collection
-    .aggregate([
-      { $match: filter },
-      { $sort: { timestamp: 1 } },
-      { $group: group },
-    ])
-    .skip(offset);
+  const pipeline: { [key: string]: any }[] = [
+    { $match: filter },
+    { $sort: { timestamp: 1 } },
+    { $group: group },
+    { $skip: offset },
+  ];
 
-  if (limit) {
-    search = await search.limit(limit);
-  }
+  if (limit) pipeline.push({ $limit: limit });
 
-  let logs = await search.toArray();
+  let logs = await collection.aggregate(pipeline).toArray();
 
   logs = logs
     .filter((log) => log._id !== null)
-    .sort((a, b) => Date.parse(b.invoked) - Date.parse(a.invoked));
+    .sort((a, b) => Date.parse(a.invoked) - Date.parse(b.invoked));
 
   return logs.map((log) => {
     let status = "running";

@@ -81,7 +81,7 @@ router.get("/functions", async (req: Request, res) => {
   try {
     const { page, limit, offset } = handleOffsetPagination(req);
 
-    const status = await getFunctionsStatus(filter, limit, offset);
+    const status = await getFunctionsStatus(filter, offset, limit);
 
     if (status.length === 0 && page !== 1) {
       return res.status(404).json({ error: "Page not found" });

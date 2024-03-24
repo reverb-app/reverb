@@ -49,6 +49,13 @@ export default class Functions extends ApiCommand<typeof Functions> {
       const res = await fetch(
         url + `/logs/functions?limit=-1&startTime=${start}&endTime=${end}`
       );
+
+      if (res.status === 500) {
+        this.error(
+          `${chalk.red("[FAIL]")} Internal Server Error, try again later`
+        );
+      }
+
       data = await res.json();
     } catch {
       this.error(`${chalk.red("[FAIL]")} Cannot connect to ${url}.`);

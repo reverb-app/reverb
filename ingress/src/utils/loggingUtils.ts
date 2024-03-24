@@ -1,5 +1,5 @@
 import { client, dbName } from "../services/mongo-service";
-import { ObjectId } from 'mongodb';
+import { AggregateOptions, ObjectId } from "mongodb";
 import { Request } from "express";
 import { isValidTimeParams } from "../utils/utils";
 import { QueryFilter, AggregateGroup } from "types/types";
@@ -47,14 +47,53 @@ export async function getCursorPaginatedLogs(
   }
 }
 
-export async function getAggregate(group: AggregateGroup, filter: QueryFilter) {
+export async function getFunctionsStatus(
+  filter: QueryFilter,
+  offset: number = 0,
+  limit: number | undefined = undefined
+) {
+  const group: AggregateGroup = {
+    _id: "$meta.funcId",
+    message: { $last: "$message" },
+    level: { $last: "$level" },
+    timestamp: { $last: "$meta.timestamp" },
+    name: { $first: "$meta.funcName" },
+    invoked: { $first: "$meta.timestamp" },
+  };
+
   const database = client.db(dbName);
   const collection = database.collection("logs");
-  const logs = collection
-    .aggregate([{ $match: filter }, { $group: group }, { $sort: { date: -1 } }])
-    .toArray();
+  const pipeline: { [key: string]: any }[] = [
+    { $match: filter },
+    { $sort: { timestamp: 1 } },
+    { $group: group },
+    { $skip: offset },
+  ];
 
-  return logs;
+  if (limit) pipeline.push({ $limit: limit });
+
+  let logs = await collection.aggregate(pipeline).toArray();
+
+  logs = logs
+    .filter((log) => log._id !== null)
+    .sort((a, b) => Date.parse(a.invoked) - Date.parse(b.invoked));
+
+  return logs.map((log) => {
+    let status = "running";
+    if (log.message === "Function completed") {
+      status = "completed";
+    } else if (log.level === "error") {
+      status = "error";
+    }
+
+    return {
+      funcId: log._id,
+      lastUpdate: log.timestamp,
+      status,
+      funcName: log.name,
+      invoked: log.invoked,
+    };
+  });
 }
 
 export function handleOffsetPagination(req: Request): {

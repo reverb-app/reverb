@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import { ApiCommand } from "../../apiCommand.js";
 import { EventFiredLog } from "../../types/types.js";
+import { Flags } from "@oclif/core";
 
 export default class Events extends ApiCommand<typeof Events> {
   static description = "Get events that have occured within a time period";
@@ -14,6 +15,26 @@ ${chalk.greenBright(
     )}
 `,
   ];
+
+  static flags = {
+    apiUrl: Flags.string({
+      char: "u",
+      description: "The url to the api gateway for this call",
+      required: false,
+    }),
+    start: Flags.string({
+      char: "s",
+      description:
+        "Start Time for logs to get in a javascript parsable format(Defaults to 7 day prior to end)",
+      required: false,
+    }),
+    end: Flags.string({
+      char: "e",
+      description:
+        "End Time for logs to get in a javascript parsable format(Defaults to now)",
+      required: false,
+    }),
+  };
 
   async run(): Promise<void> {
     const url = await this.getUrl();

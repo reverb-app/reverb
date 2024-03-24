@@ -8,7 +8,7 @@ import {
   setFilterTimestamp,
   setFilterCursor,
 } from "../utils/loggingUtils";
-import { AggregateGroup, QueryFilter } from "types/types";
+import { QueryFilter } from "types/types";
 
 const router = express.Router();
 
@@ -132,7 +132,6 @@ router.get("/functions/status", async (req: Request, res) => {
   }
 });
 
-// Maybe drop pagination
 router.get("/functions/:funcId", async (req: Request, res) => {
   const { funcId } = req.params;
 

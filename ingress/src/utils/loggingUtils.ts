@@ -64,7 +64,11 @@ export async function getFunctionsStatus(
   const database = client.db(dbName);
   const collection = database.collection("logs");
   let search = await collection
-    .aggregate([{ $match: filter }, { $group: group }])
+    .aggregate([
+      { $match: filter },
+      { $sort: { timestamp: 1 } },
+      { $group: group },
+    ])
     .skip(offset);
 
   if (limit) {
@@ -73,7 +77,9 @@ export async function getFunctionsStatus(
 
   let logs = await search.toArray();
 
-  logs = logs.filter((log) => log._id !== null);
+  logs = logs
+    .filter((log) => log._id !== null)
+    .sort((a, b) => Date.parse(b.invoked) - Date.parse(a.invoked));
 
   return logs.map((log) => {
     let status = "running";

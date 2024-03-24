@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId } from "mongodb";
 export interface Event {
   name: string;
   payload?: Object;
@@ -34,7 +34,7 @@ export interface QueryFilter {
   level?: "info" | "warn" | "debug" | "error" | "silly" | "http" | "verbose";
   _id?: { $gt: ObjectId };
   "meta.eventId"?: string;
-  "meta.timestamp"?: { $gte: Date; $lte: Date };
+  timestamp?: { $gte: Date; $lte: Date };
   "meta.funcId"?: string | { $in: string[] };
 }
 export interface AggregateGroup {

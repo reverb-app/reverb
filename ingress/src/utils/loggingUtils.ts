@@ -1,5 +1,5 @@
 import { client, dbName } from "../services/mongo-service";
-import { ObjectId } from 'mongodb';
+import { ObjectId } from "mongodb";
 import { Request } from "express";
 import { isValidTimeParams } from "../utils/utils";
 import { QueryFilter, AggregateGroup } from "types/types";
@@ -9,19 +9,18 @@ const DEFAULT_PAGE = 1;
 
 export async function getOffsetPaginatedLogs(
   offset: number,
-  limit: number,
+  limit: number | undefined,
   filter: {} = {},
   sort: {} = {}
 ): Promise<any[]> {
   try {
     const database = client.db(dbName);
     const collection = database.collection("logs");
-    const logs = await collection
-      .find(filter)
-      .sort(sort)
-      .skip(offset)
-      .limit(limit)
-      .toArray();
+    let search = await collection.find(filter).sort(sort).skip(offset);
+    if (limit) {
+      search = await search.limit(limit);
+    }
+    const logs = await search.toArray();
     return logs;
   } catch (error) {
     throw new Error("Error retrieving logs from MongoDB");
@@ -59,12 +58,18 @@ export async function getAggregate(group: AggregateGroup, filter: QueryFilter) {
 
 export function handleOffsetPagination(req: Request): {
   page: number;
-  limit: number;
+  limit?: number;
   offset: number;
 } {
-  let limit = parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+  let limit: number | undefined =
+    parseInt(req.query.limit as string) || DEFAULT_LIMIT;
+
+  if (limit === -1) {
+    limit = undefined;
+  }
+
   const page = parseInt(req.query.page as string) || DEFAULT_PAGE;
-  const offset = (page - 1) * limit;
+  const offset = (page - 1) * (limit ?? 0);
 
   return { page, limit, offset };
 }
@@ -94,7 +99,7 @@ export function setFilterTimestamp(req: Request, filter: QueryFilter) {
   }
 
   if (queryTimestamp.startTime && queryTimestamp.endTime) {
-    filter["meta.timestamp"] = {
+    filter["timestamp"] = {
       $gte: new Date(queryTimestamp.startTime),
       $lte: new Date(queryTimestamp.endTime),
     };

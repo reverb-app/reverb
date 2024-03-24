@@ -28,11 +28,13 @@ ${chalk.greenBright(
       );
       data = await res.json();
     } catch {
-      this.error(`Issue getting data from ${chalk.red(url)}.`);
+      this.error(`${chalk.red("[FAIL]")} Cannot connect to ${url}.`);
     }
 
     this.log(
-      `Showing events from ${chalk.yellow(start)} to ${chalk.yellow(end)}:\n`
+      `${chalk.greenBright("[Success]")} Showing events from ${chalk.yellow(
+        start
+      )} to ${chalk.yellow(end)}:\n`
     );
 
     if (data.length === 0) {

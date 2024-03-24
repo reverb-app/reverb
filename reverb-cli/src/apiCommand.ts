@@ -1,4 +1,5 @@
 import { Command, Flags, Interfaces } from "@oclif/core";
+import chalk from "chalk";
 import * as fs from "fs/promises";
 import * as path from "path";
 
@@ -47,7 +48,9 @@ export abstract class ApiCommand<T extends typeof Command> extends Command {
       }
     } catch (e) {}
     this.error(
-      "The -u flag is required if you have not set an api url in config"
+      `${chalk.red(
+        "[FAIL]"
+      )} The -u flag is required if you have not set an api url in config`
     );
   }
 

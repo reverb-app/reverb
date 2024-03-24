@@ -47,14 +47,48 @@ export async function getCursorPaginatedLogs(
   }
 }
 
-export async function getAggregate(group: AggregateGroup, filter: QueryFilter) {
+export async function getFunctionsStatus(
+  filter: QueryFilter,
+  offset: number = 0,
+  limit: number | undefined = undefined
+) {
+  const group: AggregateGroup = {
+    _id: "$meta.funcId",
+    message: { $last: "$message" },
+    level: { $last: "$level" },
+    timestamp: { $last: "$meta.timestamp" },
+    name: { $first: "$meta.funcName" },
+    invoked: { $first: "$meta.timestamp" },
+  };
+
   const database = client.db(dbName);
   const collection = database.collection("logs");
-  const logs = collection
-    .aggregate([{ $match: filter }, { $group: group }, { $sort: { date: -1 } }])
-    .toArray();
+  let search = await collection
+    .aggregate([{ $match: filter }, { $group: group }])
+    .skip(offset);
 
-  return logs;
+  if (limit) {
+    search = await search.limit(limit);
+  }
+
+  const logs = await search.toArray();
+
+  return logs.map((log) => {
+    let status = "running";
+    if (log.message === "Function completed") {
+      status = "completed";
+    } else if (log.level === "error") {
+      status = "error";
+    }
+
+    return {
+      funcId: log._id,
+      lastUpdate: log.timestamp,
+      status,
+      funcName: log.name,
+      invoked: log.invoked,
+    };
+  });
 }
 
 export function handleOffsetPagination(req: Request): {

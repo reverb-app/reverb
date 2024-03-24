@@ -17,7 +17,7 @@ async function main() {
 
   const runner = await run({
     connectionString,
-    concurrency: 5,
+    concurrency: 10,
     noHandleSignals: false,
     pollInterval: 1000,
     taskList: {
@@ -28,7 +28,7 @@ async function main() {
   await runner.promise;
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error(err);
   process.exit(1);
 });

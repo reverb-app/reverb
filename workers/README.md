@@ -32,7 +32,7 @@ $ npm run dev
 
 If the database has not yet been populated with the necessary data from your **Reverb functions server** codebase, your terminal will read:
 
-```sh
+```
 Waiting for functions data to populate in the database...
 ```
 

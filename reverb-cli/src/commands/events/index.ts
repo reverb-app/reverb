@@ -3,7 +3,7 @@ import { ApiCommand } from "../../apiCommand.js";
 import { EventFiredLog } from "../../types/types.js";
 
 export default class Events extends ApiCommand<typeof Events> {
-  static description = "Get events that have occured";
+  static description = "Get events that have occured within a time period";
 
   static examples = [
     `$ <%= config.bin %> events -u https://example.com

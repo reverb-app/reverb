@@ -3,6 +3,7 @@ import chalk from "chalk";
 
 import { FuncStatus } from "../../types/types.js";
 import { ApiCommand } from "../../apiCommand.js";
+import { getEmoji } from "../../utils/utils.js";
 
 export default class Status extends ApiCommand<typeof Status> {
   static args = {
@@ -13,27 +14,6 @@ export default class Status extends ApiCommand<typeof Status> {
   };
 
   static description = "Get the status of everything related to a single event";
-
-  getEmoji(status: "completed" | "error" | "running"): "🔴" | "🟡" | "🟢" {
-    switch (status) {
-      case "completed": {
-        return "🟢";
-      }
-
-      case "running": {
-        return "🟡";
-      }
-
-      case "error": {
-        return "🔴";
-      }
-
-      default: {
-        const val: never = status;
-        return val;
-      }
-    }
-  }
 
   async run(): Promise<void> {
     const { args } = await this.parse(Status);
@@ -69,7 +49,7 @@ export default class Status extends ApiCommand<typeof Status> {
 
     for (const fn of data.functions) {
       const { funcId, funcName, invoked, status } = fn;
-      const emoji = this.getEmoji(status);
+      const emoji = getEmoji(status);
       const time = new Date(invoked).toUTCString();
 
       this.log(

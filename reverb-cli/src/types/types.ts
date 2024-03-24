@@ -2,7 +2,7 @@ export interface FuncStatus {
   funcId: string;
   funcName: string;
   invoked: string;
-  lastUpdated: string;
+  lastUpdate: string;
   status: "completed" | "error" | "running";
 }
 

@@ -171,7 +171,9 @@ router.get("/errors", async (req: Request, res) => {
   try {
     const { page, limit, offset } = handleOffsetPagination(req);
     filter.level = "error";
-    const logs = await getOffsetPaginatedLogs(offset, limit, filter);
+    const logs = await getOffsetPaginatedLogs(offset, limit, filter, {
+      timestamp: -1,
+    });
 
     if (logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: "Page not found" });

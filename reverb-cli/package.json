@@ -40,8 +40,11 @@
     ],
     "topicSeparator": ":",
     "topics": {
-      "hello": {
-        "description": "Say hello to the world and others"
+      "events": {
+        "description": "Commands related to events"
+      },
+      "functions": {
+        "description": "Commands related to functions"
       }
     }
   },

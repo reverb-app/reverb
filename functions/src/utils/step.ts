@@ -2,12 +2,24 @@ import functions from "../services/fn";
 
 export class Step {
   #cache: { [key: string]: any };
+  #previousSteps: { [key: string]: boolean };
+  #funcName: string;
 
-  constructor(cache: { [key: string]: any }) {
+  constructor(cache: { [key: string]: any }, funcName: string) {
     this.#cache = cache;
+    this.#previousSteps = {};
+    this.#funcName = funcName;
   }
 
   async run(id: string, callback: () => Promise<any>) {
+    if (this.#previousSteps[id]) {
+      throw new Error(
+        `${this.#funcName}: Step Ids must be unique. ${id} already exists.`
+      );
+    }
+
+    this.#previousSteps[id] = true;
+
     if (id in this.#cache) {
       return this.#cache[id];
     }
@@ -16,6 +28,14 @@ export class Step {
   }
 
   async delay(id: string, timePeriod: string) {
+    if (this.#previousSteps[id]) {
+      throw new Error(
+        `${this.#funcName}: Step Ids must be unique. ${id} already exists.`
+      );
+    }
+
+    this.#previousSteps[id] = true;
+
     if (id in this.#cache) {
       return this.#cache[id];
     }
@@ -64,6 +84,14 @@ export class Step {
   }
 
   async invoke(id: string, invokedFnName: string, payload?: object) {
+    if (this.#previousSteps[id]) {
+      throw new Error(
+        `${this.#funcName}: Step Ids must be unique. ${id} already exists.`
+      );
+    }
+
+    this.#previousSteps[id] = true;
+
     if (id in this.#cache) {
       return this.#cache[id];
     }
@@ -78,6 +106,14 @@ export class Step {
   }
 
   async emitEvent(id: string, eventId: string, payload?: object) {
+    if (this.#previousSteps[id]) {
+      throw new Error(
+        `${this.#funcName}: Step Ids must be unique. ${id} already exists.`
+      );
+    }
+
+    this.#previousSteps[id] = true;
+
     if (id in this.#cache) {
       return this.#cache[id];
     }

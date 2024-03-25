@@ -46,7 +46,9 @@ export class Step {
 
     if (!match) {
       throw new Error(
-        `${timePeriod} not correctly formatted time period string.`
+        `${
+          this.#funcName
+        }: ${timePeriod} not correctly formatted time period string.`
       );
     }
 
@@ -99,7 +101,9 @@ export class Step {
     const fn = functions.getFunction(invokedFnName);
 
     if (!fn) {
-      throw new Error(`Invoked function ${invokedFnName} does not exist`);
+      throw new Error(
+        `${this.#funcName}: Invoked function ${invokedFnName} does not exist`
+      );
     }
 
     throw new InvokeInitiated(id, invokedFnName, payload);
@@ -119,7 +123,7 @@ export class Step {
     }
 
     if (!Object.keys(functions.getAllFunctions().events).includes(eventId)) {
-      throw new Error(`Event ${eventId} does not exist`);
+      throw new Error(`${this.#funcName}: Event ${eventId} does not exist`);
     }
 
     throw new EventEmitted(id, eventId, payload);

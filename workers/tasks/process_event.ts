@@ -1,6 +1,7 @@
 import { Task } from "graphile-worker";
 import { isValidEvent } from "../utils/utils";
 import { v4 } from "uuid";
+import { MAX_ATTEMPTS } from "../utils/deadLetterUtils";
 import log from "../utils/logUtils";
 
 const process_event: Task = async function (event, helpers) {
@@ -27,12 +28,16 @@ const process_event: Task = async function (event, helpers) {
 
     names.forEach(funcName => {
       const funcId = v4();
-      helpers.addJob("process_job", {
-        name: funcName,
-        event,
-        id: funcId,
-        cache: {},
-      });
+      helpers.addJob(
+        "process_job",
+        {
+          name: funcName,
+          event,
+          id: funcId,
+          cache: {},
+        },
+        { maxAttempts: MAX_ATTEMPTS }
+      );
       log.info("Function invoked", { eventId: event.id, funcName, funcId });
     });
   } catch (e) {

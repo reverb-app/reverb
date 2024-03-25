@@ -1,5 +1,6 @@
 import { Task } from "graphile-worker";
 import { isValidEvent } from "../utils/utils";
+import { handleRetries } from "../utils/deadLetterUtils";
 import { v4 } from "uuid";
 import { MAX_ATTEMPTS } from "../utils/deadLetterUtils";
 import log from "../utils/logUtils";
@@ -7,7 +8,11 @@ import log from "../utils/logUtils";
 const process_event: Task = async function (event, helpers) {
   if (!isValidEvent(event)) {
     log.error("Event format is not valid", { event });
-    throw new Error(`${event} is not a valid event`);
+
+    return handleRetries(
+      helpers.job,
+      new Error(`${event} is not a valid event`)
+    );
   }
 
   try {
@@ -42,7 +47,7 @@ const process_event: Task = async function (event, helpers) {
     });
   } catch (e) {
     log.error("Querying function database failed.");
-    throw e;
+    if (e instanceof Error) return handleRetries(helpers.job, e);
   }
 };
 

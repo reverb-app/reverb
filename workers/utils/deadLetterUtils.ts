@@ -17,8 +17,8 @@ export const handleRetries = (job: Job, error: Error): void => {
 
     log.error(message, {
       dead_letter: true,
-      error,
       task_type,
+      error,
       payload: job.payload,
       attempts: job.attempts,
       max_attempts: job.max_attempts,

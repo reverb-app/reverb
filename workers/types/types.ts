@@ -69,4 +69,4 @@ export interface EmitEventResult {
   payload?: object;
 }
 
-export type DeadLetterType = "function" | "event";
+export type DeadLetterType = "job" | "event";

@@ -3,6 +3,7 @@ dotenv.config();
 
 import { Task } from "graphile-worker";
 import { isValidFunctionPayload, isValidRpcResponse } from "../utils/utils";
+import { MAX_ATTEMPTS, handleRetries } from "../utils/deadLetterUtils";
 import { v4 } from "uuid";
 
 import log from "../utils/logUtils";
@@ -23,8 +24,10 @@ const process_job: Task = async function (job, helpers) {
       attempts,
       max_attempts,
     });
-    throw e;
+
+    return handleRetries(helpers.job, e);
   }
+
   let data: any;
   try {
     const response = await fetch(functionServerUrl, {
@@ -50,9 +53,10 @@ const process_job: Task = async function (job, helpers) {
       attempts,
       max_attempts,
     });
-    if (e instanceof Error)
+    if (e instanceof Error) {
       e.message = "Error communicating with function server";
-    throw e;
+      return handleRetries(helpers.job, e);
+    }
   }
 
   if (!isValidRpcResponse(data)) {
@@ -70,8 +74,9 @@ const process_job: Task = async function (job, helpers) {
       max_attempts,
     });
 
-    throw e;
+    return handleRetries(helpers.job, e);
   }
+
   if ("error" in data) {
     if (typeof data.error === "string") {
       let e;
@@ -99,7 +104,7 @@ const process_job: Task = async function (job, helpers) {
         max_attempts,
       });
 
-      throw e;
+      return handleRetries(helpers.job, e);
     } else {
       log.error("RPC Response contains an error.", {
         funcId: job.id,
@@ -110,7 +115,10 @@ const process_job: Task = async function (job, helpers) {
         max_attempts,
       });
 
-      throw data.error;
+      return handleRetries(
+        helpers.job,
+        new Error("RPC Response contains an error.")
+      );
     }
   }
 

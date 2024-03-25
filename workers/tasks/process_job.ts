@@ -25,7 +25,7 @@ const process_job: Task = async function (job, helpers) {
       max_attempts,
     });
 
-    return handleRetries(helpers.job, e);
+    return handleRetries(helpers.job, e, true);
   }
 
   let data: any;

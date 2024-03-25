@@ -11,7 +11,8 @@ const process_event: Task = async function (event, helpers) {
 
     return handleRetries(
       helpers.job,
-      new Error(`${event} is not a valid event`)
+      new Error(`${event} is not a valid event`),
+      true
     );
   }
 

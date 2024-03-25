@@ -68,3 +68,5 @@ export interface EmitEventResult {
   eventId: string;
   payload?: object;
 }
+
+export type DeadLetterType = "function" | "event";

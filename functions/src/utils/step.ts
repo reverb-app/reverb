@@ -2,12 +2,24 @@ import functions from "../services/fn";
 
 export class Step {
   #cache: { [key: string]: any };
+  #previousSteps: { [key: string]: boolean };
+  #funcName: string;
 
-  constructor(cache: { [key: string]: any }) {
+  constructor(cache: { [key: string]: any }, funcName: string) {
     this.#cache = cache;
+    this.#previousSteps = {};
+    this.#funcName = funcName;
   }
 
   async run(id: string, callback: () => Promise<any>) {
+    if (this.#previousSteps[id]) {
+      throw new Error(
+        `${this.#funcName}: Step Ids must be unique. ${id} already exists.`
+      );
+    }
+
+    this.#previousSteps[id] = true;
+
     if (id in this.#cache) {
       return this.#cache[id];
     }
@@ -16,6 +28,14 @@ export class Step {
   }
 
   async delay(id: string, timePeriod: string) {
+    if (this.#previousSteps[id]) {
+      throw new Error(
+        `${this.#funcName}: Step Ids must be unique. ${id} already exists.`
+      );
+    }
+
+    this.#previousSteps[id] = true;
+
     if (id in this.#cache) {
       return this.#cache[id];
     }
@@ -26,7 +46,9 @@ export class Step {
 
     if (!match) {
       throw new Error(
-        `${timePeriod} not correctly formatted time period string.`
+        `${
+          this.#funcName
+        }: ${timePeriod} not correctly formatted time period string.`
       );
     }
 
@@ -64,6 +86,14 @@ export class Step {
   }
 
   async invoke(id: string, invokedFnName: string, payload?: object) {
+    if (this.#previousSteps[id]) {
+      throw new Error(
+        `${this.#funcName}: Step Ids must be unique. ${id} already exists.`
+      );
+    }
+
+    this.#previousSteps[id] = true;
+
     if (id in this.#cache) {
       return this.#cache[id];
     }
@@ -71,19 +101,29 @@ export class Step {
     const fn = functions.getFunction(invokedFnName);
 
     if (!fn) {
-      throw new Error(`Invoked function ${invokedFnName} does not exist`);
+      throw new Error(
+        `${this.#funcName}: Invoked function ${invokedFnName} does not exist`
+      );
     }
 
     throw new InvokeInitiated(id, invokedFnName, payload);
   }
 
   async emitEvent(id: string, eventId: string, payload?: object) {
+    if (this.#previousSteps[id]) {
+      throw new Error(
+        `${this.#funcName}: Step Ids must be unique. ${id} already exists.`
+      );
+    }
+
+    this.#previousSteps[id] = true;
+
     if (id in this.#cache) {
       return this.#cache[id];
     }
 
     if (!Object.keys(functions.getAllFunctions().events).includes(eventId)) {
-      throw new Error(`Event ${eventId} does not exist`);
+      throw new Error(`${this.#funcName}: Event ${eventId} does not exist`);
     }
 
     throw new EventEmitted(id, eventId, payload);

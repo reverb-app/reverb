@@ -1,8 +1,8 @@
-import { client, dbName } from "../services/mongo-service";
-import { AggregateOptions, ObjectId } from "mongodb";
-import { Request } from "express";
-import { isValidTimeParams } from "../utils/utils";
-import { QueryFilter, AggregateGroup } from "types/types";
+import { client, dbName } from '../services/mongo-service';
+import { AggregateOptions, ObjectId } from 'mongodb';
+import { Request } from 'express';
+import { isValidTimeParams } from './utils';
+import { QueryFilter, AggregateGroup } from 'types/types';
 
 const DEFAULT_LIMIT = 10;
 const DEFAULT_PAGE = 1;
@@ -15,7 +15,7 @@ export async function getOffsetPaginatedLogs(
 ): Promise<any[]> {
   try {
     const database = client.db(dbName);
-    const collection = database.collection("logs");
+    const collection = database.collection('logs');
     let search = await collection.find(filter).sort(sort).skip(offset);
     if (limit) {
       search = await search.limit(limit);
@@ -23,7 +23,7 @@ export async function getOffsetPaginatedLogs(
     const logs = await search.toArray();
     return logs;
   } catch (error) {
-    throw new Error("Error retrieving logs from MongoDB");
+    throw new Error('Error retrieving logs from MongoDB');
   }
 }
 
@@ -34,7 +34,7 @@ export async function getCursorPaginatedLogs(
 ): Promise<any[]> {
   try {
     const database = client.db(dbName);
-    const collection = database.collection("logs");
+    const collection = database.collection('logs');
     const logs = await collection
       .find(filter)
       .sort(sort)
@@ -42,7 +42,7 @@ export async function getCursorPaginatedLogs(
       .toArray();
     return logs;
   } catch (error) {
-    throw new Error("Error retrieving logs from MongoDB");
+    throw new Error('Error retrieving logs from MongoDB');
   }
 }
 
@@ -52,16 +52,16 @@ export async function getFunctionsStatus(
   limit: number | undefined = undefined
 ) {
   const group: AggregateGroup = {
-    _id: "$meta.funcId",
-    message: { $last: "$message" },
-    level: { $last: "$level" },
-    timestamp: { $last: "$meta.timestamp" },
-    name: { $first: "$meta.funcName" },
-    invoked: { $first: "$meta.timestamp" },
+    _id: '$meta.funcId',
+    message: { $last: '$message' },
+    level: { $last: '$level' },
+    timestamp: { $last: '$meta.timestamp' },
+    name: { $first: '$meta.funcName' },
+    invoked: { $first: '$meta.timestamp' },
   };
 
   const database = client.db(dbName);
-  const collection = database.collection("logs");
+  const collection = database.collection('logs');
   const pipeline: { [key: string]: any }[] = [
     { $match: filter },
     { $sort: { timestamp: 1 } },
@@ -78,11 +78,11 @@ export async function getFunctionsStatus(
     .sort((a, b) => Date.parse(a.invoked) - Date.parse(b.invoked));
 
   return logs.map((log) => {
-    let status = "running";
-    if (log.message === "Function completed") {
-      status = "completed";
-    } else if (log.level === "error") {
-      status = "error";
+    let status = 'running';
+    if (log.message === 'Function completed') {
+      status = 'completed';
+    } else if (log.level === 'error') {
+      status = 'error';
     }
 
     return {
@@ -133,12 +133,12 @@ export function setFilterTimestamp(req: Request, filter: QueryFilter) {
 
   if (!isValidTimeParams(queryTimestamp)) {
     throw new Error(
-      "startTime and endTime must be provided together and be valid"
+      'startTime and endTime must be provided together and be valid'
     );
   }
 
   if (queryTimestamp.startTime && queryTimestamp.endTime) {
-    filter["timestamp"] = {
+    filter['timestamp'] = {
       $gte: new Date(queryTimestamp.startTime),
       $lte: new Date(queryTimestamp.endTime),
     };
@@ -152,5 +152,5 @@ export function setFilterCursor(req: Request, filter: QueryFilter) {
     return;
   }
 
-  filter["_id"] = { $gt: new ObjectId(cursor as string) };
+  filter['_id'] = { $gt: new ObjectId(cursor as string) };
 }

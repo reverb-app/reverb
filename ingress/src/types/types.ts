@@ -37,6 +37,7 @@ export interface QueryFilter {
   timestamp?: { $gte: Date; $lte: Date };
   "meta.funcId"?: string | { $in: string[] };
 }
+
 export interface AggregateGroup {
   _id: string;
   message?: { $last: "$message" };

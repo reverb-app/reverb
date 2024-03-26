@@ -13,7 +13,6 @@ import { QueryFilter } from '../types/types';
 
 const router = express.Router();
 
-// Implement previous and next
 router.get('/', async (req: Request, res) => {
   const filter: QueryFilter = {};
 

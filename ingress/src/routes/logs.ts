@@ -191,7 +191,7 @@ router.get("/errors", async (req: Request, res) => {
 
 router.get("/dead-letter", async (req: Request, res) => {
   const { type } = req.query;
-  if (type && !isValidDeadLetterType(type)) {
+  if (!!type && !isValidDeadLetterType(type)) {
     return res.status(400).json({
       error:
         "Invalid 'type' query parameter. Value must be 'function', 'event', or 'all'.",
@@ -199,7 +199,6 @@ router.get("/dead-letter", async (req: Request, res) => {
   }
 
   const filter: QueryFilter = {};
-
   if (type === "function" || type === "event") filter.taskType = type;
   filter.message = {
     $in: [
@@ -229,7 +228,7 @@ router.get("/dead-letter", async (req: Request, res) => {
 
     return res.status(200).json(logs);
   } catch (error) {
-    res
+    return res
       .status(500)
       .json({ error: "Error retrieving dead letter logs from MongoDB" });
   }

@@ -14,7 +14,6 @@ import { QueryFilter, HateoasLogCollection } from 'types/types';
 
 const router = express.Router();
 
-// Implement previous and next
 router.get('/', async (req: Request, res) => {
   const filter: QueryFilter = {};
 
@@ -32,6 +31,16 @@ router.get('/', async (req: Request, res) => {
   try {
     const { limit } = handleCursorPagination(req);
     const logs = await getCursorPaginatedLogs(limit, filter);
+
+    setLogLinks(logs);
+    const lastEntry = logs.logs[logs.logs.length - 1];
+    const nextCursor =
+      lastEntry.function?._id || lastEntry.event?._id || lastEntry.error?._id;
+
+    if (nextCursor)
+      logs.links = {
+        next: `/logs?cursor=${nextCursor}&limit=${limit}`,
+      };
 
     res.status(200).json(logs);
   } catch (error) {

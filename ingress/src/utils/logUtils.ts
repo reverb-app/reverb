@@ -43,7 +43,7 @@ export async function getCursorPaginatedLogs(
   limit: number,
   filter: {} = {},
   sort: {} = {}
-): Promise<any[]> {
+): Promise<HateoasLogCollection> {
   try {
     const database = client.db(dbName);
     const collection = database.collection('logs');
@@ -52,7 +52,19 @@ export async function getCursorPaginatedLogs(
       .sort(sort)
       .limit(limit)
       .toArray();
-    return logs;
+    return {
+      logs: logs.map((log) => {
+        if (log.meta?.error) {
+          return { error: log };
+        } else if (log.meta?.funcId || log.funcId) {
+          return { function: log };
+        } else if (log.meta?.eventId || log.eventId) {
+          return { event: log };
+        } else {
+          return { unknown: log };
+        }
+      }),
+    };
   } catch (error) {
     throw new Error('Error retrieving logs from MongoDB');
   }

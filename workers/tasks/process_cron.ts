@@ -1,5 +1,6 @@
 import { Task } from "graphile-worker";
 import { v4 } from "uuid";
+import { MAX_ATTEMPTS } from "../utils/deadLetterUtils";
 import log from "../utils/logUtils";
 import { isValidCronPayload } from "../utils/utils";
 
@@ -10,12 +11,16 @@ const process_cron: Task = async function (cronJob, helpers) {
   }
 
   const funcId = v4();
-  helpers.addJob("process_job", {
-    name: cronJob.funcName,
-    id: funcId,
-    event: { name: "cron", id: "" },
-    cache: {},
-  });
+  helpers.addJob(
+    "process_job",
+    {
+      name: cronJob.funcName,
+      id: funcId,
+      event: { name: "cron", id: "" },
+      cache: {},
+    },
+    { maxAttempts: MAX_ATTEMPTS }
+  );
 
   log.info("Function invoked", {
     funcId,

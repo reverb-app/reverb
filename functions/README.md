@@ -1,8 +1,8 @@
 # Reverb - Functions Server
 
-This server hosts your application's **Reverb jobs** and contains all the code needed to create these jobs from the provided [template] (https://github.com/2401-Team-6/reverb/blob/main/sample/src/index.ts). The jobs will be called from the [Graphile Worker Server] (https://github.com/2401-Team-6/reverb/tree/main/workers) which host the [Graphile Worker](https://worker.graphile.org/) runners.
+This server hosts your application's **Reverb jobs** and contains all the code needed to create these jobs from the provided [template](https://github.com/2401-Team-6/reverb/blob/main/sample/src/index.ts). The jobs will be called from the [Graphile Worker Server](https://github.com/2401-Team-6/reverb/tree/main/workers) which host the [Graphile Worker](https://worker.graphile.org/) runners.
 
-The [Sample Server] [https://github.com/2401-Team-6/reverb/tree/main/sample] provides you with an `index.ts` file, which serves as a template where you can define functions and the events or cron-jobs that will trigger these functions. Additionally `index.ts` will boot up the Functions Server.
+The [Sample Server](https://github.com/2401-Team-6/reverb/tree/main/sample) provides you with an `index.ts` file, which serves as a template where you can define functions and the events or cron-jobs that will trigger these functions. Additionally `index.ts` will boot up the Functions Server.
 
 A function can be a single function invocation or can be comprised of different steps. Each step will need to be awaited.
 
@@ -25,7 +25,7 @@ To run the Functions Server locally, you will first need to configure several en
 
 ### Running the Functions Server
 
-To initialize the Functions Server in a development environment, from the [Sample Server] [https://github.com/2401-Team-6/reverb/tree/main/sample] run:
+To initialize the Functions Server in a development environment, from the [Sample Server](https://github.com/2401-Team-6/reverb/tree/main/sample), run:
 
 ```
 $ npm run dev
@@ -34,105 +34,9 @@ $ npm run dev
 This will boot up the Functions Server. The Function Server will populate the database with the necessary data and expose the API endpoint the Workers Server uses to send requests to invoke your functions.
 
 ### Function Server API
-The [Sample Server] [https://github.com/2401-Team-6/reverb/tree/main/sample] provides you with the following `index.ts` file, which serves as a template where you can define functions.
+The [Sample Server](https://github.com/2401-Team-6/reverb/tree/main/sample) provides you with an `index.ts` file, where you can find the templates for defining the different kinds of functions.
 
-```js
-import dotenv from 'dotenv';
-dotenv.config();
-import functionsExportType from '@reverb-app/functions';
-import(
-  process.env.NODE_ENV === 'development'
-    ? '../../functions/src'
-    : '@reverb-app/functions'
-).then(
-  (
-    server: typeof functionsExportType | { default: typeof functionsExportType }
-  ) => {
-    server = 'default' in server ? server.default : server;
-
-    const func1 = server.createFunction({
-      id: 'first-function',
-      event: 'event1',
-      fn: async () => {
-        console.log('Hello world');
-      },
-    });
-
-    const func2 = server.createFunction({
-      id: 'second-function',
-      event: 'event1',
-      fn: async () => {
-        console.log('Hi :)');
-      },
-    });
-
-    const func3 = server.createFunction({
-      id: 'third-function',
-      event: 'event2',
-      fn: async (event) => {
-        if (
-          !!event.payload &&
-          'url' in event.payload &&
-          typeof event.payload.url === 'string'
-        ) {
-          fetch(event.payload.url);
-        }
-      },
-    });
-
-    const func4 = server.createFunction({
-      id: 'step-function',
-      event: 'event3',
-      fn: async (event, step) => {
-        await step.run('phone person', async () => console.log('phone person'));
-        await step.delay('some delay', '1m30s');
-        await step.run('email person', async () => console.log('email person'));
-      },
-    });
-
-    const func5 = server.createFunction({
-      id: 'function-calls-function',
-      event: 'event4',
-      fn: async (event, step) => {
-        await step.invoke('call 3rd function', 'third-function', {
-          url: 'https://enaeajsfdm4b.x.pipedream.net/',
-        });
-      },
-    });
-
-    const func6 = server.createFunction({
-      id: 'emit-event-function',
-      event: 'event5',
-      fn: async (event, step) => {
-        await step.emitEvent('emit-event2', 'event2', {
-          url: 'https://enaeajsfdm4b.x.pipedream.net/',
-        });
-      },
-    });
-
-    const func7 = server.createFunction({
-      id: 'cron-function',
-      cron: '*/4 * * * *',
-      fn: async (event, step) => {
-        await step.invoke('call 3rd function', 'third-function', {
-          url: 'https://enaeajsfdm4b.x.pipedream.net/',
-        });
-      },
-    });
-
-    const func8 = server.createFunction({
-      id: 'error-function',
-      event: 'error',
-      fn: async () => {
-        throw new Error('This error is for testing purposes');
-      },
-    });
-
-    server.serve();
-  }
-);
-```
-Here, you can then define functions with the `createFunction` method. The `createFunction` method takes 1 argument, an `FunctionData` object. There are four properties that can be applied to this object:
+You define functions with the `createFunction` method. The `createFunction` method takes 1 argument, an `FunctionData` object. There are four properties that can be applied to this object:
 
 1. `id` - This is the unique string identifier for the object
 2. `fn` - The function's code
@@ -152,6 +56,7 @@ Inside the `fn` function we provide two parameters. These must always be `await`
    - `name` - The name of the event that was fired.
    - `payload` - [Optional] Any data passed with the event when it was fired.
      - `object` type. This will be defined by you and you should check the typing when you run the function.
+
 2. `step` - An object to provide step functionality. It provides these methods:
    1. `run` - `(id: string, callback: () => Promise<any>) => Promise<any>`
       - `id` must be unique
@@ -172,6 +77,85 @@ Inside the `fn` function we provide two parameters. These must always be `await`
       - `invokedFnName` is the function name to be invoked
       - `payload` [Optional] is the payload you wish to pass to the function via the `event` object
 
----
+Examples:
 
-Once you have created your functions, you can start your server with the `reverb.serve()` method.
+```js
+const func1 = server.createFunction({
+  id: 'first-function',
+  event: 'event1',
+  fn: async () => {
+    console.log('Hello world');
+  },
+})
+const func2 = server.createFunction({
+  id: 'second-function',
+  cron: '*/4 * * * *',
+  fn: async () => {
+    console.log('Hi :)');
+  },
+})
+const func3 = server.createFunction({
+  id: 'third-function',
+  event: 'event2',
+  fn: async (event) => {
+    if (
+      !!event.payload &&
+      'url' in event.payload &&
+      typeof event.payload.url === 'string'
+    ) {
+      fetch(event.payload.url);
+    }
+  },
+})
+const func4 = server.createFunction({
+  id: 'step-function',
+  event: 'event3',
+  fn: async (event, step) => {
+    await step.run('phone person', async () => console.log('phone person'));
+    await step.delay('some delay', '1m30s');
+    await step.run('email person', async () => console.log('email person'));
+  },
+})
+const func5 = server.createFunction({
+  id: 'function-calls-function',
+  event: 'event4',
+  fn: async (event, step) => {
+    await step.invoke('call 3rd function', 'third-function', {
+      url: 'https://enaeajsfdm4b.x.pipedream.net/',
+    });
+  },
+})
+const func6 = server.createFunction({
+  id: 'emit-event-function',
+  event: 'event5',
+  fn: async (event, step) => {
+    await step.emitEvent('emit-event2', 'event2', {
+      url: 'https://enaeajsfdm4b.x.pipedream.net/',
+    });
+  },
+})
+const func7 = server.createFunction({
+  id: 'cron-function',
+  cron: '*/4 * * * *',
+  fn: async (event, step) => {
+    await step.invoke('call 3rd function', 'third-function', {
+      url: 'https://enaeajsfdm4b.x.pipedream.net/',
+    });
+  },
+})
+const func8 = server.createFunction({
+  id: 'error-function',
+  event: 'error',
+  fn: async () => {
+    throw new Error('This error is for testing purposes');
+  },
+})
+
+    const func9 = server.createFunction({
+      id: 'webhook_test',
+      event: 'reverb_received_webhook',
+      fn: async (event) => {
+        console.log(event);
+      },
+    });
+```

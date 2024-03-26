@@ -24,7 +24,7 @@ export default class Logs extends ApiCommand<typeof Logs> {
     const { args } = await this.parse(Logs);
     const url = await this.getUrl();
 
-    let data: any[];
+    let data: { logs: { function: any; error: any }[] };
 
     try {
       const res = await fetch(url + `/logs/functions/${args.funcId}?limit=-1`);
@@ -52,8 +52,8 @@ export default class Logs extends ApiCommand<typeof Logs> {
       `${chalk.greenBright("[Success]")} Function ID ${args.funcId} logs:\n`
     );
 
-    for (const log of data) {
-      this.logJson(log);
+    for (const { function: fn, error } of data.logs) {
+      this.logJson(fn || error);
       this.log();
     }
   }

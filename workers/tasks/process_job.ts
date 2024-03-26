@@ -3,6 +3,7 @@ dotenv.config();
 
 import { Task } from "graphile-worker";
 import { isValidFunctionPayload, isValidRpcResponse } from "../utils/utils";
+import { MAX_ATTEMPTS, handleRetries } from "../utils/deadLetterUtils";
 import { v4 } from "uuid";
 
 import log from "../utils/logUtils";
@@ -23,8 +24,10 @@ const process_job: Task = async function (job, helpers) {
       attempts,
       max_attempts,
     });
-    throw e;
+
+    return handleRetries(helpers.job, e, true);
   }
+
   let data: any;
   try {
     const response = await fetch(functionServerUrl, {
@@ -50,9 +53,10 @@ const process_job: Task = async function (job, helpers) {
       attempts,
       max_attempts,
     });
-    if (e instanceof Error)
+    if (e instanceof Error) {
       e.message = "Error communicating with function server";
-    throw e;
+      return handleRetries(helpers.job, e);
+    }
   }
 
   if (!isValidRpcResponse(data)) {
@@ -70,8 +74,9 @@ const process_job: Task = async function (job, helpers) {
       max_attempts,
     });
 
-    throw e;
+    return handleRetries(helpers.job, e);
   }
+
   if ("error" in data) {
     if (typeof data.error === "string") {
       let e;
@@ -99,7 +104,7 @@ const process_job: Task = async function (job, helpers) {
         max_attempts,
       });
 
-      throw e;
+      return handleRetries(helpers.job, e);
     } else {
       log.error("RPC Response contains an error.", {
         funcId: job.id,
@@ -110,7 +115,10 @@ const process_job: Task = async function (job, helpers) {
         max_attempts,
       });
 
-      throw data.error;
+      return handleRetries(
+        helpers.job,
+        new Error("RPC Response contains an error.")
+      );
     }
   }
 
@@ -129,7 +137,7 @@ const process_job: Task = async function (job, helpers) {
       return;
     case "step":
       job.cache[result.stepId] = result.stepValue;
-      helpers.addJob("process_job", job);
+      helpers.addJob("process_job", job, { maxAttempts: MAX_ATTEMPTS });
 
       log.info("Step complete", {
         funcId: job.id,
@@ -141,7 +149,10 @@ const process_job: Task = async function (job, helpers) {
     case "delay":
       const time = new Date(Date.now() + result.delayInMs);
       job.cache[result.stepId] = time;
-      helpers.addJob("process_job", job, { runAt: time });
+      helpers.addJob("process_job", job, {
+        runAt: time,
+        maxAttempts: MAX_ATTEMPTS,
+      });
 
       log.info("Delay initiated", {
         funcId: job.id,
@@ -153,16 +164,20 @@ const process_job: Task = async function (job, helpers) {
       break;
     case "invoke":
       const funcId = v4();
-      helpers.addJob("process_job", {
-        name: result.invokedFnName,
-        id: funcId,
-        event: {
-          name: `invoked from ${job.name}`,
-          id: job.event.id,
-          payload: result.payload,
+      helpers.addJob(
+        "process_job",
+        {
+          name: result.invokedFnName,
+          id: funcId,
+          event: {
+            name: `invoked from ${job.name}`,
+            id: job.event.id,
+            payload: result.payload,
+          },
+          cache: {},
         },
-        cache: {},
-      });
+        { maxAttempts: MAX_ATTEMPTS }
+      );
       log.info("Function invoked", {
         funcId: funcId,
         eventId: job.event.id,
@@ -170,7 +185,7 @@ const process_job: Task = async function (job, helpers) {
       });
 
       job.cache[result.stepId] = `${result.invokedFnName} was invoked`;
-      helpers.addJob("process_job", job);
+      helpers.addJob("process_job", job, { maxAttempts: MAX_ATTEMPTS });
       log.info("Invoked step complete", {
         funcId: job.id,
         eventId: job.event.id,
@@ -186,7 +201,7 @@ const process_job: Task = async function (job, helpers) {
         payload: result.payload,
       });
       job.cache[result.stepId] = `${result.eventId} was emitted`;
-      helpers.addJob("process_job", job);
+      helpers.addJob("process_job", job, { maxAttempts: MAX_ATTEMPTS });
 
       log.info("Event emitted", {
         funcId: job.id,

@@ -125,6 +125,8 @@ router.get('/events/:eventId', async (req: Request, res) => {
       'meta.eventId': eventId,
     });
 
+    setLogLinks(status);
+
     res.status(200).json({ eventId, functions: status });
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving event logs from MongoDB' });

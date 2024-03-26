@@ -23,12 +23,14 @@ export async function getOffsetPaginatedLogs(
     const logs = await search.toArray();
     return {
       logs: logs.map((log) => {
-        if (log.meta?.funcId || log.funcId) {
+        if (log.meta?.error) {
+          return { error: log };
+        } else if (log.meta?.funcId || log.funcId) {
           return { function: log };
         } else if (log.meta?.eventId || log.eventId) {
           return { event: log };
         } else {
-          return { error: log };
+          return { unknown: log };
         }
       }),
     };
@@ -179,16 +181,14 @@ export function setLogLinks(collection: HateoasLogCollection) {
     log.links = {};
 
     if (log.error?.meta?.error) {
-      log.links.event = `/events/${log.error.meta.eventId}`;
-      log.links.function = `/functions/${log.error.meta.funcId}`;
-    } else if (log.event?.meta?.eventId || log.event?.eventId) {
-      log.links.functions = `/events/${
-        log.event.meta?.eventId || log.event.eventId
-      }`;
-    } else if (log.function?.meta?.funcId || log.function?.funcId) {
-      log.links.logs = `/functions/${
-        log.function.meta?.funcId || log.function.funcId
-      }`;
+      log.links.event = `/logs/events/${log.error.meta.eventId}`;
+      log.links.function = `/logs/functions/${log.error.meta.funcId}`;
+    } else if (log.event?.meta?.eventId) {
+      log.links.functions = `/logs/events/${log.event.meta.eventId}`;
+    } else if (log.function?.meta?.eventId) {
+      log.links.event = `/logs/events/${log.function?.meta?.eventId}`;
+    } else if (log.function?.funcId) {
+      log.links.logs = `/logs/functions/${log.function.funcId}`;
     }
   });
 }

@@ -1,4 +1,4 @@
-import { client, dbName } from '../services/mongo-service';
+import { logsCollection } from "../services/mongo-service";
 import { AggregateOptions, ObjectId } from 'mongodb';
 import { Request } from 'express';
 import { isValidTimeParams } from './utils';
@@ -14,9 +14,7 @@ export async function getOffsetPaginatedLogs(
   sort: {} = {}
 ): Promise<HateoasLogCollection> {
   try {
-    const database = client.db(dbName);
-    const collection = database.collection('logs');
-    let search = await collection.find(filter).sort(sort).skip(offset);
+    let search = await logsCollection.find(filter).sort(sort).skip(offset);
     if (limit) {
       search = await search.limit(limit + 1);
     }
@@ -45,9 +43,7 @@ export async function getCursorPaginatedLogs(
   sort: {} = {}
 ): Promise<HateoasLogCollection> {
   try {
-    const database = client.db(dbName);
-    const collection = database.collection('logs');
-    const logs = await collection
+    const logs = await logsCollection
       .find(filter)
       .sort(sort)
       .limit(limit)
@@ -84,8 +80,6 @@ export async function getFunctionsStatus(
     invoked: { $first: '$meta.timestamp' },
   };
 
-  const database = client.db(dbName);
-  const collection = database.collection('logs');
   const pipeline: { [key: string]: any }[] = [
     { $match: filter },
     { $sort: { timestamp: 1 } },
@@ -95,7 +89,7 @@ export async function getFunctionsStatus(
 
   if (limit) pipeline.push({ $limit: limit + 1 });
 
-  let logs = await collection.aggregate(pipeline).toArray();
+  let logs = await logsCollection.aggregate(pipeline).toArray();
 
   logs = logs
     .filter((log) => log._id !== null)

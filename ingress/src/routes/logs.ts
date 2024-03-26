@@ -65,9 +65,9 @@ router.get('/events', async (req: Request, res) => {
 
     events.links = {};
     if (page > 1)
-      events.links.previous = `/events?page=${page - 1}&limit=${limit}`;
+      events.links.previous = `/logs/events?page=${page - 1}&limit=${limit}`;
     if (events.logs.length === (limit || DEFAULT_LIMIT) + 1) {
-      events.links.next = `/events?page=${page + 1}&limit=${limit}`;
+      events.links.next = `/logs/events?page=${page + 1}&limit=${limit}`;
       events.logs = events.logs.slice(0, events.logs.length - 1);
     }
 
@@ -103,9 +103,9 @@ router.get('/functions', async (req: Request, res) => {
 
     status.links = {};
     if (page > 1)
-      status.links.previous = `/functions?page=${page - 1}&limit=${limit}`;
+      status.links.previous = `/logs/functions?page=${page - 1}&limit=${limit}`;
     if (status.logs.length === (limit || DEFAULT_LIMIT) + 1) {
-      status.links.next = `/functions?page=${page + 1}&limit=${limit}`;
+      status.links.next = `/logs/functions?page=${page + 1}&limit=${limit}`;
       status.logs = status.logs.slice(0, status.logs.length - 1);
     }
 
@@ -221,9 +221,9 @@ router.get('/errors', async (req: Request, res) => {
 
     logs.links = {};
     if (page > 1)
-      logs.links.previous = `/events?page=${page - 1}&limit=${limit}`;
+      logs.links.previous = `/logs/events?page=${page - 1}&limit=${limit}`;
     if (logs.logs.length === (limit || DEFAULT_LIMIT) + 1) {
-      logs.links.next = `/events?page=${page + 1}&limit=${limit}`;
+      logs.links.next = `/logs/events?page=${page + 1}&limit=${limit}`;
       logs.logs = logs.logs.slice(0, logs.logs.length - 1);
     }
 

@@ -161,31 +161,6 @@ router.get('/events/:eventId', async (req: Request, res) => {
   }
 });
 
-router.get('/functions/status', async (req: Request, res) => {
-  const { id } = req.query;
-  if (id === undefined) {
-    res
-      .status(404)
-      .json({ error: "Must include function id's as id query parameters" });
-  }
-
-  const filter: QueryFilter = {};
-
-  if (typeof id === 'string') {
-    filter['meta.funcId'] = { $in: [id] };
-  } else if (Array.isArray(id)) {
-    filter['meta.funcId'] = { $in: id as string[] };
-  }
-
-  try {
-    const status = await getFunctionsStatus(filter);
-
-    res.status(200).json(status);
-  } catch (error) {
-    res.status(500).json({ error: 'Error retrieving logs from MongoDB' });
-  }
-});
-
 router.get('/functions/:funcId', async (req: Request, res) => {
   const { funcId } = req.params;
 

@@ -1,4 +1,4 @@
-import express, { Request } from "express";
+import express, { Request } from 'express';
 import {
   getCursorPaginatedLogs,
   getOffsetPaginatedLogs,
@@ -7,13 +7,14 @@ import {
   handleCursorPagination,
   setFilterTimestamp,
   setFilterCursor,
-} from "../utils/loggingUtils";
-import { QueryFilter } from "types/types";
+  setLogLinks,
+  DEFAULT_LIMIT,
+} from '../utils/logUtils';
+import { QueryFilter, HateoasLogCollection } from 'types/types';
 
 const router = express.Router();
 
-// Implement previous and next
-router.get("/", async (req: Request, res) => {
+router.get('/', async (req: Request, res) => {
   const filter: QueryFilter = {};
 
   try {
@@ -31,13 +32,23 @@ router.get("/", async (req: Request, res) => {
     const { limit } = handleCursorPagination(req);
     const logs = await getCursorPaginatedLogs(limit, filter);
 
+    setLogLinks(logs);
+    const lastEntry = logs.logs[logs.logs.length - 1];
+    const nextCursor =
+      lastEntry.function?._id || lastEntry.event?._id || lastEntry.error?._id;
+
+    if (nextCursor)
+      logs.links = {
+        next: `/logs?cursor=${nextCursor}&limit=${limit}`,
+      };
+
     res.status(200).json(logs);
   } catch (error) {
-    res.status(500).json({ error: "Error retrieving logs from MongoDB" });
+    res.status(500).json({ error: 'Error retrieving logs from MongoDB' });
   }
 });
 
-router.get("/events", async (req: Request, res) => {
+router.get('/events', async (req: Request, res) => {
   const filter: QueryFilter = {};
 
   try {
@@ -52,20 +63,30 @@ router.get("/events", async (req: Request, res) => {
 
   try {
     const { page, limit, offset } = handleOffsetPagination(req);
-    filter.message = { $in: ["Event emitted", "Event fired"] };
-    const logs = await getOffsetPaginatedLogs(offset, limit, filter);
+    filter.message = { $in: ['Event emitted', 'Event fired'] };
+    const events = await getOffsetPaginatedLogs(offset, limit, filter);
 
-    if (logs.length === 0 && page !== 1) {
-      return res.status(404).json({ error: "Page not found" });
+    if (events.logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: 'Page not found' });
     }
 
-    res.status(200).json(logs);
+    setLogLinks(events);
+
+    events.links = {};
+    if (page > 1)
+      events.links.previous = `/logs/events?page=${page - 1}&limit=${limit}`;
+    if (events.logs.length === (limit || DEFAULT_LIMIT) + 1) {
+      events.links.next = `/logs/events?page=${page + 1}&limit=${limit}`;
+      events.logs = events.logs.slice(0, events.logs.length - 1);
+    }
+
+    res.status(200).json(events);
   } catch (error) {
-    res.status(500).json({ error: "Error retrieving event logs from MongoDB" });
+    res.status(500).json({ error: 'Error retrieving event logs from MongoDB' });
   }
 });
 
-router.get("/functions", async (req: Request, res) => {
+router.get('/functions', async (req: Request, res) => {
   const filter: QueryFilter = {};
 
   try {
@@ -79,86 +100,98 @@ router.get("/functions", async (req: Request, res) => {
   }
 
   try {
+    let { id } = req.query;
     const { page, limit, offset } = handleOffsetPagination(req);
+
+    if (typeof id === 'string') {
+      filter['meta.funcId'] = { $in: [id] };
+    } else if (Array.isArray(id)) {
+      filter['meta.funcId'] = { $in: id as string[] };
+    }
 
     const status = await getFunctionsStatus(filter, offset, limit);
 
-    if (status.length === 0 && page !== 1) {
-      return res.status(404).json({ error: "Page not found" });
+    if (status.logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: 'Page not found' });
+    }
+
+    setLogLinks(status);
+
+    status.links = {};
+    if (page > 1)
+      status.links.previous = `/logs/functions?page=${page - 1}&limit=${limit}`;
+
+    if (Array.isArray(id))
+      id.forEach((entry) => {
+        if (!status.links) return;
+        status.links.previous = status.links.previous?.concat(`&id=${entry}`);
+      });
+    if (status.logs.length === (limit || DEFAULT_LIMIT) + 1) {
+      status.links.next = `/logs/functions?page=${page + 1}&limit=${limit}`;
+      status.logs = status.logs.slice(0, status.logs.length - 1);
+
+      if (Array.isArray(id))
+        id.forEach((entry) => {
+          if (!status.links) return;
+          status.links.next = status.links.next?.concat(`&id=${entry}`);
+        });
     }
 
     res.status(200).json(status);
   } catch (error) {
     res
       .status(500)
-      .json({ error: "Error retrieving function logs from MongoDB" });
+      .json({ error: 'Error retrieving function logs from MongoDB' });
   }
 });
 
-router.get("/events/:eventId", async (req: Request, res) => {
+router.get('/events/:eventId', async (req: Request, res) => {
   const { eventId } = req.params;
 
   try {
     const status = await getFunctionsStatus({
-      "meta.eventId": eventId,
+      'meta.eventId': eventId,
     });
 
-    res.status(200).json({ eventId, functions: status });
+    setLogLinks(status);
+
+    res.status(200).json({ eventId, logs: status.logs });
   } catch (error) {
-    res.status(500).json({ error: "Error retrieving event logs from MongoDB" });
+    res.status(500).json({ error: 'Error retrieving event logs from MongoDB' });
   }
 });
 
-router.get("/functions/status", async (req: Request, res) => {
-  const { id } = req.query;
-  if (id === undefined) {
-    res
-      .status(404)
-      .json({ error: "Must include function id's as id query parameters" });
-  }
-
-  const filter: QueryFilter = {};
-
-  if (typeof id === "string") {
-    filter["meta.funcId"] = { $in: [id] };
-  } else if (Array.isArray(id)) {
-    filter["meta.funcId"] = { $in: id as string[] };
-  }
-
-  try {
-    const status = await getFunctionsStatus(filter);
-
-    res.status(200).json(status);
-  } catch (error) {
-    res.status(500).json({ error: "Error retrieving logs from MongoDB" });
-  }
-});
-
-router.get("/functions/:funcId", async (req: Request, res) => {
+router.get('/functions/:funcId', async (req: Request, res) => {
   const { funcId } = req.params;
 
   try {
     const { page, limit, offset } = handleOffsetPagination(req);
-    const filter: QueryFilter = { "meta.funcId": funcId };
-    const logs = await getOffsetPaginatedLogs(offset, limit, filter);
+    const filter: QueryFilter = { 'meta.funcId': funcId };
+    const logs: HateoasLogCollection = await getOffsetPaginatedLogs(
+      offset,
+      limit,
+      filter
+    );
 
-    if (logs.length === 0 && page !== 1) {
-      return res.status(404).json({ error: "Page not found" });
+    if (logs.logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: 'Page not found' });
     }
 
-    if (logs.length === 0) {
-      return res.status(404).json({ error: "Function not found" });
+    if (logs.logs.length === 0) {
+      return res.status(404).json({ error: 'Function not found' });
     }
+
+    setLogLinks(logs);
 
     res.status(200).json(logs);
   } catch (error) {
     res
       .status(500)
-      .json({ error: "Error retrieving function logs from MongoDB" });
+      .json({ error: 'Error retrieving function logs from MongoDB' });
   }
 });
 
-router.get("/errors", async (req: Request, res) => {
+router.get('/errors', async (req: Request, res) => {
   const filter: QueryFilter = {};
 
   try {
@@ -173,18 +206,33 @@ router.get("/errors", async (req: Request, res) => {
 
   try {
     const { page, limit, offset } = handleOffsetPagination(req);
-    filter.level = "error";
-    const logs = await getOffsetPaginatedLogs(offset, limit, filter, {
-      timestamp: -1,
-    });
+    filter.level = 'error';
+    const logs: HateoasLogCollection = await getOffsetPaginatedLogs(
+      offset,
+      limit,
+      filter,
+      {
+        timestamp: -1,
+      }
+    );
 
-    if (logs.length === 0 && page !== 1) {
-      return res.status(404).json({ error: "Page not found" });
+    if (logs.logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: 'Page not found' });
+    }
+
+    setLogLinks(logs);
+
+    logs.links = {};
+    if (page > 1)
+      logs.links.previous = `/logs/events?page=${page - 1}&limit=${limit}`;
+    if (logs.logs.length === (limit || DEFAULT_LIMIT) + 1) {
+      logs.links.next = `/logs/events?page=${page + 1}&limit=${limit}`;
+      logs.logs = logs.logs.slice(0, logs.logs.length - 1);
     }
 
     res.status(200).json(logs);
   } catch (error) {
-    res.status(500).json({ error: "Error retrieving error logs from MongoDB" });
+    res.status(500).json({ error: 'Error retrieving error logs from MongoDB' });
   }
 });
 

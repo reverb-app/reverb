@@ -19,9 +19,7 @@ export default class Status extends ApiCommand<typeof Status> {
     const { args } = await this.parse(Status);
     const url = await this.getUrl();
 
-    let data: {
-      functions: FuncStatus[];
-    };
+    let data: { logs: { function: FuncStatus }[] };
 
     try {
       const res = await fetch(url + "/logs/events/" + args.eventId);
@@ -29,6 +27,14 @@ export default class Status extends ApiCommand<typeof Status> {
       if (res.status === 500) {
         this.error(
           `${chalk.red("[FAIL]")} Internal Server Error, try again later`
+        );
+      }
+
+      if (res.status === 403) {
+        this.error(
+          `${chalk.red(
+            "[FAIL]"
+          )} API Key invalid, please provide correct API Key`
         );
       }
 
@@ -43,11 +49,11 @@ export default class Status extends ApiCommand<typeof Status> {
       } function statuses:\n`
     );
 
-    if (data.functions.length === 0) {
+    if (data.logs.length === 0) {
       this.warn("No functions invocations found for event");
     }
 
-    for (const fn of data.functions) {
+    for (const { function: fn } of data.logs) {
       const { funcId, funcName, invoked, status } = fn;
       const emoji = getEmoji(status);
       const time = new Date(invoked).toUTCString();

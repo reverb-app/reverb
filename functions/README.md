@@ -87,13 +87,15 @@ const func1 = server.createFunction({
     console.log('Hello world');
   },
 })
+
 const func2 = server.createFunction({
   id: 'second-function',
-  cron: '*/4 * * * *',
+  cron: 'event1',
   fn: async () => {
     console.log('Hi :)');
   },
 })
+
 const func3 = server.createFunction({
   id: 'third-function',
   event: 'event2',
@@ -107,6 +109,7 @@ const func3 = server.createFunction({
     }
   },
 })
+
 const func4 = server.createFunction({
   id: 'step-function',
   event: 'event3',
@@ -116,6 +119,7 @@ const func4 = server.createFunction({
     await step.run('email person', async () => console.log('email person'));
   },
 })
+
 const func5 = server.createFunction({
   id: 'function-calls-function',
   event: 'event4',
@@ -125,6 +129,7 @@ const func5 = server.createFunction({
     });
   },
 })
+
 const func6 = server.createFunction({
   id: 'emit-event-function',
   event: 'event5',
@@ -134,6 +139,7 @@ const func6 = server.createFunction({
     });
   },
 })
+
 const func7 = server.createFunction({
   id: 'cron-function',
   cron: '*/4 * * * *',
@@ -143,6 +149,7 @@ const func7 = server.createFunction({
     });
   },
 })
+
 const func8 = server.createFunction({
   id: 'error-function',
   event: 'error',
@@ -151,11 +158,11 @@ const func8 = server.createFunction({
   },
 })
 
-    const func9 = server.createFunction({
-      id: 'webhook_test',
-      event: 'reverb_received_webhook',
-      fn: async (event) => {
-        console.log(event);
-      },
-    });
+const func9 = server.createFunction({
+   id: 'webhook_test',
+   event: 'reverb_received_webhook',
+   fn: async (event) => {
+      console.log(event);
+   },
+});
 ```

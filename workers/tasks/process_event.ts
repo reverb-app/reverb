@@ -1,12 +1,19 @@
 import { Task } from "graphile-worker";
 import { isValidEvent } from "../utils/utils";
+import { handleRetries } from "../utils/deadLetterUtils";
 import { v4 } from "uuid";
+import { MAX_ATTEMPTS } from "../utils/deadLetterUtils";
 import log from "../utils/logUtils";
 
 const process_event: Task = async function (event, helpers) {
   if (!isValidEvent(event)) {
     log.error("Event format is not valid", { event });
-    throw new Error(`${event} is not a valid event`);
+
+    return handleRetries(
+      helpers.job,
+      new Error(`${event} is not a valid event`),
+      true
+    );
   }
 
   try {
@@ -27,17 +34,21 @@ const process_event: Task = async function (event, helpers) {
 
     names.forEach(funcName => {
       const funcId = v4();
-      helpers.addJob("process_job", {
-        name: funcName,
-        event,
-        id: funcId,
-        cache: {},
-      });
+      helpers.addJob(
+        "process_job",
+        {
+          name: funcName,
+          event,
+          id: funcId,
+          cache: {},
+        },
+        { maxAttempts: MAX_ATTEMPTS }
+      );
       log.info("Function invoked", { eventId: event.id, funcName, funcId });
     });
   } catch (e) {
     log.error("Querying function database failed.");
-    throw e;
+    if (e instanceof Error) return handleRetries(helpers.job, e);
   }
 };
 

@@ -2,9 +2,9 @@ import { client, dbName } from '../services/mongo-service';
 import { AggregateOptions, ObjectId } from 'mongodb';
 import { Request } from 'express';
 import { isValidTimeParams } from './utils';
-import { QueryFilter, AggregateGroup } from 'types/types';
+import { QueryFilter, AggregateGroup, HateoasLogCollection } from 'types/types';
 
-const DEFAULT_LIMIT = 10;
+export const DEFAULT_LIMIT = 10;
 const DEFAULT_PAGE = 1;
 
 export async function getOffsetPaginatedLogs(
@@ -12,16 +12,26 @@ export async function getOffsetPaginatedLogs(
   limit: number | undefined,
   filter: {} = {},
   sort: {} = {}
-): Promise<any[]> {
+): Promise<HateoasLogCollection> {
   try {
     const database = client.db(dbName);
     const collection = database.collection('logs');
     let search = await collection.find(filter).sort(sort).skip(offset);
     if (limit) {
-      search = await search.limit(limit);
+      search = await search.limit(limit + 1);
     }
     const logs = await search.toArray();
-    return logs;
+    return {
+      logs: logs.map((log) => {
+        if (log.meta?.funcId || log.funcId) {
+          return { function: log };
+        } else if (log.meta?.eventId || log.eventId) {
+          return { event: log };
+        } else {
+          return { error: log };
+        }
+      }),
+    };
   } catch (error) {
     throw new Error('Error retrieving logs from MongoDB');
   }
@@ -50,7 +60,7 @@ export async function getFunctionsStatus(
   filter: QueryFilter,
   offset: number = 0,
   limit: number | undefined = undefined
-) {
+): Promise<HateoasLogCollection> {
   const group: AggregateGroup = {
     _id: '$meta.funcId',
     message: { $last: '$message' },
@@ -69,7 +79,7 @@ export async function getFunctionsStatus(
     { $skip: offset },
   ];
 
-  if (limit) pipeline.push({ $limit: limit });
+  if (limit) pipeline.push({ $limit: limit + 1 });
 
   let logs = await collection.aggregate(pipeline).toArray();
 
@@ -77,22 +87,31 @@ export async function getFunctionsStatus(
     .filter((log) => log._id !== null)
     .sort((a, b) => Date.parse(a.invoked) - Date.parse(b.invoked));
 
-  return logs.map((log) => {
-    let status = 'running';
-    if (log.message === 'Function completed') {
-      status = 'completed';
-    } else if (log.level === 'error') {
-      status = 'error';
-    }
+  console.log(logs.length);
 
-    return {
-      funcId: log._id,
-      lastUpdate: log.timestamp,
-      status,
-      funcName: log.name,
-      invoked: log.invoked,
-    };
-  });
+  return {
+    logs: logs.map((log) => {
+      let status = 'running';
+      if (log.message === 'Function completed') {
+        status = 'completed';
+      } else if (log.level === 'error') {
+        status = 'error';
+      }
+
+      return {
+        function: {
+          funcId: log._id,
+          lastUpdate: log.timestamp,
+          status,
+          funcName: log.name,
+          invoked: log.invoked,
+        },
+        links: {
+          logs: `/functions/${log._id}`,
+        },
+      };
+    }),
+  };
 }
 
 export function handleOffsetPagination(req: Request): {
@@ -153,4 +172,23 @@ export function setFilterCursor(req: Request, filter: QueryFilter) {
   }
 
   filter['_id'] = { $gt: new ObjectId(cursor as string) };
+}
+
+export function setLogLinks(collection: HateoasLogCollection) {
+  collection.logs.forEach((log) => {
+    log.links = {};
+
+    if (log.error?.meta?.error) {
+      log.links.event = `/events/${log.error.meta.eventId}`;
+      log.links.function = `/functions/${log.error.meta.funcId}`;
+    } else if (log.event?.meta?.eventId || log.event?.eventId) {
+      log.links.functions = `/events/${
+        log.event.meta?.eventId || log.event.eventId
+      }`;
+    } else if (log.function?.meta?.funcId || log.function?.funcId) {
+      log.links.logs = `/functions/${
+        log.function.meta?.funcId || log.function.funcId
+      }`;
+    }
+  });
 }

@@ -7,8 +7,10 @@ import {
   handleCursorPagination,
   setFilterTimestamp,
   setFilterCursor,
+  setLogLinks,
+  DEFAULT_LIMIT,
 } from '../utils/logUtils';
-import { QueryFilter } from 'types/types';
+import { QueryFilter, HateoasLogCollection } from 'types/types';
 
 const router = express.Router();
 
@@ -53,13 +55,23 @@ router.get('/events', async (req: Request, res) => {
   try {
     const { page, limit, offset } = handleOffsetPagination(req);
     filter.message = { $in: ['Event emitted', 'Event fired'] };
-    const logs = await getOffsetPaginatedLogs(offset, limit, filter);
+    const events = await getOffsetPaginatedLogs(offset, limit, filter);
 
-    if (logs.length === 0 && page !== 1) {
+    if (events.logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: 'Page not found' });
     }
 
-    res.status(200).json(logs);
+    setLogLinks(events);
+
+    events.links = {};
+    if (page > 1)
+      events.links.previous = `/events?page=${page - 1}&limit=${limit}`;
+    if (events.logs.length === (limit || DEFAULT_LIMIT) + 1) {
+      events.links.next = `/events?page=${page + 1}&limit=${limit}`;
+      events.logs = events.logs.slice(0, events.logs.length - 1);
+    }
+
+    res.status(200).json(events);
   } catch (error) {
     res.status(500).json({ error: 'Error retrieving event logs from MongoDB' });
   }
@@ -83,8 +95,18 @@ router.get('/functions', async (req: Request, res) => {
 
     const status = await getFunctionsStatus(filter, offset, limit);
 
-    if (status.length === 0 && page !== 1) {
+    if (status.logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: 'Page not found' });
+    }
+
+    setLogLinks(status);
+
+    status.links = {};
+    if (page > 1)
+      status.links.previous = `/functions?page=${page - 1}&limit=${limit}`;
+    if (status.logs.length === (limit || DEFAULT_LIMIT) + 1) {
+      status.links.next = `/functions?page=${page + 1}&limit=${limit}`;
+      status.logs = status.logs.slice(0, status.logs.length - 1);
     }
 
     res.status(200).json(status);
@@ -140,17 +162,23 @@ router.get('/functions/:funcId', async (req: Request, res) => {
   try {
     const { page, limit, offset } = handleOffsetPagination(req);
     const filter: QueryFilter = { 'meta.funcId': funcId };
-    const logs = await getOffsetPaginatedLogs(offset, limit, filter);
+    const logs: HateoasLogCollection = await getOffsetPaginatedLogs(
+      offset,
+      limit,
+      filter
+    );
 
-    if (logs.length === 0 && page !== 1) {
+    if (logs.logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: 'Page not found' });
     }
 
-    if (logs.length === 0) {
+    if (logs.logs.length === 0) {
       return res.status(404).json({ error: 'Function not found' });
     }
 
-    res.status(200).json(logs);
+    setLogLinks(logs);
+
+    res.status(200).json(logs.logs);
   } catch (error) {
     res
       .status(500)
@@ -174,12 +202,27 @@ router.get('/errors', async (req: Request, res) => {
   try {
     const { page, limit, offset } = handleOffsetPagination(req);
     filter.level = 'error';
-    const logs = await getOffsetPaginatedLogs(offset, limit, filter, {
-      timestamp: -1,
-    });
+    const logs: HateoasLogCollection = await getOffsetPaginatedLogs(
+      offset,
+      limit,
+      filter,
+      {
+        timestamp: -1,
+      }
+    );
 
-    if (logs.length === 0 && page !== 1) {
+    if (logs.logs.length === 0 && page !== 1) {
       return res.status(404).json({ error: 'Page not found' });
+    }
+
+    setLogLinks(logs);
+
+    logs.links = {};
+    if (page > 1)
+      logs.links.previous = `/events?page=${page - 1}&limit=${limit}`;
+    if (logs.logs.length === (limit || DEFAULT_LIMIT) + 1) {
+      logs.links.next = `/events?page=${page + 1}&limit=${limit}`;
+      logs.logs = logs.logs.slice(0, logs.logs.length - 1);
     }
 
     res.status(200).json(logs);

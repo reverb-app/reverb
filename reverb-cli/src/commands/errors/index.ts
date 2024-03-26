@@ -26,7 +26,7 @@ ${chalk.greenBright(
   async run(): Promise<void> {
     const url = await this.getUrl();
 
-    let data: any[];
+    let data: { logs: { error: any }[] };
 
     try {
       const res = await fetch(url + `/logs/errors`);
@@ -34,6 +34,14 @@ ${chalk.greenBright(
       if (res.status === 500) {
         this.error(
           `${chalk.red("[FAIL]")} Internal Server Error, try again later`
+        );
+      }
+
+      if (res.status === 403) {
+        this.error(
+          `${chalk.red(
+            "[FAIL]"
+          )} API Key invalid, please provide correct API Key`
         );
       }
 
@@ -48,8 +56,12 @@ ${chalk.greenBright(
       )}:\n`
     );
 
-    for (const error of data) {
-      this.logJson(error);
+    if (data.logs.length === 0) {
+      this.log("There are no errors to show");
+    }
+
+    for (const log of data.logs) {
+      this.logJson(log.error);
       this.log();
     }
   }

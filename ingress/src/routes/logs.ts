@@ -180,7 +180,7 @@ router.get('/functions/:funcId', async (req: Request, res) => {
 
     setLogLinks(logs);
 
-    res.status(200).json(logs.logs);
+    res.status(200).json(logs);
   } catch (error) {
     res
       .status(500)

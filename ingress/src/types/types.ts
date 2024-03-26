@@ -35,7 +35,7 @@ export interface QueryFilter {
   _id?: { $gt: ObjectId };
   'meta.eventId'?: string;
   timestamp?: { $gte: Date; $lte: Date };
-  taskType?: 'event' | 'function';
+  'meta.taskType'?: 'event' | 'function';
   'meta.funcId'?: string | { $in: string[] };
 }
 export interface AggregateGroup {

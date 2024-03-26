@@ -15,7 +15,7 @@ export const handleRetries = (
     } else message = "Dead letter: Max attempts limit reached";
 
     log.error(message, {
-      taskType: job.task_identifier === "process_event" ? "event" : "job",
+      taskType: job.task_identifier === "process_event" ? "event" : "function",
       error,
       payload: job.payload,
       attempts: job.attempts,

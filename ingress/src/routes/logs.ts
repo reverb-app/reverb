@@ -8,6 +8,7 @@ import {
   setFilterTimestamp,
   setFilterCursor,
 } from "../utils/loggingUtils";
+import { isValidDeadLetterType } from "utils/utils";
 import { QueryFilter } from "types/types";
 
 const router = express.Router();
@@ -112,7 +113,7 @@ router.get("/events/:eventId", async (req: Request, res) => {
 router.get("/functions/status", async (req: Request, res) => {
   const { id } = req.query;
   if (id === undefined) {
-    res
+    return res
       .status(404)
       .json({ error: "Must include function id's as id query parameters" });
   }
@@ -185,6 +186,52 @@ router.get("/errors", async (req: Request, res) => {
     res.status(200).json(logs);
   } catch (error) {
     res.status(500).json({ error: "Error retrieving error logs from MongoDB" });
+  }
+});
+
+router.get("/dead-letter", async (req: Request, res) => {
+  const { type } = req.query;
+  if (type && !isValidDeadLetterType(type)) {
+    return res.status(400).json({
+      error:
+        "Invalid 'type' query parameter. Value must be 'function', 'event', or 'all'.",
+    });
+  }
+
+  const filter: QueryFilter = {};
+
+  if (type === "function" || type === "event") filter.taskType = type;
+  filter.message = {
+    $in: [
+      "Dead letter: Invalid payload",
+      "Dead letter: Max attempts limit reached",
+    ],
+  };
+
+  try {
+    setFilterTimestamp(req, filter);
+  } catch (e) {
+    if (e instanceof Error)
+      return res.status(400).json({
+        error: e.message,
+      });
+  }
+
+  const { page, limit, offset } = handleOffsetPagination(req);
+  try {
+    const logs = await getOffsetPaginatedLogs(offset, limit, filter, {
+      timestamp: -1,
+    });
+
+    if (logs.length === 0 && page !== 1) {
+      return res.status(404).json({ error: "Page not found" });
+    }
+
+    return res.status(200).json(logs);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Error retrieving dead letter logs from MongoDB" });
   }
 });
 

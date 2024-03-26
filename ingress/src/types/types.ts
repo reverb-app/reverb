@@ -35,6 +35,7 @@ export interface QueryFilter {
   _id?: { $gt: ObjectId };
   "meta.eventId"?: string;
   timestamp?: { $gte: Date; $lte: Date };
+  taskType?: "event" | "function";
   "meta.funcId"?: string | { $in: string[] };
 }
 export interface AggregateGroup {
@@ -45,3 +46,5 @@ export interface AggregateGroup {
   name?: { $first: "$meta.funcName" };
   invoked?: { $first: "$meta.timestamp" };
 }
+
+export type DeadLetterType = "event" | "function" | "all";

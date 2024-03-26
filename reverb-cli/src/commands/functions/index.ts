@@ -44,7 +44,7 @@ export default class Functions extends ApiCommand<typeof Functions> {
     const end = this.getEndTime();
     const start = this.getStartTime();
 
-    let data: FuncStatus[];
+    let data: { logs: { function: FuncStatus }[] };
     try {
       const res = await fetch(
         url + `/logs/functions?limit=-1&startTime=${start}&endTime=${end}`
@@ -53,6 +53,14 @@ export default class Functions extends ApiCommand<typeof Functions> {
       if (res.status === 500) {
         this.error(
           `${chalk.red("[FAIL]")} Internal Server Error, try again later`
+        );
+      }
+
+      if (res.status === 403) {
+        this.error(
+          `${chalk.red(
+            "[FAIL]"
+          )} API Key invalid, please provide correct API Key`
         );
       }
 
@@ -67,11 +75,11 @@ export default class Functions extends ApiCommand<typeof Functions> {
       )} to ${chalk.yellow(end)}:\n`
     );
 
-    if (data.length === 0) {
+    if (data.logs.length === 0) {
       this.warn("No function calls in the given timeframe");
     }
 
-    for (const fn of data) {
+    for (const { function: fn } of data.logs) {
       const { funcId, funcName, lastUpdate, invoked, status } = fn;
       const emoji = getEmoji(status);
       const time = new Date(lastUpdate).toUTCString();

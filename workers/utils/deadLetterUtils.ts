@@ -1,7 +1,7 @@
 import log from './logUtils';
 import { Job } from 'graphile-worker';
 
-export const MAX_ATTEMPTS = 1;
+export const MAX_ATTEMPTS = 20;
 
 export const handleRetries = (
   job: Job,

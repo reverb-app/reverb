@@ -100,7 +100,14 @@ router.get('/functions', async (req: Request, res) => {
   }
 
   try {
+    let { id } = req.query;
     const { page, limit, offset } = handleOffsetPagination(req);
+
+    if (typeof id === 'string') {
+      filter['meta.funcId'] = { $in: [id] };
+    } else if (Array.isArray(id)) {
+      filter['meta.funcId'] = { $in: id as string[] };
+    }
 
     const status = await getFunctionsStatus(filter, offset, limit);
 
@@ -113,9 +120,21 @@ router.get('/functions', async (req: Request, res) => {
     status.links = {};
     if (page > 1)
       status.links.previous = `/logs/functions?page=${page - 1}&limit=${limit}`;
+
+    if (Array.isArray(id))
+      id.forEach((entry) => {
+        if (!status.links) return;
+        status.links.previous = status.links.previous?.concat(`&id=${entry}`);
+      });
     if (status.logs.length === (limit || DEFAULT_LIMIT) + 1) {
       status.links.next = `/logs/functions?page=${page + 1}&limit=${limit}`;
       status.logs = status.logs.slice(0, status.logs.length - 1);
+
+      if (Array.isArray(id))
+        id.forEach((entry) => {
+          if (!status.links) return;
+          status.links.next = status.links.next?.concat(`&id=${entry}`);
+        });
     }
 
     res.status(200).json(status);

@@ -6,5 +6,4 @@ client.connect();
 
 const database = client.db();
 const logsCollection = database.collection("logs");
-
 export { client, database, logsCollection };

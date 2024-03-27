@@ -53,6 +53,7 @@ services:
       - "3001:3000"
     environment:
       - GRAPHILE_CONNECTION_STRING=postgresql://docker:team6@host.docker.internal:5454/graphile
+      - MONGO_CONNECTION_STRING=mongodb://host.docker.internal:27018/logs"
     depends_on:
       database:
         condition: service_healthy

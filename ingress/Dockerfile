@@ -6,7 +6,6 @@ EXPOSE 3000
 WORKDIR /usr/ingress
 COPY package.json .
 RUN npm install
-COPY . .
+ADD dist .
 
-RUN npx tsc
-CMD ["node", "./dist/src/index.js"]
+CMD ["node", "./src/index.js"]

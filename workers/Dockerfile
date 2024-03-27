@@ -4,7 +4,6 @@ ENV NODE_ENV production
 WORKDIR /usr/workers
 COPY package.json .
 RUN npm install
-COPY . .
+ADD dist .
 
-RUN npx tsc
-CMD ["node", "./dist/index.js"]
+CMD ["node", "./index.js"]

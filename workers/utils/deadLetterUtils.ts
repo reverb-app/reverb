@@ -1,5 +1,5 @@
-import log from "./logUtils";
-import { Job } from "graphile-worker";
+import log from './logUtils';
+import { Job } from 'graphile-worker';
 
 export const MAX_ATTEMPTS = 20;
 
@@ -11,11 +11,11 @@ export const handleRetries = (
   if (isDeadLetter(job, isInvalidPayload)) {
     let message: string;
     if (isInvalidPayload) {
-      message = "Dead letter: Invalid payload";
-    } else message = "Dead letter: Max attempts limit reached";
+      message = 'Dead letter: Invalid payload';
+    } else message = 'Dead letter: Max attempts limit reached';
 
     log.error(message, {
-      taskType: job.task_identifier === "process_event" ? "event" : "job",
+      taskType: job.task_identifier === 'process_event' ? 'event' : 'function',
       error,
       payload: job.payload,
       attempts: job.attempts,

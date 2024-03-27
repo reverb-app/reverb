@@ -1,4 +1,4 @@
-import { logsCollection } from "../services/mongo-service";
+import { logsCollection } from '../services/mongo-service';
 import { AggregateOptions, ObjectId } from 'mongodb';
 import { Request } from 'express';
 import { isValidTimeParams } from './utils';
@@ -95,8 +95,6 @@ export async function getFunctionsStatus(
     .filter((log) => log._id !== null)
     .sort((a, b) => Date.parse(a.invoked) - Date.parse(b.invoked));
 
-  console.log(logs.length);
-
   return {
     logs: logs.map((log) => {
       let status = 'running';
@@ -186,7 +184,10 @@ export function setLogLinks(collection: HateoasLogCollection) {
   collection.logs.forEach((log) => {
     log.links = {};
 
-    if (log.error?.meta?.error) {
+    if (log.error?.meta?.error && log.error.meta.payload.id) {
+      log.links.event = `/logs/events/${log.error.meta.payload.event.id}`;
+      log.links.function = `/logs/functions/${log.error.meta.payload.id}`;
+    } else if (log.error?.meta?.error) {
       log.links.event = `/logs/events/${log.error.meta.eventId}`;
       log.links.function = `/logs/functions/${log.error.meta.funcId}`;
     } else if (log.event?.meta?.eventId) {

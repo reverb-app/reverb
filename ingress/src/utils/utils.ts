@@ -1,5 +1,8 @@
-import { FunctionsByEvent } from "../types/types";
-import { QueryTimestamp } from "../types/types";
+import {
+  FunctionsByEvent,
+  QueryTimestamp,
+  DeadLetterType,
+} from "../types/types";
 
 export const isValidFunctionsByEvent = (
   body: unknown
@@ -37,5 +40,15 @@ export function isValidTimeParams(
       !!timestamp.endTime &&
       isValidDateString(timestamp.endTime)) ||
       (!("startTime" in timestamp) && !("endTime" in timestamp)))
+  );
+}
+
+export function isValidDeadLetterType(
+  queryParam: unknown
+): queryParam is DeadLetterType {
+  return (
+    !!queryParam &&
+    typeof queryParam === "string" &&
+    ["event", "function", "all"].includes(queryParam)
   );
 }

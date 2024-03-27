@@ -66,7 +66,7 @@ Additionally, the ingress server serves as an API for the MongoDB database which
 | `/logs/events/:eventId`   | All functions invoked by the provided event and their status (running, completed, or error).                                       | <ul><li>None</li></ul>                                                                              |
 | `/logs/functions/:funcId` | All logs associated with the provided function, including invocation, **Reverb step** completion, errors, and function completion. | <ul><li>None</li></ul>                                                                              |
 | `/logs/errors`            | All error logs.                                                                                                                    | <ul><li>**startTime** and **endTime**</li><li>**limit**</li><li>**page**</li></ul>                  |
-| `/logs/deadletter`        | All failed jobs, including both events and functions.                                                                              | <ul><li>**startTime** and **endTime**</li><li>**limit**</li><li>**page**</li><li>**type**</li></ul> |
+| `/logs/dead-letter`       | All failed jobs, including both events and functions.                                                                              | <ul><li>**startTime** and **endTime**</li><li>**limit**</li><li>**page**</li><li>**type**</li></ul> |
 
 ### Query Param Details
 

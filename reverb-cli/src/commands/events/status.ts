@@ -1,4 +1,4 @@
-import { Args } from "@oclif/core";
+import { Args, Flags } from "@oclif/core";
 import chalk from "chalk";
 
 import { FuncStatus } from "../../types/types.js";
@@ -13,22 +13,44 @@ export default class Status extends ApiCommand<typeof Status> {
     }),
   };
 
+  static flags = {
+    apiUrl: Flags.string({
+      char: "u",
+      description: "The url to the api gateway for this call",
+      required: false,
+    }),
+    apiKey: Flags.string({
+      char: "k",
+      description: "API key that goes with the api url.",
+      required: false,
+    }),
+  };
+
   static description = "Get the status of everything related to a single event";
 
   async run(): Promise<void> {
     const { args } = await this.parse(Status);
-    const url = await this.getUrl();
+    const url = this.getUrl();
+    const key = this.getKey();
 
-    let data: {
-      functions: FuncStatus[];
-    };
+    let data: { logs: { function: FuncStatus }[] };
 
     try {
-      const res = await fetch(url + "/logs/events/" + args.eventId);
+      const res = await fetch(url + "/logs/events/" + args.eventId, {
+        headers: { "x-api-key": key },
+      });
 
       if (res.status === 500) {
         this.error(
           `${chalk.red("[FAIL]")} Internal Server Error, try again later`
+        );
+      }
+
+      if (res.status === 403) {
+        this.error(
+          `${chalk.red(
+            "[FAIL]"
+          )} API Key invalid, please provide correct API Key`
         );
       }
 
@@ -43,11 +65,11 @@ export default class Status extends ApiCommand<typeof Status> {
       } function statuses:\n`
     );
 
-    if (data.functions.length === 0) {
+    if (data.logs.length === 0) {
       this.warn("No functions invocations found for event");
     }
 
-    for (const fn of data.functions) {
+    for (const { function: fn } of data.logs) {
       const { funcId, funcName, invoked, status } = fn;
       const emoji = getEmoji(status);
       const time = new Date(invoked).toUTCString();

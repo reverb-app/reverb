@@ -35,6 +35,7 @@ export interface QueryFilter {
   _id?: { $gt: ObjectId };
   'meta.eventId'?: string;
   timestamp?: { $gte: Date; $lte: Date };
+  'meta.taskType'?: 'event' | 'function';
   'meta.funcId'?: string | { $in: string[] };
 }
 export interface AggregateGroup {
@@ -65,3 +66,25 @@ export interface HateoasLogCollection {
     next?: string;
   };
 }
+
+export interface HateoasLog {
+  event?: { [key: string]: any };
+  function?: { [key: string]: any };
+  error?: { [key: string]: any };
+  links?: {
+    functions?: string;
+    logs?: string;
+    function?: string;
+    event?: string;
+  };
+}
+
+export interface HateoasLogCollection {
+  logs: HateoasLog[];
+  links?: {
+    previous?: string;
+    next?: string;
+  };
+}
+
+export type DeadLetterType = 'event' | 'function' | 'all';

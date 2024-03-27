@@ -3,9 +3,9 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import chalk from "chalk";
 
-export default class Set extends Command {
+export default class Get extends Command {
   static description =
-    "Gets the default API URL currently set for future <%= config.bin %> calls";
+    "Gets the default API Config currently set for future <%= config.bin %> calls";
 
   async run(): Promise<void> {
     try {
@@ -15,11 +15,9 @@ export default class Set extends Command {
         })
       );
 
-      if ("apiUrl" in userConfig && typeof userConfig.apiUrl === "string") {
-        this.log(`API URL is ${chalk.greenBright(userConfig.apiUrl)}`);
-        return;
-      }
-    } catch (e) {}
-    this.error(chalk.red("No API URL set"));
+      this.logJson(userConfig);
+    } catch {
+      this.error(chalk.red("No API config set"));
+    }
   }
 }

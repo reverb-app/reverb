@@ -38,8 +38,7 @@
     "commands": "./dist/commands",
     "dirname": "reverb-cli",
     "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-plugins"
+      "@oclif/plugin-help"
     ],
     "topicSeparator": ":",
     "topics": {

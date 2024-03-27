@@ -95,8 +95,6 @@ export async function getFunctionsStatus(
     .filter((log) => log._id !== null)
     .sort((a, b) => Date.parse(a.invoked) - Date.parse(b.invoked));
 
-  console.log(logs.length);
-
   return {
     logs: logs.map((log) => {
       let status = 'running';

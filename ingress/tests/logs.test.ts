@@ -183,6 +183,474 @@ const MOCK_LOGS: Log[] = [
       "timestamp": "2024-03-26T15:32:27.287Z"
     }
   },
+  {
+    _id: new ObjectId('66043a101bcef49eb60c2773'),
+    timestamp: new Date('2024-03-27T15:24:00.085Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      funcId: 'b576e112-4498-4318-be0b-2f4d81212c45',
+      funcName: 'cron-function',
+      cron: true,
+      timestamp: '2024-03-27T15:24:00.082Z'
+    }
+  },
+  {
+    _id: new ObjectId('66043a101bcef49eb60c2774'),
+    timestamp: new Date('2024-03-27T15:24:00.152Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      funcId: '93f2f074-377e-481e-aeec-5a5861695e46',
+      eventId: '',
+      funcName: 'third-function',
+      timestamp: '2024-03-27T15:24:00.152Z'
+    }
+  },
+  {
+    _id: new ObjectId('66043a101bcef49eb60c2775'),
+    timestamp: new Date('2024-03-27T15:24:00.153Z'),
+    level: 'info',
+    message: 'Invoked step complete',
+    meta: {
+      funcId: 'b576e112-4498-4318-be0b-2f4d81212c45',
+      eventId: '',
+      stepId: 'call 3rd function',
+      invokedFnId: '93f2f074-377e-481e-aeec-5a5861695e46',
+      timestamp: '2024-03-27T15:24:00.152Z'
+    }
+  },
+  {
+    _id: new ObjectId('66043a101bcef49eb60c2776'),
+    timestamp: new Date('2024-03-27T15:24:00.221Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: '93f2f074-377e-481e-aeec-5a5861695e46',
+      eventId: '',
+      timestamp: '2024-03-27T15:24:00.221Z'
+    }
+  },
+  {
+    _id: new ObjectId('66043a101bcef49eb60c2777'),
+    timestamp: new Date('2024-03-27T15:24:00.223Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: 'b576e112-4498-4318-be0b-2f4d81212c45',
+      eventId: '',
+      timestamp: '2024-03-27T15:24:00.223Z'
+    }
+  },
+  {
+    _id: new ObjectId('66043b001bcef49eb60c2778'),
+    timestamp: new Date('2024-03-27T15:28:00.017Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      funcId: '3e52d688-9f9d-49cc-8b69-129fc123a35e',
+      funcName: 'cron-function',
+      cron: true,
+      timestamp: '2024-03-27T15:28:00.016Z'
+    }
+  },
+  {
+    _id: new ObjectId('66043b001bcef49eb60c2779'),
+    timestamp: new Date('2024-03-27T15:28:00.038Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      funcId: '0d51185d-daf4-4fdc-9fd2-d662ff311772',
+      eventId: '',
+      funcName: 'third-function',
+      timestamp: '2024-03-27T15:28:00.038Z'
+    }
+  },
+  {
+    _id: new ObjectId('66043b001bcef49eb60c277a'),
+    timestamp: new Date('2024-03-27T15:28:00.040Z'),
+    level: 'info',
+    message: 'Invoked step complete',
+    meta: {
+      funcId: '3e52d688-9f9d-49cc-8b69-129fc123a35e',
+      eventId: '',
+      stepId: 'call 3rd function',
+      invokedFnId: '0d51185d-daf4-4fdc-9fd2-d662ff311772',
+      timestamp: '2024-03-27T15:28:00.038Z'
+    }
+  },
+  {
+    _id: new ObjectId('66043b001bcef49eb60c277b'),
+    timestamp: new Date('2024-03-27T15:28:00.077Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: '0d51185d-daf4-4fdc-9fd2-d662ff311772',
+      eventId: '',
+      timestamp: '2024-03-27T15:28:00.077Z'
+    }
+  },
+  {
+    _id: new ObjectId('66043b001bcef49eb60c277c'),
+    timestamp: new Date('2024-03-27T15:28:00.079Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: '3e52d688-9f9d-49cc-8b69-129fc123a35e',
+      eventId: '',
+      timestamp: '2024-03-27T15:28:00.078Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604803109121032ff8b7e32'),
+    timestamp: new Date('2024-03-27T20:23:13.228Z'),
+    level: 'info',
+    message: 'Event fired',
+    meta: {
+      eventId: 'e27da451-cdee-42af-ac52-e38e36ea0bc4',
+      eventName: 'event1',
+      timestamp: '2024-03-27T20:23:13.221Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604803109121032ff8b7e33'),
+    timestamp: new Date('2024-03-27T20:23:13.252Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      eventId: 'e27da451-cdee-42af-ac52-e38e36ea0bc4',
+      funcName: 'first-function',
+      funcId: '46b3b88c-21da-4f8e-8580-c44f1ec43c58',
+      timestamp: '2024-03-27T20:23:13.226Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604803109121032ff8b7e34'),
+    timestamp: new Date('2024-03-27T20:23:13.252Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      eventId: 'e27da451-cdee-42af-ac52-e38e36ea0bc4',
+      funcName: 'second-function',
+      funcId: '6f5e681b-90de-479e-83e3-d98f5ff06113',
+      timestamp: '2024-03-27T20:23:13.227Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604803109121032ff8b7e35'),
+    timestamp: new Date('2024-03-27T20:23:13.347Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: '6f5e681b-90de-479e-83e3-d98f5ff06113',
+      eventId: 'e27da451-cdee-42af-ac52-e38e36ea0bc4',
+      timestamp: '2024-03-27T20:23:13.347Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604803109121032ff8b7e36'),
+    timestamp: new Date('2024-03-27T20:23:13.351Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: '46b3b88c-21da-4f8e-8580-c44f1ec43c58',
+      eventId: 'e27da451-cdee-42af-ac52-e38e36ea0bc4',
+      timestamp: '2024-03-27T20:23:13.349Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604803709121032ff8b7e37'),
+    timestamp: new Date('2024-03-27T20:23:19.891Z'),
+    level: 'info',
+    message: 'Event fired',
+    meta: {
+      eventId: '3aff8abb-859a-4ca3-a7ae-7cf530a84185',
+      eventName: 'event2',
+      timestamp: '2024-03-27T20:23:19.890Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604803709121032ff8b7e38'),
+    timestamp: new Date('2024-03-27T20:23:19.893Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      eventId: '3aff8abb-859a-4ca3-a7ae-7cf530a84185',
+      funcName: 'third-function',
+      funcId: 'fd35a2a6-9a2c-47d1-a918-a721950e7ddf',
+      timestamp: '2024-03-27T20:23:19.891Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604803709121032ff8b7e39'),
+    timestamp: new Date('2024-03-27T20:23:19.901Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: 'fd35a2a6-9a2c-47d1-a918-a721950e7ddf',
+      eventId: '3aff8abb-859a-4ca3-a7ae-7cf530a84185',
+      timestamp: '2024-03-27T20:23:19.900Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604805509121032ff8b7e3a'),
+    timestamp: new Date('2024-03-27T20:23:49.774Z'),
+    level: 'info',
+    message: 'Event fired',
+    meta: {
+      eventId: '7196f127-5373-42c3-a244-2e4a34dd3c31',
+      eventName: 'event3',
+      timestamp: '2024-03-27T20:23:49.773Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604805509121032ff8b7e3b'),
+    timestamp: new Date('2024-03-27T20:23:49.789Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      eventId: '7196f127-5373-42c3-a244-2e4a34dd3c31',
+      funcName: 'step-function',
+      funcId: 'a9f40c3a-abc3-4765-b3ff-9dd17abeecfa',
+      timestamp: '2024-03-27T20:23:49.773Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604805509121032ff8b7e3c'),
+    timestamp: new Date('2024-03-27T20:23:49.818Z'),
+    level: 'info',
+    message: 'Step complete',
+    meta: {
+      funcId: 'a9f40c3a-abc3-4765-b3ff-9dd17abeecfa',
+      eventId: '7196f127-5373-42c3-a244-2e4a34dd3c31',
+      stepId: 'phone person',
+      stepValue: null,
+      timestamp: '2024-03-27T20:23:49.818Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604805509121032ff8b7e3d'),
+    timestamp: new Date('2024-03-27T20:23:49.828Z'),
+    level: 'info',
+    message: 'Delay initiated',
+    meta: {
+      funcId: 'a9f40c3a-abc3-4765-b3ff-9dd17abeecfa',
+      eventId: '7196f127-5373-42c3-a244-2e4a34dd3c31',
+      stepId: 'some delay',
+      delay: 90000,
+      timestamp: '2024-03-27T20:23:49.827Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806009121032ff8b7e3e'),
+    timestamp: new Date('2024-03-27T20:24:00.047Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      funcId: '0ab21eb9-8a4f-4f27-804c-ff94fe7a444e',
+      funcName: 'cron-function',
+      cron: true,
+      timestamp: '2024-03-27T20:24:00.046Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806009121032ff8b7e3f'),
+    timestamp: new Date('2024-03-27T20:24:00.069Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      funcId: 'cf54d206-5add-44a6-8a4d-99e03a9a48d6',
+      eventId: '',
+      funcName: 'third-function',
+      timestamp: '2024-03-27T20:24:00.068Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806009121032ff8b7e40'),
+    timestamp: new Date('2024-03-27T20:24:00.070Z'),
+    level: 'info',
+    message: 'Invoked step complete',
+    meta: {
+      funcId: '0ab21eb9-8a4f-4f27-804c-ff94fe7a444e',
+      eventId: '',
+      stepId: 'call 3rd function',
+      invokedFnId: 'cf54d206-5add-44a6-8a4d-99e03a9a48d6',
+      timestamp: '2024-03-27T20:24:00.068Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806009121032ff8b7e41'),
+    timestamp: new Date('2024-03-27T20:24:00.081Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: '0ab21eb9-8a4f-4f27-804c-ff94fe7a444e',
+      eventId: '',
+      timestamp: '2024-03-27T20:24:00.081Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806009121032ff8b7e42'),
+    timestamp: new Date('2024-03-27T20:24:00.142Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: 'cf54d206-5add-44a6-8a4d-99e03a9a48d6',
+      eventId: '',
+      timestamp: '2024-03-27T20:24:00.142Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806609121032ff8b7e43'),
+    timestamp: new Date('2024-03-27T20:24:06.112Z'),
+    level: 'info',
+    message: 'Event fired',
+    meta: {
+      eventId: 'a8ef3097-c844-476d-ba5d-f6b2d1d7cc33',
+      eventName: 'event4',
+      timestamp: '2024-03-27T20:24:06.111Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806609121032ff8b7e44'),
+    timestamp: new Date('2024-03-27T20:24:06.113Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      eventId: 'a8ef3097-c844-476d-ba5d-f6b2d1d7cc33',
+      funcName: 'function-calls-function',
+      funcId: 'df060030-3bda-48f7-8582-168a93e89ffe',
+      timestamp: '2024-03-27T20:24:06.112Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806609121032ff8b7e45'),
+    timestamp: new Date('2024-03-27T20:24:06.126Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      funcId: 'dbcb5029-8c00-488c-a2e0-0fde5972cb99',
+      eventId: 'a8ef3097-c844-476d-ba5d-f6b2d1d7cc33',
+      funcName: 'third-function',
+      timestamp: '2024-03-27T20:24:06.126Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806609121032ff8b7e46'),
+    timestamp: new Date('2024-03-27T20:24:06.127Z'),
+    level: 'info',
+    message: 'Invoked step complete',
+    meta: {
+      funcId: 'df060030-3bda-48f7-8582-168a93e89ffe',
+      eventId: 'a8ef3097-c844-476d-ba5d-f6b2d1d7cc33',
+      stepId: 'call 3rd function',
+      invokedFnId: 'dbcb5029-8c00-488c-a2e0-0fde5972cb99',
+      timestamp: '2024-03-27T20:24:06.126Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806609121032ff8b7e47'),
+    timestamp: new Date('2024-03-27T20:24:06.133Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: 'dbcb5029-8c00-488c-a2e0-0fde5972cb99',
+      eventId: 'a8ef3097-c844-476d-ba5d-f6b2d1d7cc33',
+      timestamp: '2024-03-27T20:24:06.133Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604806609121032ff8b7e48'),
+    timestamp: new Date('2024-03-27T20:24:06.136Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: 'df060030-3bda-48f7-8582-168a93e89ffe',
+      eventId: 'a8ef3097-c844-476d-ba5d-f6b2d1d7cc33',
+      timestamp: '2024-03-27T20:24:06.136Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604808109121032ff8b7e49'),
+    timestamp: new Date('2024-03-27T20:24:33.245Z'),
+    level: 'info',
+    message: 'Event fired',
+    meta: {
+      eventId: '2f208d70-fd22-421a-94a8-ad863b036f40',
+      eventName: 'error',
+      timestamp: '2024-03-27T20:24:33.244Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604808109121032ff8b7e4a'),
+    timestamp: new Date('2024-03-27T20:24:33.247Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      eventId: '2f208d70-fd22-421a-94a8-ad863b036f40',
+      funcName: 'error-function',
+      funcId: '71457e0d-6991-44e5-8458-d0c12fb4e049',
+      timestamp: '2024-03-27T20:24:33.245Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604809209121032ff8b7e4e'),
+    timestamp: new Date('2024-03-27T20:24:50.388Z'),
+    level: 'info',
+    message: 'Event fired',
+    meta: {
+      eventId: 'cfe1597d-2224-472f-9e35-61bd1895ea92',
+      eventName: 'reverb_received_webhook',
+      timestamp: '2024-03-27T20:24:50.388Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604809209121032ff8b7e4f'),
+    timestamp: new Date('2024-03-27T20:24:50.389Z'),
+    level: 'info',
+    message: 'Function invoked',
+    meta: {
+      eventId: 'cfe1597d-2224-472f-9e35-61bd1895ea92',
+      funcName: 'webhook_test',
+      funcId: 'ea6e1ebd-06fb-4c9d-a5af-01de3c02396a',
+      timestamp: '2024-03-27T20:24:50.388Z'
+    }
+  },
+  {
+    _id: new ObjectId('6604809209121032ff8b7e50'),
+    timestamp: new Date('2024-03-27T20:24:50.398Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: 'ea6e1ebd-06fb-4c9d-a5af-01de3c02396a',
+      eventId: 'cfe1597d-2224-472f-9e35-61bd1895ea92',
+      timestamp: '2024-03-27T20:24:50.398Z'
+    }
+  },
+  {
+    _id: new ObjectId('660480b009121032ff8b7e52'),
+    timestamp: new Date('2024-03-27T20:25:20.045Z'),
+    level: 'info',
+    message: 'Step complete',
+    meta: {
+      funcId: 'a9f40c3a-abc3-4765-b3ff-9dd17abeecfa',
+      eventId: '7196f127-5373-42c3-a244-2e4a34dd3c31',
+      stepId: 'email person',
+      stepValue: null,
+      timestamp: '2024-03-27T20:25:20.044Z'
+    }
+  },
+  {
+    _id: new ObjectId('660480b009121032ff8b7e53'),
+    timestamp: new Date('2024-03-27T20:25:20.057Z'),
+    level: 'info',
+    message: 'Function completed',
+    meta: {
+      funcId: 'a9f40c3a-abc3-4765-b3ff-9dd17abeecfa',
+      eventId: '7196f127-5373-42c3-a244-2e4a34dd3c31',
+      timestamp: '2024-03-27T20:25:20.057Z'
+    }
+  }
 ]
 
 beforeEach(() => {
@@ -252,11 +720,11 @@ describe('GET /logs', () => {
     expect(response.body).toHaveProperty('links');
   });
 
-  it('should return 200 with all log entries', async () => {
+  it('when no limit specified, should return 200 with 10 log entries', async () => {
     const response = await request(app).get('/logs/');
 
     expect(response.status).toBe(200);
-    expect(response.body.logs.length).toEqual(MOCK_LOGS.length);
+    expect(response.body.logs.length).toEqual(10);
   });
 
   it('with limit of 1 should return 200 with one log', async () => {
@@ -272,7 +740,7 @@ describe('GET /logs', () => {
   //   const response = await request(app).get(`/logs/?cursor=${cursor}`);
   //   expect(response.status).toBe(200);
   //   console.log(response.body.logs.map((log: Log) => log))
-  // expect(response.body.logs.length).toEqual(MOCK_LOGS.length - 1);
+  // expect(response.body.logs.map((log: Log) => log._id.toHexString())).not.toContain(cursor);
   // });
 
   // it('GET request to /logs should return 200 with one log when startTime and endTime query parameters are provided', async () => {
@@ -356,5 +824,96 @@ describe('GET /logs/events', () => {
     const response = await request(app).get('/logs/events/?endTime=2024-03-26T15:32:27.287Z');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
+  });
+});
+
+describe('GET /logs/functions', () => {
+  it('should return 200 and logs with pagination links', async () => {
+    const response = await request(app).get('/logs/functions');
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('logs');
+    expect(response.body).toHaveProperty('links');
+  });
+
+  it('should return 404 if page is not found', async () => {
+    const response = await request(app).get('/logs/functions?page=9999');
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual({ error: 'Page not found' });
+  });
+
+  it('should return 400 with error message if startTime is invalid', async () => {
+    const response = await request(app).get('/logs/functions?startTime=invalid&endTime=2024-03-26T15:32:27.287Z');
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBeDefined();
+  });
+
+  it('should return 400 with error message if endTime is invalid', async () => {
+    const response = await request(app).get('/logs/functions/?startTime=2024-03-26T15:32:27.287Z&endTime=invalid');
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBeDefined();
+  });
+
+  it('should return 400 with error message if startTime is present but endTime is missing', async () => {
+    const response = await request(app).get('/logs/functions/?startTime=2024-03-26T15:32:27.287Z');
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBeDefined();
+  });
+
+  it('should return 400 with error message if endTime is present but startTime is missing', async () => {
+    const response = await request(app).get('/logs/functions/?endTime=2024-03-26T15:32:27.287Z');
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBeDefined();
+  });
+
+  it('should return a function log filtered by ID', async () => {
+    const id = '76be1433-64fb-459d-aee2-42884e109acf';
+    const response = await request(app).get(`/logs/functions?id=${id}`);
+    expect(response.status).toBe(200);
+    expect(response.body.logs.every((log: any) => log.function.funcId === id)).toBe(true);
+  });
+
+  // it('should return function logs filtered by array of IDs', async () => {
+  //   const ids = ['aa151413-103f-406f-8542-4bbe3553c387', 'd1b34c11-2677-41d5-bdbe-4845d576ffd6'];
+  //   const response = await request(app).get(`/logs/functions?id=${ids.join(',')}`);
+  //   console.log(response.body)
+  //   expect(response.status).toBe(200);
+  //   expect(response.body.logs.every((log: any) => ids.includes(log.functions.funcId))).toBe(true);
+  // });
+});
+
+describe('GET logs/events/:eventId', () => {
+  it('should return logs for a specific event ID', async () => {
+    const eventId = '6602ea8802a74bde96e81d15';
+    const response = await request(app).get(`/logs/events/${eventId}`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('eventId', eventId);
+  });
+});
+
+describe('GET logs/functions/:funcId', () => {
+  it('should return logs for a specific function ID', async () => {
+    const funcId = '76be1433-64fb-459d-aee2-42884e109acf';
+    const response = await request(app).get(`/logs/functions/${funcId}`);
+    expect(response.status).toBe(200);
+  });
+
+  it('should return 404 if function ID does not exist', async () => {
+    const funcId = 'invalid';
+    const response = await request(app).get(`/logs/functions/${funcId}`);
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual({ error: 'Function not found' });
+  });
+});
+
+describe('GET /errors', () => {
+  it('should return error logs', async () => {
+    const response = await request(app).get('/logs/errors');
+    expect(response.status).toBe(200);
+  });
+
+  it('should return 404 if page is not found', async () => {
+    const response = await request(app).get('/logs/errors?page=100');
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual({ error: 'Page not found' });
   });
 });

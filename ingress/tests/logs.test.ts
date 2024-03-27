@@ -243,6 +243,7 @@ beforeEach(() => {
 afterEach(() => {
   jest.resetAllMocks();
 })
+
 describe('GET /logs', () => {
   it('should return 200 and logs with pagination links', async () => {
     const response = await request(app).get('/logs');
@@ -265,8 +266,6 @@ describe('GET /logs', () => {
     expect(response.status).toBe(200);
     expect(response.body.logs.length).toEqual(1);
   });
-
-
 
   // it('should return logs filtered by cursor', async () => {
   //   const cursor = "6602ea8802a74bde96e81d15"
@@ -327,5 +326,35 @@ describe('GET /logs/events', () => {
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('logs');
     expect(response.body).toHaveProperty('links');
+  });
+
+  it('should return 404 if page is not found', async () => {
+    const response = await request(app).get('/logs/events?page=9999');
+    expect(response.status).toBe(404);
+    expect(response.body).toEqual({ error: 'Page not found' });
+  });
+
+  it('should return 400 with error message if startTime is invalid', async () => {
+    const response = await request(app).get('/logs/events?startTime=invalid&endTime=2024-03-26T15:32:27.287Z');
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBeDefined();
+  });
+
+  it('should return 400 with error message if endTime is invalid', async () => {
+    const response = await request(app).get('/logs/events/?startTime=2024-03-26T15:32:27.287Z&endTime=invalid');
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBeDefined();
+  });
+
+  it('should return 400 with error message if startTime is present but endTime is missing', async () => {
+    const response = await request(app).get('/logs/events/?startTime=2024-03-26T15:32:27.287Z');
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBeDefined();
+  });
+
+  it('should return 400 with error message if endTime is present but startTime is missing', async () => {
+    const response = await request(app).get('/logs/events/?endTime=2024-03-26T15:32:27.287Z');
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBeDefined();
   });
 });

@@ -18,16 +18,24 @@ export default class Logs extends ApiCommand<typeof Logs> {
       description: "The url to the api gateway for this call",
       required: false,
     }),
+    apiKey: Flags.string({
+      char: "k",
+      description: "API key that goes with the api url.",
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
     const { args } = await this.parse(Logs);
-    const url = await this.getUrl();
+    const url = this.getUrl();
+    const key = this.getKey();
 
     let data: { logs: { function: any; error: any }[] };
 
     try {
-      const res = await fetch(url + `/logs/functions/${args.funcId}?limit=-1`);
+      const res = await fetch(url + `/logs/functions/${args.funcId}?limit=-1`, {
+        headers: { "x-api-key": key },
+      });
 
       if (res.status === 404) {
         this.error(

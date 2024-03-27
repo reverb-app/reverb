@@ -5,7 +5,7 @@ import chalk from "chalk";
 
 export default class Get extends Command {
   static description =
-    "Gets the default API URL currently set for future <%= config.bin %> calls";
+    "Gets the default API Config currently set for future <%= config.bin %> calls";
 
   async run(): Promise<void> {
     try {

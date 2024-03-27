@@ -1,4 +1,4 @@
-import { Args } from "@oclif/core";
+import { Args, Flags } from "@oclif/core";
 import chalk from "chalk";
 
 import { FuncStatus } from "../../types/types.js";
@@ -13,16 +13,32 @@ export default class Status extends ApiCommand<typeof Status> {
     }),
   };
 
+  static flags = {
+    apiUrl: Flags.string({
+      char: "u",
+      description: "The url to the api gateway for this call",
+      required: false,
+    }),
+    apiKey: Flags.string({
+      char: "k",
+      description: "API key that goes with the api url.",
+      required: false,
+    }),
+  };
+
   static description = "Get the status of everything related to a single event";
 
   async run(): Promise<void> {
     const { args } = await this.parse(Status);
-    const url = await this.getUrl();
+    const url = this.getUrl();
+    const key = this.getKey();
 
     let data: { logs: { function: FuncStatus }[] };
 
     try {
-      const res = await fetch(url + "/logs/events/" + args.eventId);
+      const res = await fetch(url + "/logs/events/" + args.eventId, {
+        headers: { "x-api-key": key },
+      });
 
       if (res.status === 500) {
         this.error(

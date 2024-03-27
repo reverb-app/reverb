@@ -21,15 +21,23 @@ ${chalk.greenBright(
       description: "The url to the api gateway for this call",
       required: false,
     }),
+    apiKey: Flags.string({
+      char: "k",
+      description: "API key that goes with the api url.",
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
-    const url = await this.getUrl();
+    const url = this.getUrl();
+    const key = this.getKey();
 
     let data: { logs: { error: any }[] };
 
     try {
-      const res = await fetch(url + `/logs/errors`);
+      const res = await fetch(url + `/logs/errors`, {
+        headers: { "x-api-key": key },
+      });
 
       if (res.status === 500) {
         this.error(

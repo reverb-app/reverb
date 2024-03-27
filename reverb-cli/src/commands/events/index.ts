@@ -22,6 +22,11 @@ ${chalk.greenBright(
       description: "The url to the api gateway for this call",
       required: false,
     }),
+    apiKey: Flags.string({
+      char: "k",
+      description: "API key that goes with the api url.",
+      required: false,
+    }),
     start: Flags.string({
       char: "s",
       description:
@@ -37,20 +42,32 @@ ${chalk.greenBright(
   };
 
   async run(): Promise<void> {
-    const url = await this.getUrl();
+    const url = this.getUrl();
+    const key = this.getKey();
 
     const end = this.getEndTime();
     const start = this.getStartTime();
 
-    let data: EventFiredLog[];
+    let data: { logs: { event: EventFiredLog }[] };
     try {
       const res = await fetch(
-        url + `/logs/events?limit=-1&startTime=${start}&endTime=${end}`
+        url + `/logs/events?limit=-1&startTime=${start}&endTime=${end}`,
+        {
+          headers: { "x-api-key": key },
+        }
       );
 
       if (res.status === 500) {
         this.error(
           `${chalk.red("[FAIL]")} Internal Server Error, try again later`
+        );
+      }
+
+      if (res.status === 403) {
+        this.error(
+          `${chalk.red(
+            "[FAIL]"
+          )} API Key invalid, please provide correct API Key`
         );
       }
 
@@ -65,13 +82,13 @@ ${chalk.greenBright(
       )} to ${chalk.yellow(end)}:\n`
     );
 
-    if (data.length === 0) {
+    if (data.logs.length === 0) {
       this.warn("No events in the given timeframe");
     }
 
-    for (const log of data) {
-      const timestamp = new Date(log.timestamp).toUTCString();
-      const { eventId, eventName } = log.meta;
+    for (const { event } of data.logs) {
+      const timestamp = new Date(event.timestamp).toUTCString();
+      const { eventId, eventName } = event.meta;
       this.log(
         `${chalk.greenBright(eventName)} | ${eventId} | ${chalk.yellow(
           timestamp

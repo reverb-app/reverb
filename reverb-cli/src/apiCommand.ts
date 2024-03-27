@@ -17,6 +17,11 @@ export abstract class ApiCommand<T extends typeof Command> extends Command {
       description: "The url to the api gateway for this call",
       required: false,
     }),
+    apiKey: Flags.string({
+      char: "k",
+      description: "API key that goes with the api url.",
+      required: false,
+    }),
     start: Flags.string({
       char: "s",
       description:
@@ -32,26 +37,36 @@ export abstract class ApiCommand<T extends typeof Command> extends Command {
   };
 
   protected flags!: Flags<T>;
+  protected apiConfig: { apiUrl?: string; apiKey?: string } = {};
 
-  public async getUrl(): Promise<string> {
+  public getUrl(): string {
     if (this.flags.apiUrl) return this.flags.apiUrl;
 
-    try {
-      const userConfig = JSON.parse(
-        await fs.readFile(path.join(this.config.configDir, "config.json"), {
-          encoding: "utf-8",
-        })
-      );
+    if (
+      "apiUrl" in this.apiConfig &&
+      typeof this.apiConfig.apiUrl === "string"
+    ) {
+      return this.apiConfig.apiUrl;
+    }
 
-      if ("apiUrl" in userConfig && typeof userConfig.apiUrl === "string") {
-        return userConfig.apiUrl;
-      }
-    } catch (e) {}
     this.error(
       `${chalk.red(
         "[FAIL]"
       )} The -u flag is required if you have not set an api url in config`
     );
+  }
+
+  public getKey(): string {
+    if (this.flags.apiKey) return this.flags.apiKey;
+
+    if (
+      "apiKey" in this.apiConfig &&
+      typeof this.apiConfig.apiKey === "string"
+    ) {
+      return this.apiConfig.apiKey;
+    }
+
+    return "";
   }
 
   public getEndTime(): string {
@@ -88,5 +103,13 @@ export abstract class ApiCommand<T extends typeof Command> extends Command {
       strict: this.ctor.strict,
     });
     this.flags = flags as Flags<T>;
+
+    try {
+      this.apiConfig = JSON.parse(
+        await fs.readFile(path.join(this.config.configDir, "config.json"), {
+          encoding: "utf-8",
+        })
+      );
+    } catch {}
   }
 }

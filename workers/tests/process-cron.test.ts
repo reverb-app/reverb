@@ -77,3 +77,17 @@ test("addJob is called with the correct arguments", async () => {
     { maxAttempts: 20 }
   );
 });
+
+test("logs an error on incorrect job", async () => {
+  try {
+    await process_cron(funcPayload, mockHelpers);
+  } catch {
+  } finally {
+    expect(log.error).toHaveBeenCalledTimes(1);
+  }
+});
+
+test("logs on function payload enqueued", async () => {
+  await process_cron(validCronJob, mockHelpers);
+  expect(log.info).toHaveBeenCalledTimes(1);
+});

@@ -41,7 +41,7 @@ const mockHelpers = {
   },
 } as JobHelpers;
 
-test("incorrect event dead letter queues and resolves", () => {
+test("invalid event format dead letter queues and resolves", () => {
   expect(
     process_event(incorrectEventOne, mockHelpers)
   ).resolves.toBeUndefined();

@@ -6,7 +6,6 @@ EXPOSE 3000
 WORKDIR /usr/function_server
 COPY package.json .
 RUN npm install
-COPY . .
+ADD dist .
 
-RUN npx tsc
-CMD ["node", "./dist/index.js"]
+CMD ["node", "./index.js"]

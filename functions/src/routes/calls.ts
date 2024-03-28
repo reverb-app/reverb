@@ -37,7 +37,7 @@ router.post("/", async (req, res: Response<RpcResponse>) => {
 
   if (!fn) {
     if (id) {
-      body = { error: `Method ${method} does not exist.`, id };
+      body = { error: `RPC failed: Method ${method} does not exist.`, id };
     }
 
     return res.status(404).json(body);

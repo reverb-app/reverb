@@ -1,5 +1,5 @@
 import process_cron from "../tasks/process_cron";
-import { JobHelpers } from "graphile-worker";
+import { JobHelpers, AddJobFunction, Job } from "graphile-worker";
 import { CronPayload, Event, FunctionPayload } from "../types/types";
 import log from "../utils/logUtils";
 
@@ -30,27 +30,36 @@ jest.spyOn(log, "info");
 jest.spyOn(log, "warn");
 jest.spyOn(log, "error");
 
+const mockAddJob: AddJobFunction = async (task, payload) => {
+  if (!!payload && typeof payload === "object" && "funcName" in payload) {
+    return {
+      payload: { name: payload.funcName },
+      attempts: 1,
+      max_attempts: 5,
+    } as Job;
+  } else {
+    return { payload: {}, attempts: 1, max_attempts: 5 } as Job;
+  }
+};
+
 const mockHelpers = {
   job: {
     payload: {},
-    attempts: 0,
-    max_attempts: 0,
+    attempts: 1,
+    max_attempts: 5,
   },
+  addJob: mockAddJob,
 } as JobHelpers;
 
 beforeEach(() => {
   jest.clearAllMocks();
 });
 
-test("incorrect cron job throws an error", () => {
-  expect(() => process_cron(funcPayload, mockHelpers)).rejects.toThrow(
+test("invalid cron job throws an error", () => {
+  expect(process_cron(funcPayload, mockHelpers)).rejects.toThrow(
     /Cron format is not valid/
   );
-  expect(() => process_cron(eventPayload, mockHelpers)).rejects.toThrow(
+  expect(process_cron(eventPayload, mockHelpers)).rejects.toThrow(
     /Cron format is not valid/
   );
 });
-
-// test("correct cron job does not throw an error", () => {
-//   expect(() => process_cron(validCronJob, {}));
-// });

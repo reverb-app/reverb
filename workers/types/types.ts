@@ -39,8 +39,7 @@ export interface Secret {
 
 export interface CompleteResult {
   type: "complete";
-  stepId: string;
-  stepValue: any;
+  value: any;
 }
 
 export interface StepResult {

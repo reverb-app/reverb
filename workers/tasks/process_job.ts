@@ -134,7 +134,11 @@ const process_job: Task = async function (job, helpers) {
   const result = data.result;
   switch (result.type) {
     case "complete":
-      log.info("Function completed", { funcId: job.id, eventId: job.event.id });
+      log.info("Function completed", {
+        funcId: job.id,
+        eventId: job.event.id,
+        value: result.value,
+      });
       return;
     case "step":
       job.cache[result.stepId] = result.stepValue;

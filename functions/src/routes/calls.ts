@@ -44,12 +44,13 @@ router.post("/", async (req, res: Response<RpcResponse>) => {
   }
 
   try {
-    await fn.fn(params.event, new Step(params.cache, fn.id));
+    const value = await fn.fn(params.event, new Step(params.cache, fn.id));
     if (id) {
       body = {
         id,
         result: {
           type: "complete",
+          value,
         },
       };
     }

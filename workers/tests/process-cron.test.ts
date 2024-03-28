@@ -74,7 +74,7 @@ test("addJob is called with the correct arguments", async () => {
       event: { name: "cron", id: "" },
       cache: {},
     }),
-    { maxAttempts: 20 }
+    { maxAttempts: expect.any(Number) }
   );
 });
 

@@ -23,164 +23,37 @@ interface Log {
 
 const MOCK_LOGS: Log[] = [
   {
-    "_id": new ObjectId("6602ea8802a74bde96e81d15"),
-    "timestamp": new Date("2024-01-02T15:32:24.521Z"),
-    "level": "info",
-    "message": "Event fired",
-    "meta": {
-      "eventId": "59e5a468-b952-402e-a6c3-69390dfb33fe",
-      "eventName": "error",
-      "timestamp": "2024-03-26T15:32:24.520Z"
+    _id: new ObjectId("6602ea8a02a74bde96e81d1b"),
+    timestamp: new Date("2024-03-26T15:32:26.253Z"),
+    level: "info",
+    message: "Event fired",
+    meta: {
+      eventId: "7583c224-07da-4522-b87c-41e7fdc00e0b",
+      eventName: "error",
+      timestamp: "2024-03-26T15:32:26.253Z"
     }
   },
   {
-    "_id": new ObjectId("6602ea8802a74bde96e81d16"),
-    "timestamp": new Date("2024-03-26T15:32:24.525Z"),
-    "level": "info",
-    "message": "Function invoked",
-    "meta": {
-      "eventId": "59e5a468-b952-402e-a6c3-69390dfb33fe",
-      "funcName": "error-function",
-      "funcId": "a3ea0ec0-ed04-4f55-81ca-e2704de81d9c",
-      "timestamp": "2024-03-26T15:32:24.521Z"
+    _id: new ObjectId("6602ea8a02a74bde96e81d1c"),
+    timestamp: new Date("2024-03-26T15:32:26.254Z"),
+    level: "info",
+    message: "Function invoked",
+    meta: {
+      eventId: "7583c224-07da-4522-b87c-41e7fdc00e0b",
+      funcName: "error-function",
+      funcId: "18a85c96-5fbd-4ee8-ad6f-b69a5a9ce669",
+      timestamp: "2024-03-26T15:32:26.253Z"
     }
   },
   {
-    "_id": new ObjectId("6602ea8802a74bde96e81d17"),
-    "timestamp": new Date("2024-03-26T15:32:24.550Z"),
-    "level": "error",
-    "message": "RPC Response contains an improperly formatted error.",
-    "meta": {
-      "funcId": "a3ea0ec0-ed04-4f55-81ca-e2704de81d9c",
-      "eventId": "59e5a468-b952-402e-a6c3-69390dfb33fe",
-      "error": {
-        "message": "This error is for testing purposes",
-        "name": "Error",
-        "stack": "Error: This error is for testing purposes\n    at /home/memlin/capstone/Project-ingress/workers/tasks/process_job.ts:89:13\n    at Generator.next (<anonymous>)\n    at fulfilled (/home/memlin/capstone/Project-ingress/workers/tasks/process_job.ts:5:58)\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)"
-      },
-      "payload": {
-        "name": "error-function",
-        "event": {
-          "name": "error",
-          "id": "59e5a468-b952-402e-a6c3-69390dfb33fe"
-        },
-        "id": "a3ea0ec0-ed04-4f55-81ca-e2704de81d9c",
-        "cache": {}
-      },
-      "attempts": 1,
-      "max_attempts": 25,
-      "timestamp": "2024-03-26T15:32:24.545Z"
-    }
-  },
-  {
-    "_id": new ObjectId("6602ea8902a74bde96e81d18"),
-    "timestamp": new Date("2024-03-26T15:32:25.237Z"),
-    "level": "info",
-    "message": "Event fired",
-    "meta": {
-      "eventId": "ba28584c-294f-4ec1-9d17-1924749618b1",
-      "eventName": "error",
-      "timestamp": "2024-03-26T15:32:25.237Z"
-    }
-  },
-  {
-    "_id": new ObjectId("6602ea8902a74bde96e81d19"),
-    "timestamp": new Date("2024-03-26T15:32:25.241Z"),
-    "level": "info",
-    "message": "Function invoked",
-    "meta": {
-      "eventId": "ba28584c-294f-4ec1-9d17-1924749618b1",
-      "funcName": "error-function",
-      "funcId": "9efd214c-2a54-4633-b2bb-9e305f34df33",
-      "timestamp": "2024-03-26T15:32:25.237Z"
-    }
-  },
-  {
-    "_id": new ObjectId("6602ea8902a74bde96e81d1a"),
-    "timestamp": new Date("2024-03-26T15:32:25.265Z"),
-    "level": "error",
-    "message": "RPC Response contains an improperly formatted error.",
-    "meta": {
-      "funcId": "9efd214c-2a54-4633-b2bb-9e305f34df33",
-      "eventId": "ba28584c-294f-4ec1-9d17-1924749618b1",
-      "error": {
-        "message": "This error is for testing purposes",
-        "name": "Error",
-        "stack": "Error: This error is for testing purposes\n    at /home/memlin/capstone/Project-ingress/workers/tasks/process_job.ts:89:13\n    at Generator.next (<anonymous>)\n    at fulfilled (/home/memlin/capstone/Project-ingress/workers/tasks/process_job.ts:5:58)\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)"
-      },
-      "payload": {
-        "name": "error-function",
-        "event": {
-          "name": "error",
-          "id": "ba28584c-294f-4ec1-9d17-1924749618b1"
-        },
-        "id": "9efd214c-2a54-4633-b2bb-9e305f34df33",
-        "cache": {}
-      },
-      "attempts": 1,
-      "max_attempts": 25,
-      "timestamp": "2024-03-26T15:32:25.264Z"
-    }
-  },
-  {
-    "_id": new ObjectId("6602ea8a02a74bde96e81d1b"),
-    "timestamp": new Date("2024-03-26T15:32:26.253Z"),
-    "level": "info",
-    "message": "Event fired",
-    "meta": {
-      "eventId": "7583c224-07da-4522-b87c-41e7fdc00e0b",
-      "eventName": "error",
-      "timestamp": "2024-03-26T15:32:26.253Z"
-    }
-  },
-  {
-    "_id": new ObjectId("6602ea8a02a74bde96e81d1c"),
-    "timestamp": new Date("2024-03-26T15:32:26.254Z"),
-    "level": "info",
-    "message": "Function invoked",
-    "meta": {
-      "eventId": "7583c224-07da-4522-b87c-41e7fdc00e0b",
-      "funcName": "error-function",
-      "funcId": "18a85c96-5fbd-4ee8-ad6f-b69a5a9ce669",
-      "timestamp": "2024-03-26T15:32:26.253Z"
-    }
-  },
-  {
-    "_id": new ObjectId("6602ea8a02a74bde96e81d1d"),
-    "timestamp": new Date("2024-03-26T15:32:26.267Z"),
-    "level": "error",
-    "message": "RPC Response contains an improperly formatted error.",
-    "meta": {
-      "funcId": "18a85c96-5fbd-4ee8-ad6f-b69a5a9ce669",
-      "eventId": "7583c224-07da-4522-b87c-41e7fdc00e0b",
-      "error": {
-        "message": "This error is for testing purposes",
-        "name": "Error",
-        "stack": "Error: This error is for testing purposes\n    at /home/memlin/capstone/Project-ingress/workers/tasks/process_job.ts:89:13\n    at Generator.next (<anonymous>)\n    at fulfilled (/home/memlin/capstone/Project-ingress/workers/tasks/process_job.ts:5:58)\n    at processTicksAndRejections (node:internal/process/task_queues:95:5)"
-      },
-      "payload": {
-        "name": "error-function",
-        "event": {
-          "name": "error",
-          "id": "7583c224-07da-4522-b87c-41e7fdc00e0b"
-        },
-        "id": "18a85c96-5fbd-4ee8-ad6f-b69a5a9ce669",
-        "cache": {}
-      },
-      "attempts": 1,
-      "max_attempts": 25,
-      "timestamp": "2024-03-26T15:32:26.267Z"
-    }
-  },
-  {
-    "_id": new ObjectId("6602ea8b02a74bde96e81d1e"),
-    "timestamp": new Date("2024-03-26T15:32:27.287Z"),
-    "level": "info",
-    "message": "Event fired",
-    "meta": {
-      "eventId": "f2e971d9-7454-4aaa-879a-64786f1dcf91",
-      "eventName": "error",
-      "timestamp": "2024-03-26T15:32:27.287Z"
+    _id: new ObjectId("6602ea8b02a74bde96e81d1e"),
+    timestamp: new Date("2024-03-26T15:32:27.287Z"),
+    level: "info",
+    message: "Event fired",
+    meta: {
+      eventId: "f2e971d9-7454-4aaa-879a-64786f1dcf91",
+      eventName: "error",
+      timestamp: "2024-03-26T15:32:27.287Z"
     }
   },
   {
@@ -193,214 +66,6 @@ const MOCK_LOGS: Log[] = [
       funcName: 'cron-function',
       cron: true,
       timestamp: '2024-03-27T15:24:00.082Z'
-    }
-  },
-  {
-    _id: new ObjectId('66043a101bcef49eb60c2774'),
-    timestamp: new Date('2024-03-27T15:24:00.152Z'),
-    level: 'info',
-    message: 'Function invoked',
-    meta: {
-      funcId: '93f2f074-377e-481e-aeec-5a5861695e46',
-      eventId: '',
-      funcName: 'third-function',
-      timestamp: '2024-03-27T15:24:00.152Z'
-    }
-  },
-  {
-    _id: new ObjectId('66043a101bcef49eb60c2775'),
-    timestamp: new Date('2024-03-27T15:24:00.153Z'),
-    level: 'info',
-    message: 'Invoked step complete',
-    meta: {
-      funcId: 'b576e112-4498-4318-be0b-2f4d81212c45',
-      eventId: '',
-      stepId: 'call 3rd function',
-      invokedFnId: '93f2f074-377e-481e-aeec-5a5861695e46',
-      timestamp: '2024-03-27T15:24:00.152Z'
-    }
-  },
-  {
-    _id: new ObjectId('66043a101bcef49eb60c2776'),
-    timestamp: new Date('2024-03-27T15:24:00.221Z'),
-    level: 'info',
-    message: 'Function completed',
-    meta: {
-      funcId: '93f2f074-377e-481e-aeec-5a5861695e46',
-      eventId: '',
-      timestamp: '2024-03-27T15:24:00.221Z'
-    }
-  },
-  {
-    _id: new ObjectId('66043a101bcef49eb60c2777'),
-    timestamp: new Date('2024-03-27T15:24:00.223Z'),
-    level: 'info',
-    message: 'Function completed',
-    meta: {
-      funcId: 'b576e112-4498-4318-be0b-2f4d81212c45',
-      eventId: '',
-      timestamp: '2024-03-27T15:24:00.223Z'
-    }
-  },
-  {
-    _id: new ObjectId('66043b001bcef49eb60c2778'),
-    timestamp: new Date('2024-03-27T15:28:00.017Z'),
-    level: 'info',
-    message: 'Function invoked',
-    meta: {
-      funcId: '3e52d688-9f9d-49cc-8b69-129fc123a35e',
-      funcName: 'cron-function',
-      cron: true,
-      timestamp: '2024-03-27T15:28:00.016Z'
-    }
-  },
-  {
-    _id: new ObjectId('66043b001bcef49eb60c2779'),
-    timestamp: new Date('2024-03-27T15:28:00.038Z'),
-    level: 'info',
-    message: 'Function invoked',
-    meta: {
-      funcId: '0d51185d-daf4-4fdc-9fd2-d662ff311772',
-      eventId: '',
-      funcName: 'third-function',
-      timestamp: '2024-03-27T15:28:00.038Z'
-    }
-  },
-  {
-    _id: new ObjectId('66043b001bcef49eb60c277a'),
-    timestamp: new Date('2024-03-27T15:28:00.040Z'),
-    level: 'info',
-    message: 'Invoked step complete',
-    meta: {
-      funcId: '3e52d688-9f9d-49cc-8b69-129fc123a35e',
-      eventId: '',
-      stepId: 'call 3rd function',
-      invokedFnId: '0d51185d-daf4-4fdc-9fd2-d662ff311772',
-      timestamp: '2024-03-27T15:28:00.038Z'
-    }
-  },
-  {
-    _id: new ObjectId('66043b001bcef49eb60c277b'),
-    timestamp: new Date('2024-03-27T15:28:00.077Z'),
-    level: 'info',
-    message: 'Function completed',
-    meta: {
-      funcId: '0d51185d-daf4-4fdc-9fd2-d662ff311772',
-      eventId: '',
-      timestamp: '2024-03-27T15:28:00.077Z'
-    }
-  },
-  {
-    _id: new ObjectId('66043b001bcef49eb60c277c'),
-    timestamp: new Date('2024-03-27T15:28:00.079Z'),
-    level: 'info',
-    message: 'Function completed',
-    meta: {
-      funcId: '3e52d688-9f9d-49cc-8b69-129fc123a35e',
-      eventId: '',
-      timestamp: '2024-03-27T15:28:00.078Z'
-    }
-  },
-  {
-    _id: new ObjectId('6604803109121032ff8b7e32'),
-    timestamp: new Date('2024-03-27T20:23:13.228Z'),
-    level: 'info',
-    message: 'Event fired',
-    meta: {
-      eventId: 'e27da451-cdee-42af-ac52-e38e36ea0bc4',
-      eventName: 'event1',
-      timestamp: '2024-03-27T20:23:13.221Z'
-    }
-  },
-  {
-    _id: new ObjectId('6604803109121032ff8b7e33'),
-    timestamp: new Date('2024-03-27T20:23:13.252Z'),
-    level: 'info',
-    message: 'Function invoked',
-    meta: {
-      eventId: 'e27da451-cdee-42af-ac52-e38e36ea0bc4',
-      funcName: 'first-function',
-      funcId: '46b3b88c-21da-4f8e-8580-c44f1ec43c58',
-      timestamp: '2024-03-27T20:23:13.226Z'
-    }
-  },
-  {
-    _id: new ObjectId('6604803109121032ff8b7e34'),
-    timestamp: new Date('2024-03-27T20:23:13.252Z'),
-    level: 'info',
-    message: 'Function invoked',
-    meta: {
-      eventId: 'e27da451-cdee-42af-ac52-e38e36ea0bc4',
-      funcName: 'second-function',
-      funcId: '6f5e681b-90de-479e-83e3-d98f5ff06113',
-      timestamp: '2024-03-27T20:23:13.227Z'
-    }
-  },
-  {
-    _id: new ObjectId('6604803109121032ff8b7e35'),
-    timestamp: new Date('2024-03-27T20:23:13.347Z'),
-    level: 'info',
-    message: 'Function completed',
-    meta: {
-      funcId: '6f5e681b-90de-479e-83e3-d98f5ff06113',
-      eventId: 'e27da451-cdee-42af-ac52-e38e36ea0bc4',
-      timestamp: '2024-03-27T20:23:13.347Z'
-    }
-  },
-  {
-    _id: new ObjectId('6604803109121032ff8b7e36'),
-    timestamp: new Date('2024-03-27T20:23:13.351Z'),
-    level: 'info',
-    message: 'Function completed',
-    meta: {
-      funcId: '46b3b88c-21da-4f8e-8580-c44f1ec43c58',
-      eventId: 'e27da451-cdee-42af-ac52-e38e36ea0bc4',
-      timestamp: '2024-03-27T20:23:13.349Z'
-    }
-  },
-  {
-    _id: new ObjectId('6604803709121032ff8b7e37'),
-    timestamp: new Date('2024-03-27T20:23:19.891Z'),
-    level: 'info',
-    message: 'Event fired',
-    meta: {
-      eventId: '3aff8abb-859a-4ca3-a7ae-7cf530a84185',
-      eventName: 'event2',
-      timestamp: '2024-03-27T20:23:19.890Z'
-    }
-  },
-  {
-    _id: new ObjectId('6604803709121032ff8b7e38'),
-    timestamp: new Date('2024-03-27T20:23:19.893Z'),
-    level: 'info',
-    message: 'Function invoked',
-    meta: {
-      eventId: '3aff8abb-859a-4ca3-a7ae-7cf530a84185',
-      funcName: 'third-function',
-      funcId: 'fd35a2a6-9a2c-47d1-a918-a721950e7ddf',
-      timestamp: '2024-03-27T20:23:19.891Z'
-    }
-  },
-  {
-    _id: new ObjectId('6604803709121032ff8b7e39'),
-    timestamp: new Date('2024-03-27T20:23:19.901Z'),
-    level: 'info',
-    message: 'Function completed',
-    meta: {
-      funcId: 'fd35a2a6-9a2c-47d1-a918-a721950e7ddf',
-      eventId: '3aff8abb-859a-4ca3-a7ae-7cf530a84185',
-      timestamp: '2024-03-27T20:23:19.900Z'
-    }
-  },
-  {
-    _id: new ObjectId('6604805509121032ff8b7e3a'),
-    timestamp: new Date('2024-03-27T20:23:49.774Z'),
-    level: 'info',
-    message: 'Event fired',
-    meta: {
-      eventId: '7196f127-5373-42c3-a244-2e4a34dd3c31',
-      eventName: 'event3',
-      timestamp: '2024-03-27T20:23:49.773Z'
     }
   },
   {
@@ -693,7 +358,6 @@ beforeEach(() => {
         this.logs.slice(0, num)
       },
 
-      aggregate() { }
     };
 
     const client = {
@@ -718,6 +382,7 @@ describe('GET /logs', () => {
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('logs');
     expect(response.body).toHaveProperty('links');
+    console.log(response.body.logs)
   });
 
   it('when no limit specified, should return 200 with 10 log entries', async () => {
@@ -734,28 +399,6 @@ describe('GET /logs', () => {
     expect(response.status).toBe(200);
     expect(response.body.logs.length).toEqual(1);
   });
-
-  // it('should return logs filtered by cursor', async () => {
-  //   const cursor = "6602ea8802a74bde96e81d15"
-  //   const response = await request(app).get(`/logs/?cursor=${cursor}`);
-  //   expect(response.status).toBe(200);
-  //   console.log(response.body.logs.map((log: Log) => log))
-  // expect(response.body.logs.map((log: Log) => log._id.toHexString())).not.toContain(cursor);
-  // });
-
-  // it('GET request to /logs should return 200 with one log when startTime and endTime query parameters are provided', async () => {
-  //   const startTime = new Date('2024-01-01').toISOString();
-  //   const endTime = new Date('2024-01-03').toISOString();
-
-  //   console.log(startTime, endTime)
-
-  //   const response = await request(app)
-  //     .get(`/logs?startTime=${startTime}&endTime=${endTime}`);
-
-
-  //   expect(response.status).toBe(200);
-  //   expect(response.body.logs.length).toEqual(1);
-  // });
 
   it('should return 400 with error message if startTime is invalid', async () => {
     const response = await request(app).get('/logs/?startTime=invalid&endTime=2024-03-26T15:32:27.287Z');
@@ -871,14 +514,6 @@ describe('GET /logs/functions', () => {
     expect(response.status).toBe(200);
     expect(response.body.logs.every((log: any) => log.function.funcId === id)).toBe(true);
   });
-
-  // it('should return function logs filtered by array of IDs', async () => {
-  //   const ids = ['aa151413-103f-406f-8542-4bbe3553c387', 'd1b34c11-2677-41d5-bdbe-4845d576ffd6'];
-  //   const response = await request(app).get(`/logs/functions?id=${ids.join(',')}`);
-  //   console.log(response.body)
-  //   expect(response.status).toBe(200);
-  //   expect(response.body.logs.every((log: any) => ids.includes(log.functions.funcId))).toBe(true);
-  // });
 });
 
 describe('GET logs/events/:eventId', () => {
@@ -909,6 +544,7 @@ describe('GET /errors', () => {
   it('should return error logs', async () => {
     const response = await request(app).get('/logs/errors');
     expect(response.status).toBe(200);
+    console.log(response.body.logs);
   });
 
   it('should return 404 if page is not found', async () => {

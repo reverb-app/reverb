@@ -30,7 +30,7 @@ jest.spyOn(log, "info");
 jest.spyOn(log, "warn");
 jest.spyOn(log, "error");
 
-const mockAddJob: AddJobFunction = async (task, payload) => {
+const mockAddJob: AddJobFunction = jest.fn(async (task, payload) => {
   if (!!payload && typeof payload === "object" && "funcName" in payload) {
     return {
       payload: { name: payload.funcName },
@@ -40,7 +40,7 @@ const mockAddJob: AddJobFunction = async (task, payload) => {
   } else {
     return { payload: {}, attempts: 1, max_attempts: 5 } as Job;
   }
-};
+});
 
 const mockHelpers = {
   job: {
@@ -55,11 +55,25 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-test("invalid cron job throws an error", () => {
-  expect(process_cron(funcPayload, mockHelpers)).rejects.toThrow(
+test("invalid cron job throws an error", async () => {
+  await expect(process_cron(funcPayload, mockHelpers)).rejects.toThrow(
     /Cron format is not valid/
   );
-  expect(process_cron(eventPayload, mockHelpers)).rejects.toThrow(
+  await expect(process_cron(eventPayload, mockHelpers)).rejects.toThrow(
     /Cron format is not valid/
+  );
+});
+
+test("addJob is called with the correct arguments", async () => {
+  await process_cron(validCronJob, mockHelpers);
+  expect(mockHelpers.addJob).toHaveBeenCalledWith(
+    "process_job",
+    expect.objectContaining({
+      name: "my-function",
+      id: expect.any(String),
+      event: { name: "cron", id: "" },
+      cache: {},
+    }),
+    { maxAttempts: 20 }
   );
 });

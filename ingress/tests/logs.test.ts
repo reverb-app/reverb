@@ -320,7 +320,7 @@ const MOCK_LOGS: Log[] = [
 
 beforeEach(() => {
   jest.mock("../src/services/mongo-service", () => {
-    const collection = {
+    const logsCollection = {
       logs: MOCK_LOGS,
 
       find(filter: { [key: string]: any }) {
@@ -363,21 +363,22 @@ beforeEach(() => {
     const client = {
       db() {
         return {
-          collection() { return collection }
+          collection() { return logsCollection }
         }
       }
     }
 
-    return { client, dbName: '' }
+    return { client, db: '', logsCollection }
   });
 });
+
 
 afterEach(() => {
   jest.resetAllMocks();
 })
 
 describe('GET /logs', () => {
-  it('should return 200 and logs with pagination links', async () => {
+  test('should return 200 and logs with pagination links', async () => {
     const response = await request(app).get('/logs');
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('logs');
@@ -385,14 +386,14 @@ describe('GET /logs', () => {
     console.log(response.body.logs)
   });
 
-  it('when no limit specified, should return 200 with 10 log entries', async () => {
-    const response = await request(app).get('/logs/');
+  test('when no limit specified, should return 200 with 10 log entries', async () => {
+    const response = await request(app).get('/logs');
 
     expect(response.status).toBe(200);
     expect(response.body.logs.length).toEqual(10);
   });
 
-  it('with limit of 1 should return 200 with one log', async () => {
+  test('with limit of 1 should return 200 with one log', async () => {
     const limit = '1';
     const response = await request(app).get(`/logs?limit=${limit}`);
 
@@ -400,25 +401,25 @@ describe('GET /logs', () => {
     expect(response.body.logs.length).toEqual(1);
   });
 
-  it('should return 400 with error message if startTime is invalid', async () => {
+  test('should return 400 with error message if startTime is invalid', async () => {
     const response = await request(app).get('/logs/?startTime=invalid&endTime=2024-03-26T15:32:27.287Z');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
   });
 
-  it('should return 400 with error message if endTime is invalid', async () => {
+  test('should return 400 with error message if endTime is invalid', async () => {
     const response = await request(app).get('/logs/?startTime=2024-03-26T15:32:27.287Z&endTime=invalid');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
   });
 
-  it('should return 400 with error message if startTime is present but endTime is missing', async () => {
+  test('should return 400 with error message if startTime is present but endTime is missing', async () => {
     const response = await request(app).get('/logs/?startTime=2024-03-26T15:32:27.287Z');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
   });
 
-  it('should return 400 with error message if endTime is present but startTime is missing', async () => {
+  test('should return 400 with error message if endTime is present but startTime is missing', async () => {
     const response = await request(app).get('/logs/?endTime=2024-03-26T15:32:27.287Z');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
@@ -432,38 +433,39 @@ describe('GET /logs', () => {
 });
 
 describe('GET /logs/events', () => {
-  it('should return 200 and event logs with pagination links', async () => {
+  test('should return 200 and event logs with pagination links', async () => {
     const response = await request(app).get('/logs/events');
+    console.log(response.body)
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('logs');
     expect(response.body).toHaveProperty('links');
   });
 
-  it('should return 404 if page is not found', async () => {
+  test('should return 404 if page is not found', async () => {
     const response = await request(app).get('/logs/events?page=9999');
     expect(response.status).toBe(404);
     expect(response.body).toEqual({ error: 'Page not found' });
   });
 
-  it('should return 400 with error message if startTime is invalid', async () => {
+  test('should return 400 with error message if startTime is invalid', async () => {
     const response = await request(app).get('/logs/events?startTime=invalid&endTime=2024-03-26T15:32:27.287Z');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
   });
 
-  it('should return 400 with error message if endTime is invalid', async () => {
+  test('should return 400 with error message if endTime is invalid', async () => {
     const response = await request(app).get('/logs/events/?startTime=2024-03-26T15:32:27.287Z&endTime=invalid');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
   });
 
-  it('should return 400 with error message if startTime is present but endTime is missing', async () => {
+  test('should return 400 with error message if startTime is present but endTime is missing', async () => {
     const response = await request(app).get('/logs/events/?startTime=2024-03-26T15:32:27.287Z');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
   });
 
-  it('should return 400 with error message if endTime is present but startTime is missing', async () => {
+  test('should return 400 with error message if endTime is present but startTime is missing', async () => {
     const response = await request(app).get('/logs/events/?endTime=2024-03-26T15:32:27.287Z');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
@@ -471,44 +473,44 @@ describe('GET /logs/events', () => {
 });
 
 describe('GET /logs/functions', () => {
-  it('should return 200 and logs with pagination links', async () => {
+  test('should return 200 and logs with pagination links', async () => {
     const response = await request(app).get('/logs/functions');
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('logs');
     expect(response.body).toHaveProperty('links');
   });
 
-  it('should return 404 if page is not found', async () => {
+  test('should return 404 if page is not found', async () => {
     const response = await request(app).get('/logs/functions?page=9999');
     expect(response.status).toBe(404);
     expect(response.body).toEqual({ error: 'Page not found' });
   });
 
-  it('should return 400 with error message if startTime is invalid', async () => {
+  test('should return 400 with error message if startTime is invalid', async () => {
     const response = await request(app).get('/logs/functions?startTime=invalid&endTime=2024-03-26T15:32:27.287Z');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
   });
 
-  it('should return 400 with error message if endTime is invalid', async () => {
+  test('should return 400 with error message if endTime is invalid', async () => {
     const response = await request(app).get('/logs/functions/?startTime=2024-03-26T15:32:27.287Z&endTime=invalid');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
   });
 
-  it('should return 400 with error message if startTime is present but endTime is missing', async () => {
+  test('should return 400 with error message if startTime is present but endTime is missing', async () => {
     const response = await request(app).get('/logs/functions/?startTime=2024-03-26T15:32:27.287Z');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
   });
 
-  it('should return 400 with error message if endTime is present but startTime is missing', async () => {
+  test('should return 400 with error message if endTime is present but startTime is missing', async () => {
     const response = await request(app).get('/logs/functions/?endTime=2024-03-26T15:32:27.287Z');
     expect(response.status).toBe(400);
     expect(response.body.error).toBeDefined();
   });
 
-  it('should return a function log filtered by ID', async () => {
+  test('should return a function log filtered by ID', async () => {
     const id = '76be1433-64fb-459d-aee2-42884e109acf';
     const response = await request(app).get(`/logs/functions?id=${id}`);
     expect(response.status).toBe(200);
@@ -517,7 +519,7 @@ describe('GET /logs/functions', () => {
 });
 
 describe('GET logs/events/:eventId', () => {
-  it('should return logs for a specific event ID', async () => {
+  test('should return logs for a specific event ID', async () => {
     const eventId = '6602ea8802a74bde96e81d15';
     const response = await request(app).get(`/logs/events/${eventId}`);
     expect(response.status).toBe(200);
@@ -526,13 +528,13 @@ describe('GET logs/events/:eventId', () => {
 });
 
 describe('GET logs/functions/:funcId', () => {
-  it('should return logs for a specific function ID', async () => {
-    const funcId = '76be1433-64fb-459d-aee2-42884e109acf';
+  test('should return logs for a specific function ID', async () => {
+    const funcId = 'ea6e1ebd-06fb-4c9d-a5af-01de3c02396a';
     const response = await request(app).get(`/logs/functions/${funcId}`);
     expect(response.status).toBe(200);
   });
 
-  it('should return 404 if function ID does not exist', async () => {
+  test('should return 404 if function ID does not exist', async () => {
     const funcId = 'invalid';
     const response = await request(app).get(`/logs/functions/${funcId}`);
     expect(response.status).toBe(404);
@@ -540,14 +542,14 @@ describe('GET logs/functions/:funcId', () => {
   });
 });
 
-describe('GET /errors', () => {
-  it('should return error logs', async () => {
+describe('GET logs/errors', () => {
+  test('should return error logs', async () => {
     const response = await request(app).get('/logs/errors');
     expect(response.status).toBe(200);
     console.log(response.body.logs);
   });
 
-  it('should return 404 if page is not found', async () => {
+  test('should return 404 if page is not found', async () => {
     const response = await request(app).get('/logs/errors?page=100');
     expect(response.status).toBe(404);
     expect(response.body).toEqual({ error: 'Page not found' });

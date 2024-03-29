@@ -1,7 +1,7 @@
 import processEvent from "../src/tasks/process-event";
 import { JobHelpers } from "graphile-worker";
 import { v4 } from "uuid";
-import log from "../src/utils/logUtils";
+import log from "../src/utils/log-utils";
 
 const correctEvent = {
   name: "test_event",

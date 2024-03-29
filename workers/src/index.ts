@@ -8,7 +8,7 @@ import {
   waitForDB,
   connectionString,
   startCronRunner,
-} from "./utils/cronUtils";
+} from "./utils/cron-utils";
 
 async function main() {
   await waitForDB();

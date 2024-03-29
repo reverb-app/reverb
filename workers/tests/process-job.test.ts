@@ -1,6 +1,6 @@
 import processJob from "../src/tasks/process-job";
 import { JobHelpers } from "graphile-worker";
-import log from "../src/utils/logUtils";
+import log from "../src/utils/log-utils";
 
 const correctJob = {
   name: "test",

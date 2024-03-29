@@ -1,7 +1,7 @@
 import { Task } from "graphile-worker";
 import { v4 } from "uuid";
-import { MAX_ATTEMPTS } from "../utils/deadLetterUtils";
-import log from "../utils/logUtils";
+import { MAX_ATTEMPTS } from "../utils/dead-letter-utils";
+import log from "../utils/log-utils";
 import { isValidCronPayload } from "../utils/utils";
 
 const processCron: Task = async function (cronJob, helpers) {

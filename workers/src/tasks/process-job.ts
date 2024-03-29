@@ -3,10 +3,10 @@ dotenv.config();
 
 import { Task } from "graphile-worker";
 import { isValidFunctionPayload, isValidRpcResponse } from "../utils/utils";
-import { MAX_ATTEMPTS, handleRetries } from "../utils/deadLetterUtils";
+import { MAX_ATTEMPTS, handleRetries } from "../utils/dead-letter-utils";
 import { v4 } from "uuid";
 
-import log from "../utils/logUtils";
+import log from "../utils/log-utils";
 
 const functionServerUrl: string = process.env.FUNCTION_SERVER_URL ?? "";
 if (!functionServerUrl) {

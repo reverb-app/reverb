@@ -1,9 +1,9 @@
 import { Task } from "graphile-worker";
 import { isValidEvent } from "../utils/utils";
-import { handleRetries } from "../utils/deadLetterUtils";
+import { handleRetries } from "../utils/dead-letter-utils";
 import { v4 } from "uuid";
-import { MAX_ATTEMPTS } from "../utils/deadLetterUtils";
-import log from "../utils/logUtils";
+import { MAX_ATTEMPTS } from "../utils/dead-letter-utils";
+import log from "../utils/log-utils";
 
 const processEvent: Task = async function (event, helpers) {
   if (!isValidEvent(event)) {

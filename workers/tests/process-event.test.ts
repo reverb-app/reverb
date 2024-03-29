@@ -1,7 +1,7 @@
-import processEvent from "../tasks/process-event";
+import processEvent from "../src/tasks/process-event";
 import { JobHelpers } from "graphile-worker";
 import { v4 } from "uuid";
-import log from "../utils/logUtils";
+import log from "../src/utils/logUtils";
 
 const correctEvent = {
   name: "test_event",
@@ -17,7 +17,7 @@ const incorrectEventTwo = {
   name: "test_event",
 };
 
-jest.mock("../utils/logUtils", () => {
+jest.mock("../src/utils/logUtils", () => {
   return {
     info: () => {},
     warn: () => {},

@@ -1,7 +1,7 @@
-import processCron from "../tasks/process-cron";
+import processCron from "../src/tasks/process-cron";
 import { JobHelpers, AddJobFunction, Job } from "graphile-worker";
-import { CronPayload, Event, FunctionPayload } from "../types/types";
-import log from "../utils/logUtils";
+import { CronPayload, Event, FunctionPayload } from "../src/types/types";
+import log from "../src/utils/logUtils";
 
 const validCronJob: CronPayload = { funcName: "my-function" };
 
@@ -18,7 +18,7 @@ const eventPayload: Event = {
   payload: { test: true },
 };
 
-jest.mock("../utils/logUtils", () => {
+jest.mock("../src/utils/logUtils", () => {
   return {
     info: () => {},
     warn: () => {},

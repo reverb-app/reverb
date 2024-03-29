@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { ApiCommand } from "../../apiCommand.js";
+import { ApiCommand } from "../../api-command.js";
 import { Flags } from "@oclif/core";
 
 export default class Errors extends ApiCommand<typeof Errors> {

@@ -2,7 +2,7 @@ import { Args, Flags } from "@oclif/core";
 import chalk from "chalk";
 
 import { FuncStatus } from "../../types/types.js";
-import { ApiCommand } from "../../apiCommand.js";
+import { ApiCommand } from "../../api-command.js";
 import { getEmoji } from "../../utils/utils.js";
 
 export default class Status extends ApiCommand<typeof Status> {

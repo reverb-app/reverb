@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import { ApiCommand } from "../../apiCommand.js";
+import { ApiCommand } from "../../api-command.js";
 import { FuncStatus } from "../../types/types.js";
 import { getEmoji } from "../../utils/utils.js";
 import { Flags } from "@oclif/core";

@@ -1,6 +1,6 @@
 import { Args, Flags } from "@oclif/core";
 import chalk from "chalk";
-import { ApiCommand } from "../../apiCommand.js";
+import { ApiCommand } from "../../api-command.js";
 
 export default class Logs extends ApiCommand<typeof Logs> {
   static args = {

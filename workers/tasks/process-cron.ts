@@ -4,7 +4,7 @@ import { MAX_ATTEMPTS } from "../utils/deadLetterUtils";
 import log from "../utils/logUtils";
 import { isValidCronPayload } from "../utils/utils";
 
-const process_cron: Task = async function (cronJob, helpers) {
+const processCron: Task = async function (cronJob, helpers) {
   if (!isValidCronPayload(cronJob)) {
     log.error("Cron format is not valid", { cronJob });
     throw new Error(`Cron format is not valid: ${cronJob}`);
@@ -29,4 +29,4 @@ const process_cron: Task = async function (cronJob, helpers) {
   });
 };
 
-export default process_cron;
+export default processCron;

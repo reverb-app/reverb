@@ -13,7 +13,7 @@ if (!functionServerUrl) {
   throw new Error("No function server URL found");
 }
 
-const process_job: Task = async function (job, helpers) {
+const processJob: Task = async function (job, helpers) {
   const { payload, attempts, max_attempts } = helpers.job;
 
   if (!isValidFunctionPayload(job)) {
@@ -223,4 +223,4 @@ const process_job: Task = async function (job, helpers) {
   }
 };
 
-export default process_job;
+export default processJob;

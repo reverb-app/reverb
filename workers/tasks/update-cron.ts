@@ -3,7 +3,7 @@ import log from "../utils/logUtils";
 import { isValidUpdateCronPayload } from "../utils/utils";
 import { startCronRunner } from "../utils/cronUtils";
 
-const update_cron: Task = async function (job, helpers) {
+const updateCron: Task = async function (job, helpers) {
   const dbHash = (await helpers.query("SELECT hash FROM hash")).rows[0].hash;
 
   if (!isValidUpdateCronPayload(job)) {
@@ -16,4 +16,4 @@ const update_cron: Task = async function (job, helpers) {
   startCronRunner();
 };
 
-export default update_cron;
+export default updateCron;

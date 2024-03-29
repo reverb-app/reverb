@@ -1,4 +1,4 @@
-import process_cron from "../tasks/process_cron";
+import processCron from "../tasks/process-cron";
 import { JobHelpers, AddJobFunction, Job } from "graphile-worker";
 import { CronPayload, Event, FunctionPayload } from "../types/types";
 import log from "../utils/logUtils";
@@ -56,16 +56,16 @@ beforeEach(() => {
 });
 
 test("invalid cron job throws an error", async () => {
-  await expect(process_cron(funcPayload, mockHelpers)).rejects.toThrow(
+  await expect(processCron(funcPayload, mockHelpers)).rejects.toThrow(
     /Cron format is not valid/
   );
-  await expect(process_cron(eventPayload, mockHelpers)).rejects.toThrow(
+  await expect(processCron(eventPayload, mockHelpers)).rejects.toThrow(
     /Cron format is not valid/
   );
 });
 
 test("addJob is called with the correct arguments", async () => {
-  await process_cron(validCronJob, mockHelpers);
+  await processCron(validCronJob, mockHelpers);
   expect(mockHelpers.addJob).toHaveBeenCalledWith(
     "process_job",
     expect.objectContaining({
@@ -80,7 +80,7 @@ test("addJob is called with the correct arguments", async () => {
 
 test("logs an error on incorrect job", async () => {
   try {
-    await process_cron(funcPayload, mockHelpers);
+    await processCron(funcPayload, mockHelpers);
   } catch {
   } finally {
     expect(log.error).toHaveBeenCalledTimes(1);
@@ -88,6 +88,6 @@ test("logs an error on incorrect job", async () => {
 });
 
 test("logs on function payload enqueued", async () => {
-  await process_cron(validCronJob, mockHelpers);
+  await processCron(validCronJob, mockHelpers);
   expect(log.info).toHaveBeenCalledTimes(1);
 });

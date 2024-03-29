@@ -2,8 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import { run } from "graphile-worker";
-import process_event from "./tasks/process_event";
-import process_job from "./tasks/process_job";
+import processEvent from "./tasks/process-event";
+import processJob from "./tasks/process-job";
 import {
   waitForDB,
   connectionString,
@@ -21,14 +21,14 @@ async function main() {
     noHandleSignals: false,
     pollInterval: 1000,
     taskList: {
-      process_event,
-      process_job,
+      process_event: processEvent,
+      process_job: processJob,
     },
   });
   await runner.promise;
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   process.exit(1);
 });

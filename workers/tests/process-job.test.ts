@@ -1,4 +1,4 @@
-import process_job from "../tasks/process_job";
+import processJob from "../tasks/process-job";
 import { JobHelpers } from "graphile-worker";
 import log from "../utils/logUtils";
 
@@ -42,15 +42,15 @@ const mockHelpers = {
 } as JobHelpers;
 
 test("incorrect job format dead letter queues and resolves", () => {
-  expect(process_job(incorrectJobOne, mockHelpers)).resolves.toBeUndefined();
-  expect(process_job(incorrectJobTwo, mockHelpers)).resolves.toBeUndefined();
+  expect(processJob(incorrectJobOne, mockHelpers)).resolves.toBeUndefined();
+  expect(processJob(incorrectJobTwo, mockHelpers)).resolves.toBeUndefined();
 
   expect(log.error).toHaveBeenCalledTimes(4);
 });
 
 test("throws an error when it can't connect to Function server", () => {
   global.fetch = jest.fn(() => Promise.reject(new Error("failed")));
-  expect(() => process_job(correctJob, mockHelpers)).rejects.toThrow();
+  expect(() => processJob(correctJob, mockHelpers)).rejects.toThrow();
 });
 
 test("throws an error when invalid RPCResponse", () => {
@@ -61,7 +61,7 @@ test("throws an error when invalid RPCResponse", () => {
       },
     })
   ) as jest.Mock;
-  expect(() => process_job(correctJob, mockHelpers)).rejects.toThrow();
+  expect(() => processJob(correctJob, mockHelpers)).rejects.toThrow();
 });
 
 test("throws an error on valid RPCResponse that has an error property", () => {
@@ -76,7 +76,7 @@ test("throws an error on valid RPCResponse that has an error property", () => {
       },
     })
   ) as jest.Mock;
-  expect(() => process_job(correctJob, mockHelpers)).rejects.toThrow();
+  expect(() => processJob(correctJob, mockHelpers)).rejects.toThrow();
 });
 
 test("does not throw an error on valid RPC response that has a result property", async () => {
@@ -96,7 +96,7 @@ test("does not throw an error on valid RPC response that has a result property",
     })
   ) as jest.Mock;
 
-  (process_job(correctJob, mockHelpers) as Promise<void>).then(val =>
+  (processJob(correctJob, mockHelpers) as Promise<void>).then((val) =>
     expect(val).toBeUndefined()
   );
 });
@@ -104,7 +104,7 @@ test("does not throw an error on valid RPC response that has a result property",
 describe("Logger", () => {
   test("logs an error on incorrect job", async () => {
     try {
-      await process_job(incorrectJobOne, mockHelpers);
+      await processJob(incorrectJobOne, mockHelpers);
     } catch {
     } finally {
       expect(log.error).toHaveBeenCalled();
@@ -114,7 +114,7 @@ describe("Logger", () => {
   test("logs an error when it can't connect to Function server", async () => {
     global.fetch = jest.fn(() => Promise.reject(new Error("failed")));
     try {
-      await process_job(correctJob, mockHelpers);
+      await processJob(correctJob, mockHelpers);
     } catch {
     } finally {
       expect(log.error).toHaveBeenCalled();
@@ -131,7 +131,7 @@ describe("Logger", () => {
     ) as jest.Mock;
 
     try {
-      await process_job(correctJob, mockHelpers);
+      await processJob(correctJob, mockHelpers);
     } catch {
     } finally {
       expect(log.error).toHaveBeenCalled();
@@ -152,7 +152,7 @@ describe("Logger", () => {
     ) as jest.Mock;
 
     try {
-      await process_job(correctJob, mockHelpers);
+      await processJob(correctJob, mockHelpers);
     } catch {
     } finally {
       expect(log.error).toHaveBeenCalled();
@@ -171,7 +171,7 @@ describe("Logger", () => {
       })
     ) as jest.Mock;
 
-    await process_job(correctJob, mockHelpers);
+    await processJob(correctJob, mockHelpers);
     expect(log.warn).toHaveBeenCalled();
   });
 
@@ -190,7 +190,7 @@ describe("Logger", () => {
       })
     ) as jest.Mock;
 
-    await process_job(correctJob, mockHelpers);
+    await processJob(correctJob, mockHelpers);
     expect(log.info).toHaveBeenCalled();
   });
 
@@ -211,7 +211,7 @@ describe("Logger", () => {
       })
     ) as jest.Mock;
 
-    await process_job(correctJob, {
+    await processJob(correctJob, {
       addJob: () => {},
       job: mockHelpers.job,
     } as unknown as JobHelpers);
@@ -235,7 +235,7 @@ describe("Logger", () => {
       })
     ) as jest.Mock;
 
-    await process_job(correctJob, {
+    await processJob(correctJob, {
       addJob: () => {},
       job: mockHelpers.job,
     } as unknown as JobHelpers);
@@ -259,7 +259,7 @@ describe("Logger", () => {
       })
     ) as jest.Mock;
 
-    await process_job(correctJob, {
+    await processJob(correctJob, {
       addJob: () => {},
       job: mockHelpers.job,
     } as unknown as JobHelpers);
@@ -283,7 +283,7 @@ describe("Logger", () => {
       })
     ) as jest.Mock;
 
-    await process_job(correctJob, {
+    await processJob(correctJob, {
       addJob: () => {},
       job: mockHelpers.job,
     } as unknown as JobHelpers);

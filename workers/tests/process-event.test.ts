@@ -1,12 +1,12 @@
-import process_event from '../tasks/process_event';
-import { JobHelpers } from 'graphile-worker';
-import { v4 } from 'uuid';
-import log from '../utils/logUtils';
+import process_event from "../tasks/process_event";
+import { JobHelpers } from "graphile-worker";
+import { v4 } from "uuid";
+import log from "../utils/logUtils";
 
 const correctEvent = {
-  name: 'test_event',
+  name: "test_event",
   id: v4(),
-  payload: { key: 'value' },
+  payload: { key: "value" },
 };
 
 const incorrectEventOne = {
@@ -14,10 +14,10 @@ const incorrectEventOne = {
 };
 
 const incorrectEventTwo = {
-  name: 'test_event',
+  name: "test_event",
 };
 
-jest.mock('../utils/logUtils', () => {
+jest.mock("../utils/logUtils", () => {
   return {
     info: () => {},
     warn: () => {},
@@ -25,9 +25,9 @@ jest.mock('../utils/logUtils', () => {
   };
 });
 
-jest.spyOn(log, 'info');
-jest.spyOn(log, 'warn');
-jest.spyOn(log, 'error');
+jest.spyOn(log, "info");
+jest.spyOn(log, "warn");
+jest.spyOn(log, "error");
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -41,13 +41,16 @@ const mockHelpers = {
   },
 } as JobHelpers;
 
-test('incorrect event throws an error', () => {
-  expect(() => process_event(incorrectEventOne, mockHelpers)).rejects.toThrow();
-  expect(() => process_event(incorrectEventTwo, mockHelpers)).rejects.toThrow();
+test("invalid event format dead letter queues and resolves", () => {
+  expect(
+    process_event(incorrectEventOne, mockHelpers)
+  ).resolves.toBeUndefined();
+
+  expect(log.error).toHaveBeenCalledTimes(2);
 });
 
-describe('Logger', () => {
-  test('logs an error on incorrect job', async () => {
+describe("Logger", () => {
+  test("logs an error on incorrect job", async () => {
     try {
       await process_event(incorrectEventOne, mockHelpers);
     } catch {
@@ -56,17 +59,17 @@ describe('Logger', () => {
     }
   });
 
-  test('logs on event complete', async () => {
+  test("logs on event complete", async () => {
     await process_event(correctEvent, {
       addJob: () => {},
       query: () => {
-        return { job: mockHelpers.job, rows: [{ name: 'test_function' }] };
+        return { job: mockHelpers.job, rows: [{ name: "test_function" }] };
       },
     } as unknown as JobHelpers);
     expect(log.info).toHaveBeenCalled();
   });
 
-  test('logs a warning when event has no functions', async () => {
+  test("logs a warning when event has no functions", async () => {
     await process_event(correctEvent, {
       query: () => {
         return {
@@ -79,13 +82,13 @@ describe('Logger', () => {
     expect(log.warn).toHaveBeenCalled();
   });
 
-  test('logs for each function invoked by event', async () => {
+  test("logs for each function invoked by event", async () => {
     await process_event(correctEvent, {
       addJob: () => {},
       query: () => {
         return {
           job: mockHelpers.job,
-          rows: [{ name: 'test_function1' }, { name: 'test_function2' }],
+          rows: [{ name: "test_function1" }, { name: "test_function2" }],
         };
       },
     } as unknown as JobHelpers);

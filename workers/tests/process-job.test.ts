@@ -1,23 +1,23 @@
-import process_job from '../tasks/process_job';
-import { JobHelpers } from 'graphile-worker';
-import log from '../utils/logUtils';
+import process_job from "../tasks/process_job";
+import { JobHelpers } from "graphile-worker";
+import log from "../utils/logUtils";
 
 const correctJob = {
-  name: 'test',
-  id: '',
-  event: { name: 'test', payload: 'test', type: 'complete' },
+  name: "test",
+  id: "",
+  event: { name: "test", payload: "test", type: "complete" },
   cache: {},
 };
 
 const incorrectJobOne = {
-  name: 'test',
+  name: "test",
 };
 
 const incorrectJobTwo = {
-  event: { name: 'test', payload: 'test' },
+  event: { name: "test", payload: "test" },
 };
 
-jest.mock('../utils/logUtils', () => {
+jest.mock("../utils/logUtils", () => {
   return {
     info: () => {},
     warn: () => {},
@@ -25,9 +25,9 @@ jest.mock('../utils/logUtils', () => {
   };
 });
 
-jest.spyOn(log, 'info');
-jest.spyOn(log, 'warn');
-jest.spyOn(log, 'error');
+jest.spyOn(log, "info");
+jest.spyOn(log, "warn");
+jest.spyOn(log, "error");
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -36,22 +36,24 @@ beforeEach(() => {
 const mockHelpers = {
   job: {
     payload: {},
-    attempts: 0,
-    max_attempts: 0,
+    attempts: 1,
+    max_attempts: 5,
   },
 } as JobHelpers;
 
-test('incorrect job throws an error', () => {
-  expect(() => process_job(incorrectJobOne, mockHelpers)).rejects.toThrow();
-  expect(() => process_job(incorrectJobTwo, mockHelpers)).rejects.toThrow();
+test("incorrect job format dead letter queues and resolves", () => {
+  expect(process_job(incorrectJobOne, mockHelpers)).resolves.toBeUndefined();
+  expect(process_job(incorrectJobTwo, mockHelpers)).resolves.toBeUndefined();
+
+  expect(log.error).toHaveBeenCalledTimes(4);
 });
 
 test("throws an error when it can't connect to Function server", () => {
-  global.fetch = jest.fn(() => Promise.reject(new Error('failed')));
+  global.fetch = jest.fn(() => Promise.reject(new Error("failed")));
   expect(() => process_job(correctJob, mockHelpers)).rejects.toThrow();
 });
 
-test('throws an error when invalid RPCResponse', () => {
+test("throws an error when invalid RPCResponse", () => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
       json: async () => {
@@ -62,10 +64,10 @@ test('throws an error when invalid RPCResponse', () => {
   expect(() => process_job(correctJob, mockHelpers)).rejects.toThrow();
 });
 
-test('throws an error on valid RPCResponse that has an error property', () => {
+test("throws an error on valid RPCResponse that has an error property", () => {
   let errorRPCResponse = {
-    error: 'error',
-    id: 'id',
+    error: "error",
+    id: "id",
   };
   global.fetch = jest.fn(() =>
     Promise.resolve({
@@ -77,14 +79,14 @@ test('throws an error on valid RPCResponse that has an error property', () => {
   expect(() => process_job(correctJob, mockHelpers)).rejects.toThrow();
 });
 
-test('does not throw an error on valid RPC response that has a result property', async () => {
+test("does not throw an error on valid RPC response that has a result property", async () => {
   let resultRPCResponse = {
     result: {
-      type: 'complete',
-      stepId: 'step-id',
-      stepValue: 'any',
+      type: "complete",
+      stepId: "step-id",
+      stepValue: "any",
     },
-    id: 'id',
+    id: "id",
   };
   global.fetch = jest.fn(() =>
     Promise.resolve({
@@ -94,13 +96,13 @@ test('does not throw an error on valid RPC response that has a result property',
     })
   ) as jest.Mock;
 
-  (process_job(correctJob, mockHelpers) as Promise<void>).then((val) =>
+  (process_job(correctJob, mockHelpers) as Promise<void>).then(val =>
     expect(val).toBeUndefined()
   );
 });
 
-describe('Logger', () => {
-  test('logs an error on incorrect job', async () => {
+describe("Logger", () => {
+  test("logs an error on incorrect job", async () => {
     try {
       await process_job(incorrectJobOne, mockHelpers);
     } catch {
@@ -110,7 +112,7 @@ describe('Logger', () => {
   });
 
   test("logs an error when it can't connect to Function server", async () => {
-    global.fetch = jest.fn(() => Promise.reject(new Error('failed')));
+    global.fetch = jest.fn(() => Promise.reject(new Error("failed")));
     try {
       await process_job(correctJob, mockHelpers);
     } catch {
@@ -119,7 +121,7 @@ describe('Logger', () => {
     }
   });
 
-  test('logs an error when invalid RPCResponse', async () => {
+  test("logs an error when invalid RPCResponse", async () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         json: async () => {
@@ -136,10 +138,10 @@ describe('Logger', () => {
     }
   });
 
-  test('logs an error on valid RPCResponse that has an error property', async () => {
+  test("logs an error on valid RPCResponse that has an error property", async () => {
     let errorRPCResponse = {
-      error: 'error',
-      id: 'id',
+      error: "error",
+      id: "id",
     };
     global.fetch = jest.fn(() =>
       Promise.resolve({
@@ -157,9 +159,9 @@ describe('Logger', () => {
     }
   });
 
-  test('logs a warning on RPCResponse without result field', async () => {
+  test("logs a warning on RPCResponse without result field", async () => {
     let resultRPCResponse = {
-      id: 'id',
+      id: "id",
     };
     global.fetch = jest.fn(() =>
       Promise.resolve({
@@ -173,11 +175,11 @@ describe('Logger', () => {
     expect(log.warn).toHaveBeenCalled();
   });
 
-  test('logs on function complete', async () => {
+  test("logs on function complete", async () => {
     let resultRPCResponse = {
-      id: 'id',
+      id: "id",
       result: {
-        type: 'complete',
+        type: "complete",
       },
     };
     global.fetch = jest.fn(() =>
@@ -192,13 +194,13 @@ describe('Logger', () => {
     expect(log.info).toHaveBeenCalled();
   });
 
-  test('logs on step.run', async () => {
+  test("logs on step.run", async () => {
     let resultRPCResponse = {
-      id: 'id',
+      id: "id",
       result: {
-        type: 'step',
-        stepId: 'string',
-        stepValue: 'any',
+        type: "step",
+        stepId: "string",
+        stepValue: "any",
       },
     };
     global.fetch = jest.fn(() =>
@@ -216,12 +218,12 @@ describe('Logger', () => {
     expect(log.info).toHaveBeenCalled();
   });
 
-  test('logs on step.delay', async () => {
+  test("logs on step.delay", async () => {
     let resultRPCResponse = {
-      id: 'id',
+      id: "id",
       result: {
-        type: 'delay',
-        stepId: 'string',
+        type: "delay",
+        stepId: "string",
         delayInMs: 0,
       },
     };
@@ -240,13 +242,13 @@ describe('Logger', () => {
     expect(log.info).toHaveBeenCalled();
   });
 
-  test('logs on step.invoke', async () => {
+  test("logs on step.invoke", async () => {
     let resultRPCResponse = {
-      id: 'id',
+      id: "id",
       result: {
-        type: 'invoke',
-        stepId: 'string',
-        invokedFnName: 'string',
+        type: "invoke",
+        stepId: "string",
+        invokedFnName: "string",
       },
     };
     global.fetch = jest.fn(() =>
@@ -264,13 +266,13 @@ describe('Logger', () => {
     expect(log.info).toHaveBeenCalled();
   });
 
-  test('logs on step.emitEvent', async () => {
+  test("logs on step.emitEvent", async () => {
     let resultRPCResponse = {
-      id: 'id',
+      id: "id",
       result: {
-        type: 'emitEvent',
-        stepId: 'string',
-        eventId: 'string',
+        type: "emitEvent",
+        stepId: "string",
+        eventId: "string",
       },
     };
     global.fetch = jest.fn(() =>

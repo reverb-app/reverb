@@ -7,6 +7,7 @@ import {
   handleCursorPagination,
   setFilterTimestamp,
   setFilterCursor,
+  setFilterName,
   setLogLinks,
   DEFAULT_LIMIT,
 } from "../utils/logUtils";
@@ -54,6 +55,7 @@ router.get("/events", async (req: Request, res) => {
 
   try {
     setFilterTimestamp(req, filter);
+    setFilterName(req, filter, '/events')
   } catch (e) {
     if (!(e instanceof Error)) return;
 
@@ -92,6 +94,7 @@ router.get("/functions", async (req: Request, res) => {
 
   try {
     setFilterTimestamp(req, filter);
+    setFilterName(req, filter, '/functions');
   } catch (e) {
     if (!(e instanceof Error)) return;
 

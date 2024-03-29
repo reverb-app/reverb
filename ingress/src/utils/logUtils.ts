@@ -180,6 +180,24 @@ export function setFilterCursor(req: Request, filter: QueryFilter) {
   filter['_id'] = { $gt: new ObjectId(cursor as string) };
 }
 
+export function setFilterName(
+  req: Request,
+  filter: QueryFilter,
+  route: string
+) {
+  const { name } = req.query;
+
+  if (!name) {
+    return;
+  }
+
+  if (route === '/functions') {
+    filter['meta.funcName'] = name as string;
+  } else if (route === '/events') {
+    filter['meta.eventName'] = name as string;
+  }
+}
+
 export function setLogLinks(collection: HateoasLogCollection) {
   collection.logs.forEach((log) => {
     log.links = {};

@@ -1,7 +1,7 @@
-import process_event from "../tasks/process_event";
+import processEvent from "../src/tasks/process-event";
 import { JobHelpers } from "graphile-worker";
 import { v4 } from "uuid";
-import log from "../utils/logUtils";
+import log from "../src/utils/log-utils";
 
 const correctEvent = {
   name: "test_event",
@@ -17,7 +17,7 @@ const incorrectEventTwo = {
   name: "test_event",
 };
 
-jest.mock("../utils/logUtils", () => {
+jest.mock("../src/utils/logUtils", () => {
   return {
     info: () => {},
     warn: () => {},
@@ -42,9 +42,7 @@ const mockHelpers = {
 } as JobHelpers;
 
 test("invalid event format dead letter queues and resolves", () => {
-  expect(
-    process_event(incorrectEventOne, mockHelpers)
-  ).resolves.toBeUndefined();
+  expect(processEvent(incorrectEventOne, mockHelpers)).resolves.toBeUndefined();
 
   expect(log.error).toHaveBeenCalledTimes(2);
 });
@@ -52,7 +50,7 @@ test("invalid event format dead letter queues and resolves", () => {
 describe("Logger", () => {
   test("logs an error on incorrect job", async () => {
     try {
-      await process_event(incorrectEventOne, mockHelpers);
+      await processEvent(incorrectEventOne, mockHelpers);
     } catch {
     } finally {
       expect(log.error).toHaveBeenCalled();
@@ -60,7 +58,7 @@ describe("Logger", () => {
   });
 
   test("logs on event complete", async () => {
-    await process_event(correctEvent, {
+    await processEvent(correctEvent, {
       addJob: () => {},
       query: () => {
         return { job: mockHelpers.job, rows: [{ name: "test_function" }] };
@@ -70,7 +68,7 @@ describe("Logger", () => {
   });
 
   test("logs a warning when event has no functions", async () => {
-    await process_event(correctEvent, {
+    await processEvent(correctEvent, {
       query: () => {
         return {
           job: mockHelpers.job,
@@ -83,7 +81,7 @@ describe("Logger", () => {
   });
 
   test("logs for each function invoked by event", async () => {
-    await process_event(correctEvent, {
+    await processEvent(correctEvent, {
       addJob: () => {},
       query: () => {
         return {

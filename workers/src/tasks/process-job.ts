@@ -3,17 +3,17 @@ dotenv.config();
 
 import { Task } from "graphile-worker";
 import { isValidFunctionPayload, isValidRpcResponse } from "../utils/utils";
-import { MAX_ATTEMPTS, handleRetries } from "../utils/deadLetterUtils";
+import { MAX_ATTEMPTS, handleRetries } from "../utils/dead-letter-utils";
 import { v4 } from "uuid";
 
-import log from "../utils/logUtils";
+import log from "../utils/log-utils";
 
 const functionServerUrl: string = process.env.FUNCTION_SERVER_URL ?? "";
 if (!functionServerUrl) {
   throw new Error("No function server URL found");
 }
 
-const process_job: Task = async function (job, helpers) {
+const processJob: Task = async function (job, helpers) {
   const { payload, attempts, max_attempts } = helpers.job;
 
   if (!isValidFunctionPayload(job)) {
@@ -134,7 +134,11 @@ const process_job: Task = async function (job, helpers) {
   const result = data.result;
   switch (result.type) {
     case "complete":
-      log.info("Function completed", { funcId: job.id, eventId: job.event.id });
+      log.info("Function completed", {
+        funcId: job.id,
+        eventId: job.event.id,
+        value: result.value,
+      });
       return;
     case "step":
       job.cache[result.stepId] = result.stepValue;
@@ -219,4 +223,4 @@ const process_job: Task = async function (job, helpers) {
   }
 };
 
-export default process_job;
+export default processJob;

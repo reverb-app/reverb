@@ -4,6 +4,6 @@ ENV NODE_ENV production
 WORKDIR /usr/workers
 COPY package.json .
 RUN npm install
-ADD dist .
+ADD dist/src .
 
 CMD ["node", "./index.js"]

@@ -1,9 +1,9 @@
 import { Secret } from "../types/types";
 import { makeWorkerUtils, parseCronItem, run } from "graphile-worker";
 import type { Runner, ParsedCronItem, CronItem } from "graphile-worker";
-import process_cron from "../tasks/process_cron";
-import update_cron from "../tasks/update_cron";
-import vacuum_db from "../tasks/vacuum_db";
+import processCron from "../tasks/process-cron";
+import updateCron from "../tasks/update-cron";
+import vacuumDb from "../tasks/vacuum-db";
 
 const secret = process.env.DB_SECRET;
 export let connectionString = process.env.GRAPHILE_CONNECTION_STRING;
@@ -19,7 +19,7 @@ export const waitForDB = async () => {
   const utils = await makeWorkerUtils({ connectionString });
 
   let hashExists;
-  await utils.withPgClient(async client => {
+  await utils.withPgClient(async (client) => {
     const result = await client.query("SELECT * FROM hash");
     if (result.rows.length > 0) hashExists = true;
   });
@@ -28,9 +28,9 @@ export const waitForDB = async () => {
   utils.logger.info(
     "Waiting for functions data to populate in the database..."
   );
-  return new Promise<void>(res => {
+  return new Promise<void>((res) => {
     const id = setInterval(() => {
-      utils.withPgClient(async client => {
+      utils.withPgClient(async (client) => {
         const result = await client.query("SELECT * FROM hash");
         if (result.rows.length > 0) {
           clearInterval(id);
@@ -50,7 +50,7 @@ export const startCronRunner = async () => {
   const parsedCrons: ParsedCronItem[] = [];
 
   const utils = await makeWorkerUtils({ connectionString });
-  utils.withPgClient(async client => {
+  utils.withPgClient(async (client) => {
     const hash = (await client.query("SELECT hash FROM hash")).rows[0].hash;
     const cronFuncs = (
       await client.query(
@@ -58,7 +58,7 @@ export const startCronRunner = async () => {
       )
     ).rows;
 
-    cronFuncs.forEach(cronFunc => {
+    cronFuncs.forEach((cronFunc) => {
       const cronItem: CronItem = {
         task: "process_cron",
         match: cronFunc.cron,
@@ -90,9 +90,9 @@ export const startCronRunner = async () => {
     concurrency: 2,
     noHandleSignals: false,
     taskList: {
-      process_cron,
-      update_cron,
-      vacuum_db,
+      process_cron: processCron,
+      update_cron: updateCron,
+      vacuum_db: vacuumDb,
     },
   });
 };

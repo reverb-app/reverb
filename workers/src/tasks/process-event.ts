@@ -1,11 +1,11 @@
 import { Task } from "graphile-worker";
 import { isValidEvent } from "../utils/utils";
-import { handleRetries } from "../utils/deadLetterUtils";
+import { handleRetries } from "../utils/dead-letter-utils";
 import { v4 } from "uuid";
-import { MAX_ATTEMPTS } from "../utils/deadLetterUtils";
-import log from "../utils/logUtils";
+import { MAX_ATTEMPTS } from "../utils/dead-letter-utils";
+import log from "../utils/log-utils";
 
-const process_event: Task = async function (event, helpers) {
+const processEvent: Task = async function (event, helpers) {
   if (!isValidEvent(event)) {
     log.error("Event format is not valid", { event });
 
@@ -22,7 +22,7 @@ const process_event: Task = async function (event, helpers) {
         `SELECT functions.name FROM functions JOIN events ON functions.event_id = events.id WHERE events.name = $1;`,
         [event.name]
       )
-    ).rows.map(obj => obj.name);
+    ).rows.map((obj) => obj.name);
     log.info("Event fired", { eventId: event.id, eventName: event.name });
 
     if (names.length === 0) {
@@ -32,7 +32,7 @@ const process_event: Task = async function (event, helpers) {
       });
     }
 
-    names.forEach(funcName => {
+    names.forEach((funcName) => {
       const funcId = v4();
       helpers.addJob(
         "process_job",
@@ -52,4 +52,4 @@ const process_event: Task = async function (event, helpers) {
   }
 };
 
-export default process_event;
+export default processEvent;

@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { ApiCommand } from "../../api-command.js";
 import { EventFiredLog } from "../../types/types.js";
-import { Flags } from "@oclif/core";
+import { Errors, Flags } from "@oclif/core";
 
 export default class Events extends ApiCommand<typeof Events> {
   static description = "Get events that have occured within a time period";
@@ -39,9 +39,15 @@ ${chalk.greenBright(
         "End Time for logs to get in a javascript parsable format(Defaults to now)",
       required: false,
     }),
+    name: Flags.string({
+      char: "n",
+      description: "Filter by event name",
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
+    const { flags } = await this.parse(Events);
     const url = this.getUrl();
     const key = this.getKey();
 
@@ -50,8 +56,10 @@ ${chalk.greenBright(
 
     let data: { logs: { event: EventFiredLog }[] };
     try {
+      const nameQuery = flags.name ? "&name=" + flags.name : "";
       const res = await fetch(
-        url + `/logs/events?limit=-1&startTime=${start}&endTime=${end}`,
+        url +
+          `/logs/events?limit=-1&startTime=${start}&endTime=${end}${nameQuery}`,
         {
           headers: { "x-api-key": key },
         }

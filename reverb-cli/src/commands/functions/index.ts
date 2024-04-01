@@ -41,9 +41,15 @@ export default class Functions extends ApiCommand<typeof Functions> {
         "End Time for logs to get in a javascript parsable format(Defaults to now)",
       required: false,
     }),
+    name: Flags.string({
+      char: "n",
+      description: "Filter by event name",
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
+    const { flags } = await this.parse(Functions);
     const url = this.getUrl();
     const key = this.getKey();
 
@@ -52,8 +58,10 @@ export default class Functions extends ApiCommand<typeof Functions> {
 
     let data: { logs: { function: FuncStatus }[] };
     try {
+      const nameQuery = flags.name ? "&name=" + flags.name : "";
       const res = await fetch(
-        url + `/logs/functions?limit=-1&startTime=${start}&endTime=${end}`,
+        url +
+          `/logs/functions?limit=-1&startTime=${start}&endTime=${end}${nameQuery}`,
         {
           headers: { "x-api-key": key },
         }

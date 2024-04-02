@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import { ApiCommand } from "../../api-command.js";
 import { EventFiredLog } from "../../types/types.js";
-import { Errors, Flags } from "@oclif/core";
+import { Flags } from "@oclif/core";
 
 export default class Events extends ApiCommand<typeof Events> {
   static description = "Get events that have occured within a time period";

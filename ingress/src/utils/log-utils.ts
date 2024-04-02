@@ -19,6 +19,7 @@ export async function getOffsetPaginatedLogs(
       search = await search.limit(limit + 1);
     }
     const logs = await search.toArray();
+
     return {
       logs: logs.map((log) => {
         if (log.meta?.error) {
@@ -87,7 +88,7 @@ export async function getFunctionsStatus(
     { $skip: offset },
   ];
 
-  if (limit) pipeline.push({ $limit: limit + 1 });
+  if (limit) pipeline.push({ $limit: limit });
 
   let logs = await logsCollection.aggregate(pipeline).toArray();
 

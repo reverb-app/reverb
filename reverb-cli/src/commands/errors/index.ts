@@ -26,18 +26,36 @@ ${chalk.greenBright(
       description: "API key that goes with the api url.",
       required: false,
     }),
+    start: Flags.string({
+      char: "s",
+      description:
+        "Start Time for logs to get in a javascript parsable format(Defaults to 7 day prior to end)",
+      required: false,
+    }),
+    end: Flags.string({
+      char: "e",
+      description:
+        "End Time for logs to get in a javascript parsable format(Defaults to now)",
+      required: false,
+    }),
   };
 
   async run(): Promise<void> {
     const url = this.getUrl();
     const key = this.getKey();
 
+    const end = this.getEndTime();
+    const start = this.getStartTime();
+
     let data: { logs: { error: any }[] };
 
     try {
-      const res = await fetch(url + `/logs/errors`, {
-        headers: { "x-api-key": key },
-      });
+      const res = await fetch(
+        url + `/logs/errors?limit=-1&startTime=${start}&endTime=${end}`,
+        {
+          headers: { "x-api-key": key },
+        }
+      );
 
       if (res.status === 500) {
         this.warn(

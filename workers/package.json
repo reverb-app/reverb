@@ -9,7 +9,12 @@
     "build": "rm -rf dist && tsc"
   },
   "keywords": [],
-  "author": "",
+  "contributors": [
+    "Christopher Perkins",
+    "Blake Fromkin",
+    "Morgan Davis",
+    "Vincent Sijssens"
+  ],
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.4.5",

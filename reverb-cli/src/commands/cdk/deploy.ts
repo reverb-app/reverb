@@ -1,18 +1,11 @@
-import { Command } from "@oclif/core";
-import { exec, spawn } from "child_process";
-import { promisify } from "util";
 import fs from "fs/promises";
-import decompress from "decompress";
 import ora from "ora";
 import path from "path";
 import chalk from "chalk";
+import { DIRECTORY_NAME, runCommand } from "../../utils/utils.js";
+import { CdkCommand } from "../../cdk-command.js";
 
-const GITHUB_ZIP =
-  "https://github.com/2401-Team-6/reverb-infrastructure/archive/refs/heads/master.zip";
-const DIRECTORY_NAME = "reverb-infrastructure-master";
-const runCommand = promisify(exec);
-
-export default class Deploy extends Command {
+export default class Deploy extends CdkCommand<typeof Deploy> {
   static description =
     "This will deploy the default Reverb infrastructure to AWS using the CDK.\n Before running this command, please link your AWS account to the AWS CLI and bootstrap your CDK.";
 
@@ -43,69 +36,11 @@ export default class Deploy extends Command {
     );
   }
 
-  private async download() {
-    const downloadSpinner = ora({
-      color: "yellow",
-      text: "Downloading CDK Template",
-    }).start();
-
-    let buffer: Buffer | null = null;
-
-    if (!(await this.cdkExists())) {
-      const res = await fetch(GITHUB_ZIP);
-      buffer = Buffer.from(await res.arrayBuffer());
-    }
-    downloadSpinner.stopAndPersist({
-      symbol: "✅",
-      text: "Downloaded CDK Template",
-    });
-
-    return buffer;
-  }
-
-  private async unzip(buffer: Buffer | null) {
-    const unzipSpinner = ora({
-      color: "yellow",
-      text: "Unzipping Template",
-    }).start();
-
-    if (buffer) {
-      const files = await decompress(buffer, this.config.configDir);
-    }
-
-    unzipSpinner.stopAndPersist({
-      symbol: "✅",
-      text: "CDK Template Unzipped",
-    });
-  }
-
-  private async dependencies() {
-    const dependenciesSpinner = ora({
-      color: "yellow",
-      text: "Installing Dependencies",
-    }).start();
-
-    if (!(await this.modulesExists())) {
-      await runCommand(
-        `cd ${path.join(this.config.configDir, DIRECTORY_NAME)} && npm install`
-      );
-    }
-
-    dependenciesSpinner.stopAndPersist({
-      symbol: "✅",
-      text: "Dependencies Installed",
-    });
-  }
-
   private async deploy() {
     const deploySpinner = ora({
       color: "yellow",
       text: "Deploying infrastructure to AWS [This may take tens of minutes]",
     }).start();
-
-    await fs.mkdir(this.config.configDir, {
-      recursive: true,
-    }); // just in case it does not exist
 
     await runCommand(
       `cd ${path.join(
@@ -172,25 +107,5 @@ export default class Deploy extends Command {
     }
 
     return settings;
-  }
-
-  private async cdkExists() {
-    try {
-      await fs.access(path.join(this.config.configDir, DIRECTORY_NAME));
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  private async modulesExists() {
-    try {
-      await fs.access(
-        path.join(this.config.configDir, DIRECTORY_NAME, "node_modules")
-      );
-      return true;
-    } catch {
-      return false;
-    }
   }
 }

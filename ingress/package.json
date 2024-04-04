@@ -8,7 +8,12 @@
     "dev": "nodemon src/index.ts",
     "build": "tsc"
   },
-  "author": "",
+  "contributors": [
+    "Christopher Perkins",
+    "Blake Fromkin",
+    "Morgan Davis",
+    "Vincent Sijssens"
+  ],
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^4.17.21",

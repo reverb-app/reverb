@@ -38,17 +38,19 @@ export default class Logs extends ApiCommand<typeof Logs> {
       });
 
       if (res.status === 404) {
-        this.error(
+        this.warn(
           `${chalk.red("[FAIL]")} Function with id ${
             args.funcId
           } does not exist`
         );
+        throw "error";
       }
 
       if (res.status === 500) {
-        this.error(
+        this.warn(
           `${chalk.red("[FAIL]")} Internal Server Error, try again later`
         );
+        throw "error";
       }
 
       data = await res.json();

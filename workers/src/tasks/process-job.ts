@@ -47,6 +47,7 @@ const processJob: Task = async function (job, helpers) {
   } catch (e) {
     log.error("Error communicating with function server", {
       funcId: job.id,
+      funcName: job.name,
       eventId: job.event.id,
       error: e,
       payload,
@@ -67,6 +68,7 @@ const processJob: Task = async function (job, helpers) {
 
     log.error("Did not receive a valid RPC response from function server", {
       funcId: job.id,
+      funcName: job.name,
       eventId: job.event.id,
       response: data,
       error: e,
@@ -98,6 +100,7 @@ const processJob: Task = async function (job, helpers) {
 
       log.error(logMessage, {
         funcId: job.id,
+        funcName: job.name,
         eventId: job.event.id,
         error: e,
         payload,
@@ -109,6 +112,7 @@ const processJob: Task = async function (job, helpers) {
     } else {
       log.error("RPC Response contains an error.", {
         funcId: job.id,
+        funcName: job.name,
         eventId: job.event.id,
         error: data.error,
         payload,
@@ -126,6 +130,7 @@ const processJob: Task = async function (job, helpers) {
   if (!data.result) {
     log.warn("No result data in RPC response", {
       funcId: job.id,
+      funcName: job.name,
       eventId: job.event.id,
     });
     return;
@@ -136,6 +141,7 @@ const processJob: Task = async function (job, helpers) {
     case "complete":
       log.info("Function completed", {
         funcId: job.id,
+        funcName: job.name,
         eventId: job.event.id,
         value: result.value,
       });
@@ -146,6 +152,7 @@ const processJob: Task = async function (job, helpers) {
 
       log.info("Step complete", {
         funcId: job.id,
+        funcName: job.name,
         eventId: job.event.id,
         stepId: result.stepId,
         stepValue: result.stepValue,
@@ -161,6 +168,7 @@ const processJob: Task = async function (job, helpers) {
 
       log.info("Delay initiated", {
         funcId: job.id,
+        funcName: job.name,
         eventId: job.event.id,
         stepId: result.stepId,
         delay: result.delayInMs,
@@ -193,6 +201,7 @@ const processJob: Task = async function (job, helpers) {
       helpers.addJob("process_job", job, { maxAttempts: MAX_ATTEMPTS });
       log.info("Invoked step complete", {
         funcId: job.id,
+        funcName: job.name,
         eventId: job.event.id,
         stepId: result.stepId,
         invokedFnId: funcId,
@@ -211,6 +220,7 @@ const processJob: Task = async function (job, helpers) {
 
       log.info("Event emitted", {
         funcId: job.id,
+        funcName: job.name,
         eventId: job.event.id,
         stepId: result.stepId,
         emittedEventId: eventId,

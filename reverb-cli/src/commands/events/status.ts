@@ -41,17 +41,19 @@ export default class Status extends ApiCommand<typeof Status> {
       });
 
       if (res.status === 500) {
-        this.error(
+        this.warn(
           `${chalk.red("[FAIL]")} Internal Server Error, try again later`
         );
+        throw "error";
       }
 
       if (res.status === 403) {
-        this.error(
+        this.warn(
           `${chalk.red(
             "[FAIL]"
           )} API Key invalid, please provide correct API Key`
         );
+        throw "error";
       }
 
       data = await res.json();

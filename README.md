@@ -64,7 +64,7 @@ You just need to follow these steps:
 2. Set up some secrets in the GitHub repository:
 - **DOCKER_USER** is your Docker Hub username.
 - **DOCKER_PASS** is your Docker Hub access key.
-- **DOCKER_TAG** is the tagname you wish to give your function servers image (**<USER>/<APP>** is the usual format).
+- **DOCKER_TAG** is the tagname you wish to give your function servers image (**\<USER\>\/\<APP\>** is the usual format).
 - **AWS_ACCESS_KEY_ID** is the access key for an AWS IAM account with *lambda:InvokeFunction allowed*. Preferably, that being its only permission.
 - **AWS_SECRET_ACCESS_KEY** is the secret key tied to the above access key.
 - **UPDATE_LAMBDA_NAME** is the Lambda name output by the reverb-cli tool when it deploys. You can use the command `reverb-cli api:show` to retrieve this information at a later time.

@@ -42,4 +42,22 @@ $ reverb-cli cdk:deploy
 
 By following the above steps, the reverb-cli will download the Reverb’s CDK project and deploy it to your aws account. This will deploy an empty function server as well, which you will need to replace.
 
+### Script Functions
+
+To download the template project, run the command:
+
+```sh
+$ npm create reverb <app-name>
+```
+`<app-name>` is whatever directory name you want it to be stored in. This command will download the template project for you. 
+
+Change directories to `<app-name>` and then run:
+
+```sh
+npm install
+```
+
+This will install the dependencies of the application.
+
+Inside the template, there is a sample of how to make functions along with a README that describes how to do so. There is a `docker compose` available  to test your function server locally.  Functionality is all up to the individual developer. Once you are done we can move on to the next step.
 

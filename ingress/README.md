@@ -1,12 +1,8 @@
 # Reverb - Ingress Server
 
-**Unlike the [Reverb CDK for AWS](), This directory is configured for local development, and thus does not provide any authentication requirements to access its API endpoints. If installing on production servers, make sure to implement any security features your application needs.**
+**Unlike the [Reverb CDK for AWS](https://github.com/reverb-app/reverb-infrastructure), This directory is configured for local development, and thus does not provide any authentication requirements to access its API endpoints. If installing on production servers, make sure to implement any security features your application needs.**
 
-^^**_LINK TO CDK ON GH_**
-
-This server provides API endpoints for enqueueing your application's **Reverb jobs**, including events and webhooks. It also provides an endpoint for retrieving logs related to said jobs. Note that if you are using the [Reverb CDK for AWS](), any changes made to the ingress server must instead be made to the ingress Lambda initialized by that tool, as it is independent from the code in this directory.
-
-^^**_LINK TO CDK ON GH_**
+This server provides API endpoints for enqueueing your application's **Reverb jobs**, including events and webhooks. It also provides an endpoint for retrieving logs related to said jobs. Note that if you are using the [Reverb CDK for AWS](https://github.com/reverb-app/reverb-infrastructure), any changes made to the ingress server must instead be made to the ingress Lambda initialized by that tool, as it is independent from the code in this directory.
 
 ## Install
 
@@ -23,19 +19,14 @@ $ npm install
 To run your ingress server locally, you will first need to configure several environment variables in a `.env` file.
 
 - `GRAPHILE_CONNECTION_STRING` is for connecting with the PostgreSQL database that will host your job queue. This should be the same database to which your functions server and workers server is connected.
-  - 👉 [Learn more about configuring your **Reverb functions server**]()
-  - 👉 [Learn more about configuring your **Reverb workers server**]()
-  - ^^**_LINK TO FUNCTIONS AND WORKERS SERVERS ON GH_**
+  - 👉 [Learn more about configuring your **Reverb functions server**](https://github.com/reverb-app/reverb/blob/main/functions/README.md)
+  - 👉 [Learn more about configuring your **Reverb workers server**](https://github.com/reverb-app/reverb/blob/main/workers/README.md)
 - `MONGO_CONNECTION_STRING` is for connecting with the MongoDB database that hosts your logs, as the ingress server provides an API endpoint for accessing them. Therefore, this should be the same database that your workers server is connected to. Logging is configured with [winston](https://www.npmjs.com/package/winston).
-  - 👉 [Learn more about configuring your **Reverb workers server**]()
-  - ^^**_LINK TO WORKERS SERVER ON GH_**
 - Optionally, `PORT` can be set to specify which port the ingress server should run on. It defaults to `3000`.
 
 ### Running Your Ingress Server
 
-Before booting your ingress server, verify that your PostgreSQL and MongoDB instances are running. If they are not, the ingress server will crash. For more information on starting these database instances, see the [install instructions for your Reverb workers server]().
-
-^^**_LINK TO WORKERS SERVER ON GH_**
+Before booting your ingress server, verify that your PostgreSQL and MongoDB instances are running. If they are not, the ingress server will crash. For more information on starting these database instances, see the [install instructions for your Reverb workers server](https://github.com/reverb-app/reverb/blob/main/workers/README.md).
 
 To initialize the ingress server in a development environment, run:
 
@@ -48,11 +39,9 @@ $ npm run dev
 Once running, the ingress server provides the following API endpoints for managing your **Reverb jobs**:
 
 - `/events` is where your **Reverb events** should be sent to to trigger your **Reverb jobs**. This endpoint only accepts `POST` requests, and at minimum it must contain a JSON body with a `name` attribute. If any of your **Reverb functions** associated with that event name require additional parameters, the JSON body must contain a `payload` attribute, which should be an object. This will be accessible as a property on the event object provided as the first argument passed to the callback in your `createFunction` call.
-  - 👉 [See our example **Reverb functions**]()
-  - ^^**_LINK TO TEMPLATE SERVER ON GH_**
+  - 👉 [See our example **Reverb functions**](https://github.com/reverb-app/reverb/blob/main/sample/src/index.ts)
 - `/webhooks` is an endpoint you can provide to webhook providers to produce **Reverb jobs** on webhook reception. It will fire a hard-coded **Reverb event** named `reverb_received_webhook`, which can be used as the `event` attribute when creating your functions to fire when a webhook is received. The webhook's data is provided as a `webhook` attribute on the event's `payload`, split into `headers` and `body`. In short, if the event passed to your `createFunction` call is named `event`, the body of a webhook can be accessed via `event.payload.webhook.body` within the `createFunction` callback.
-  - 👉 [See our example **Reverb functions**]()
-  - ^^**_LINK TO TEMPLATE SERVER ON GH_**
+  - 👉 [See our example **Reverb functions**](https://github.com/reverb-app/reverb/blob/main/sample/src/index.ts)
 
 ### Logging API Endpoints
 

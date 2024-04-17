@@ -17,8 +17,7 @@ $ npm install
 To run your Graphile workers locally, you will first need to configure several environment variables in a `.env` file.
 
 - `GRAPHILE_CONNECTION_STRING` is for connecting with the PostgreSQL database that will host your job queue. This should be the same database to which your functions server is connected.
-  - 👉 [Learn more about configuring your **Reverb functions server**]()
-  - ^^**_LINK TO FUNCTIONS SERVER ON GH_**
+  - 👉 [Learn more about configuring your **Reverb functions server**](https://github.com/reverb-app/reverb/blob/main/functions/README.md)
 - `FUNCTION_SERVER_URL` configures the HTTP endpoint where the workers should send [JSON-RPC](https://www.jsonrpc.org/specification) requests to invoke your functions. This will most likely be `http://localhost:3002/calls`
 - `MONGO_CONNECTION_STRING` is for logging event, function, job, and error data to a MongoDB database. Logging is configured with [winston](https://www.npmjs.com/package/winston).
 

@@ -61,3 +61,21 @@ This will install the dependencies of the application.
 
 Inside the template, there is a sample of how to make functions along with a README that describes how to do so. There is a `docker compose` available  to test your function server locally.  Functionality is all up to the individual developer. Once you are done we can move on to the next step.
 
+### Deploy Function Server
+
+You just need to follow these steps:
+
+1. Create a GitHub repository for your function server
+   
+2. Set up some secrets in the GitHub repository:
+- **DOCKER_USER** is your Docker Hub username.
+- **DOCKER_PASS** is your Docker Hub access key.
+- **DOCKER_TAG** is the tagname you wish to give your function servers image (**<USER>/<APP>** is the usual format).
+- **AWS_ACCESS_KEY_ID** is the access key for an AWS IAM account with *lambda:InvokeFunction allowed*. Preferably, that being its only permission.
+- **AWS_SECRET_ACCESS_KEY** is the secret key tied to the above access key.
+- **UPDATE_LAMBDA_NAME** is the Lambda name output by the reverb-cli tool when it deploys. You can use the command `reverb-cli api:show` to retrieve this information at a later time.
+- **ENVIRONMENT** being a JSON formatted array of environmental variable objects. If you have no needed environmental variables, please set this to `[]`.
+
+3. Push your function server code to the main branch of the github repository.
+
+By pushing to a GitHub repository with the above secrets in place, the GitHub action should fire and automate the deployment of your function server. You may also run the action manually. Each updated version of the server just needs to be pushed to main for it to redeploy.

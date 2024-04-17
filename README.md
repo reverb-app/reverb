@@ -10,12 +10,6 @@ There are three steps to fully deploying Reverb.
 2. Script functions
 3. Deploy function server
 
-This project uses [node](http://nodejs.org/) and [npm](https://www.npmjs.com/). For local development, simply run:
-
-```sh
-$ npm install
-```
-
 ### Deploying Base Infrastructure
 
 This project uses [node](http://nodejs.org/) and [npm](https://www.npmjs.com/).

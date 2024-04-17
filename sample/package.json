@@ -16,7 +16,7 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "@reverb-app/functions": "^0.0.5",
+    "@reverb-app/functions": "^1.0.0",
     "dotenv": "^16.4.5"
   },
   "devDependencies": {

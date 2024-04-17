@@ -1,6 +1,6 @@
 {
   "name": "@reverb-app/cli",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Log explorer for Reverb",
   "keywords": [
     "oclif"
@@ -21,7 +21,8 @@
   "files": [
     "/bin",
     "/dist",
-    "/oclif.manifest.json"
+    "/oclif.manifest.json",
+    "README.md"
   ],
   "scripts": {
     "build": "shx rm -rf dist && tsc -b",

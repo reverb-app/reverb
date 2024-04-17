@@ -1,6 +1,6 @@
 {
   "name": "create-reverb",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Used to download a template function server project for a Reverb deployment",
   "main": "dist/index.js",
   "bin": "dist/bin.js",
@@ -21,7 +21,9 @@
     "typescript": "^5.4.3"
   },
   "files": [
-    "dist/index.js"
+    "dist/index.js",
+    "dist/bin.js",
+    "README.md"
   ],
   "contributors": [
     "Christopher Perkins",

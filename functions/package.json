@@ -1,6 +1,6 @@
 {
   "name": "@reverb-app/functions",
-  "version": "0.0.6",
+  "version": "1.0.0",
   "description": "",
   "types": "./lib/cjs/types/index.d.ts",
   "main": "./lib/cjs/index.js",
@@ -31,7 +31,8 @@
     "pg-format": "^1.0.4"
   },
   "files": [
-    "lib/**/*"
+    "lib/**/*",
+    "README.md"
   ],
   "exports": {
     ".": {

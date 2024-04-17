@@ -5,16 +5,6 @@ import { Flags } from "@oclif/core";
 export default class Errors extends ApiCommand<typeof Errors> {
   static description = "Get events that have occured within a time period";
 
-  static examples = [
-    `$ <%= config.bin %> events -u https://example.com
-${chalk.greenBright(
-  "event1"
-)} | 28268a12-9668-4b92-ad77-9bfd8801222a | ${chalk.yellow(
-      "Sun, 24 Mar 2024 00:14:41 GMT"
-    )}
-`,
-  ];
-
   static flags = {
     apiUrl: Flags.string({
       char: "u",

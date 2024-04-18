@@ -7,11 +7,11 @@ import(
     : "@reverb-app/functions"
 ).then(
   (
-    server: typeof functionsExportType | { default: typeof functionsExportType }
+    reverb: typeof functionsExportType | { default: typeof functionsExportType }
   ) => {
-    server = "default" in server ? server.default : server;
+    reverb = "default" in reverb ? reverb.default : reverb;
 
-    const func1 = server.createFunction({
+    const func1 = reverb.createFunction({
       id: "first-function",
       event: "event1",
       fn: async () => {
@@ -19,7 +19,7 @@ import(
       },
     });
 
-    const func2 = server.createFunction({
+    const func2 = reverb.createFunction({
       id: "second-function",
       event: "event1",
       fn: async () => {
@@ -27,7 +27,7 @@ import(
       },
     });
 
-    const func3 = server.createFunction({
+    const func3 = reverb.createFunction({
       id: "third-function",
       event: "event2",
       fn: async (event) => {
@@ -41,7 +41,7 @@ import(
       },
     });
 
-    const func4 = server.createFunction({
+    const func4 = reverb.createFunction({
       id: "step-function",
       event: "event3",
       fn: async (event, step) => {
@@ -51,37 +51,37 @@ import(
       },
     });
 
-    const func5 = server.createFunction({
+    const func5 = reverb.createFunction({
       id: "function-calls-function",
       event: "event4",
       fn: async (event, step) => {
         await step.invoke("call 3rd function", "third-function", {
-          url: "https://enaeajsfdm4b.x.pipedream.net/",
+          url: "https://example.com/",
         });
       },
     });
 
-    const func6 = server.createFunction({
+    const func6 = reverb.createFunction({
       id: "emit-event-function",
       event: "event5",
       fn: async (event, step) => {
         await step.emitEvent("emit-event2", "event2", {
-          url: "https://enaeajsfdm4b.x.pipedream.net/",
+          url: "https://example.com/",
         });
       },
     });
 
-    const func7 = server.createFunction({
+    const func7 = reverb.createFunction({
       id: "cron-function",
       cron: "*/4 * * * *",
       fn: async (event, step) => {
         await step.invoke("call 3rd function", "third-function", {
-          url: "https://enaeajsfdm4b.x.pipedream.net/",
+          url: "https://example.com/",
         });
       },
     });
 
-    const func8 = server.createFunction({
+    const func8 = reverb.createFunction({
       id: "error-function",
       event: "error",
       fn: async () => {
@@ -89,7 +89,7 @@ import(
       },
     });
 
-    const func9 = server.createFunction({
+    const func9 = reverb.createFunction({
       id: "webhook-test",
       event: "reverb-received-webhook",
       fn: async (event) => {
@@ -97,6 +97,6 @@ import(
       },
     });
 
-    server.serve();
+    reverb.serve();
   }
 );

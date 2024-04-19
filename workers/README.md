@@ -1,6 +1,6 @@
 # Reverb - Graphile Workers Server
 
-This server hosts [Graphile Worker](https://worker.graphile.org/) runners that are responsible for managing your Postgres job queue and processing your application's **Reverb jobs**. These include jobs triggered by events, cron, or steps within the **Reverb step functions** you've defined in your codebase.
+This server hosts [Graphile Worker](https://worker.graphile.org/) runners that are responsible for managing your Postgres job queue and processing your application's **Reverb workflows**. These include workflows triggered by events, cron, or steps within the **Reverb step functions** you've defined in your codebase.
 
 ## Install
 

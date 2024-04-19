@@ -76,15 +76,15 @@ Inside the template, there is a sample demonstrating how to define functions alo
 
 By pushing to a GitHub repository with the above secrets in place, the GitHub Action should fire and automate the deployment of your functions server. You may also run the Action manually. Each updated version of the server just needs to be pushed to main for it to automatically redeploy.
 
-## Reverb's Three Node Pattern
+## Reverb's Three Nodes
 
 Reverb’s functionality is organized in a three-node pattern. The three nodes are the [**Ingress Server**](https://github.com/reverb-app/reverb/blob/main/ingress/README.md), the [**Graphile Workers Server**](https://github.com/reverb-app/reverb/blob/main/workers/README.md) and the [**Functions Server**](https://github.com/reverb-app/reverb/blob/main/functions/README.md).
 
 ### Ingress Server
 
-**Unlike the [Reverb CDK for AWS](https://github.com/reverb-app/reverb-infrastructure), this directory is configured for local development, and thus does not provide any authentication requirements to access its API endpoints. If installing on production servers, make sure to implement any security features your application needs.**
+_Unlike the [Reverb CDK for AWS](https://github.com/reverb-app/reverb-infrastructure), this directory is configured for local development, and thus does not provide any authentication requirements to access its API endpoints. If installing on production servers, make sure to implement any security features your application needs._
 
-This server provides API endpoints for enqueueing your application's **Reverb triggers**, including events and webhooks. It also provides an endpoint for retrieving logs related to said jobs. Note that if you are using the [Reverb CDK for AWS](https://github.com/reverb-app/reverb-infrastructure), any changes made to the ingress server must instead be made to the ingress Lambda initialized by that tool, as it is independent from the code in this directory.
+This server provides API endpoints for enqueueing your application's **Reverb triggers**, including events and webhooks. It also provides an endpoint for retrieving logs related to your events and workflows. Note that if you are using the [Reverb CDK for AWS](https://github.com/reverb-app/reverb-infrastructure), any changes made to the ingress server must instead be made to the ingress Lambda initialized by that tool, as it is independent from the code in this directory.
 
 - 👉 [Learn more about configuring your **Reverb Ingress Server**](https://github.com/reverb-app/reverb/blob/main/ingress/README.md).
 

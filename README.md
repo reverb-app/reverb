@@ -80,7 +80,7 @@ By pushing to a GitHub repository with the above secrets in place, the GitHub ac
 
 ## Reverb's Three Node Pattern
 
-Reverb’s functionality is organized in a three-node pattern. The three nodes are the [**Ingress Server**](https://github.com/reverb-app/reverb/tree/main-readme/ingress), the [**Graphile Workers Server**](https://github.com/reverb-app/reverb/tree/main-readme/workers) and the [**Functions Server**](https://github.com/reverb-app/reverb/tree/main-readme/functions).
+Reverb’s functionality is organized in a three-node pattern. The three nodes are the [**Ingress Server**](https://github.com/reverb-app/reverb/blob/main/ingress/README.md), the [**Graphile Workers Server**](https://github.com/reverb-app/reverb/blob/main/workers/README.md) and the [**Functions Server**](https://github.com/reverb-app/reverb/blob/main/functions/README.md).
 
 ### Ingress Server
 
@@ -88,7 +88,7 @@ Reverb’s functionality is organized in a three-node pattern. The three nodes a
 
 This server provides API endpoints for enqueueing your application's **Reverb jobs**, including events and webhooks. It also provides an endpoint for retrieving logs related to said jobs. Note that if you are using the [Reverb CDK for AWS](https://github.com/reverb-app/reverb-infrastructure), any changes made to the ingress server must instead be made to the ingress Lambda initialized by that tool, as it is independent from the code in this directory.
 
-- 👉 [Learn more about configuring your **Reverb Ingress Server**](https://github.com/reverb-app/reverb/blob/main-readme/ingress/README.md).
+- 👉 [Learn more about configuring your **Reverb Ingress Server**](https://github.com/reverb-app/reverb/blob/main/ingress/README.md).
 
 ### Graphile Workers Server
 

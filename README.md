@@ -36,7 +36,7 @@ $ npm install -g @reverb-app/cli
 $ reverb-cli cdk:deploy
 ```
 
-By following the above steps, the reverb-cli will download the Reverb’s CDK project and deploy it to your AWS account. This will deploy an empty functions server as well, which you will need to replace by following the steps below.
+By following the above steps, the reverb-cli will download the Reverb CDK project and deploy the engine infrastructure to your AWS account. This will deploy an empty functions server as well, which you will need to replace by following the steps below.
 
 ### Script Functions
 
